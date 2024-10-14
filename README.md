@@ -32,7 +32,7 @@ The following dependencies have been included for the backend part of the Cinema
 ### Prerequisites
 
 Ensure you have the following installed on your system:
-- **Java 17** (for the Spring Boot backend)
+- **Java 23** (for the Spring Boot backend)
 - **Node.js** and **npm** or **yarn** (for the React frontend)
 - **PostgreSQL** (for the database)
 
