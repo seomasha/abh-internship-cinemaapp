@@ -2,6 +2,7 @@ import React from "react";
 
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
+import { RxHamburgerMenu } from "react-icons/rx";
 import colors from "../utils/colors";
 
 const MyNavbar = () => {
@@ -25,11 +26,15 @@ const MyNavbar = () => {
         </div>
       </Navbar.Brand>
 
-      <Navbar.Collapse className="justify-content-end">
+      <Navbar.Toggle aria-controls="responsive-navbar-nav" className="text-light">
+        <RxHamburgerMenu />
+      </Navbar.Toggle>
+
+      <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
         <Nav>
-          <Nav.Link className="text-light">Currently showing</Nav.Link>
-          <Nav.Link className="text-light">Upcoming movies</Nav.Link>
-          <Nav.Link className="text-light">Venues</Nav.Link>
+          <Nav.Link className="text-light mx-4">Currently showing</Nav.Link>
+          <Nav.Link className="text-light mx-4">Upcoming movies</Nav.Link>
+          <Nav.Link className="text-light mx-4">Venues</Nav.Link>
         </Nav>
       </Navbar.Collapse>
 
