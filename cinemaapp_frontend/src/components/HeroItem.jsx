@@ -6,31 +6,22 @@ import colors from "../utils/colors";
 const HeroItem = ({ imageUrl, title, description, genre }) => {
   return (
     <div
+      className="hero-item"
       style={{
         backgroundImage: `url(${imageUrl})`,
-        minHeight: "810px",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        display: "flex",
-        alignItems: "flex-end",
-        padding: "8rem",
       }}
     >
-      <div
-        style={{
-          color: "white",
-          borderRadius: "10px",
-          width: "fit-content",
-        }}
-        className="p-3"
-      >
-        <div className="mb-3">
-          <HeroMovieCategory genre={genre} />
+      <div className="p-3 hero-item-content">
+        <div className="mb-3 d-flex flex-wrap">
+          {genre.map((genreItem, index) => (
+            <HeroMovieCategory key={index} genre={genreItem} />
+          ))}
         </div>
-        <h1 className="font-weight-bold" style={{ fontSize: "48px" }}>
-          {title}
-        </h1>
-        <p className="w-75">{description}</p>
+
+        <h1 className="bold-title hero-title">{title}</h1>
+        <p className="w-75" style={{ fontFamily: "Urbanist Bold" }}>
+          {description}
+        </p>
         <Button
           variant=""
           style={{ backgroundColor: colors.primary_red, color: "white" }}

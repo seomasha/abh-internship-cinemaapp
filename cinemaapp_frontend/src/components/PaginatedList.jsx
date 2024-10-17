@@ -1,49 +1,40 @@
 import React, { useState } from "react";
 import colors from "../utils/colors";
 import Card from "./Card";
-import { Pagination } from "react-bootstrap"; // Import Bootstrap Pagination
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaChevronLeft,
-  FaChevronRight,
-} from "react-icons/fa"; // Import arrow icons
+import { Pagination } from "react-bootstrap";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import SmallButton from "./SmallButton";
+import { duration } from "@mui/material";
 
-const PaginatedList = () => {
+const PaginatedList = ({ title }) => {
   const cardsData = [
-    { id: 1, title: "Movie 1" },
-    { id: 2, title: "Movie 2" },
-    { id: 3, title: "Movie 3" },
-    { id: 4, title: "Movie 4" },
-    { id: 5, title: "Movie 5" },
-    { id: 6, title: "Movie 6" },
-    { id: 7, title: "Movie 7" },
-    { id: 8, title: "Movie 8" },
-    { id: 9, title: "Movie 9" },
-    { id: 10, title: "Movie 10" },
-    // Add more cards as needed
+    { id: 1, title: "Movie 1", duration: "100", genre: "Adventure" },
+    { id: 2, title: "Movie 2", duration: "101", genre: "Comedy" },
+    { id: 3, title: "Movie 3", duration: "102", genre: "SF" },
+    { id: 4, title: "Movie 4", duration: "103", genre: "Adventure" },
+    { id: 5, title: "Movie 5", duration: "104", genre: "Comedy" },
+    { id: 6, title: "Movie 6", duration: "105", genre: "SF" },
+    { id: 7, title: "Movie 7", duration: "106", genre: "Comedy" },
+    { id: 8, title: "Movie 8", duration: "107", genre: "Adventure" },
+    { id: 9, title: "Movie 9", duration: "108", genre: "SF" },
+    { id: 10, title: "Movie 10", duration: "109", genre: "Adventure" },
   ];
 
-  const itemsPerPage = 4; // Number of cards per page
+  const itemsPerPage = 4;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Calculate the index of the first and last card for the current page
   const indexOfLastCard = currentPage * itemsPerPage;
   const indexOfFirstCard = indexOfLastCard - itemsPerPage;
   const currentCards = cardsData.slice(indexOfFirstCard, indexOfLastCard);
 
-  // Total number of pages
   const totalPages = Math.ceil(cardsData.length / itemsPerPage);
 
-  // Function to handle next page
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
 
-  // Function to handle previous page
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -51,21 +42,22 @@ const PaginatedList = () => {
   };
 
   return (
-    <div style={{ padding: "4rem 8rem" }}>
+    <div style={{ padding: "3rem 8rem" }}>
       <div className="d-flex justify-content-between align-items-center">
-        <h3 className="mb-4">Currently Showing</h3>
+        <h3 className="mb-4" style={{ fontFamily: "Urbanist Bold" }}>
+          {title}
+        </h3>
         <h6 style={{ color: colors.primary_red }} className="fw-bold">
           See all
         </h6>
       </div>
 
-      <div className="d-flex justify-content-center gap-5">
+      <div className="d-flex justify-content-start gap-5">
         {currentCards.map((card) => (
-          <Card key={card.id} title={card.title} />
+          <Card key={card.id} title={card.title} duration={card.duration} genre={card.genre}/>
         ))}
       </div>
 
-      {/* Pagination Controls */}
       <div className="d-flex justify-content-end align-items-center mt-4 pl-4">
         <div className="text-center mb-3 my-auto mx-4">
           <h6>

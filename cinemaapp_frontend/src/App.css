@@ -2,3 +2,47 @@
     font-family: "Urbanist";
     src: url('./assets/fonts/Urbanist-Regular.ttf') format('truetype');
 }
+
+@font-face {
+    font-family: "Urbanist Bold";
+    src: url('./assets/fonts/Urbanist-Bold.ttf') format('truetype');
+}
+
+.bold-title {
+    font-family: "Urbanist Bold";
+}
+
+.hero-title {
+    font-size: 48px;
+}
+
+.card {
+    width: 280px;
+    min-height: 350px;
+    background: url('https://images6.alphacoders.com/130/1307795.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.footer {
+    background: linear-gradient(to right, #1A1A1A, #B22222);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero-item {
+    min-height: 810px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 8rem;
+}
+
+.hero-item-content {
+    color: white;
+    border-radius: 10px;
+    width: fit-content;
+}
