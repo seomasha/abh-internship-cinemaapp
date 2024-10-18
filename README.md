@@ -14,6 +14,7 @@ The following dependencies have been installed for the frontend part of the Cine
 - **Formik:** A library for building forms in React, making form handling and validation easier.
 - **Yup:** A JavaScript schema builder for value parsing and validation.
 - **React Router:** A library for routing in React applications, allowing navigation between different components and views.
+- **React icons:**: A library containing various types of icons.
 
 ## Backend Dependencies Used
 
