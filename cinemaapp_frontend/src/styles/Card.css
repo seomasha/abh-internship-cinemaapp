@@ -1,0 +1,7 @@
+.card {
+  width: 280px;
+  min-height: 350px;
+  background: url("https://images6.alphacoders.com/130/1307795.jpg");
+  background-size: cover;
+  background-position: center;
+}

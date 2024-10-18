@@ -3,13 +3,7 @@ import colors from "../utils/colors";
 
 const HeroMovieCategory = ({ genre }) => {
   return (
-    <h6
-      className="bg-light text-dark p-2 rounded me-2 d-inline-block"
-      style={{
-        backgroundColor: colors.gray,
-        color: colors.text_dark,
-      }}
-    >
+    <h6 className="bg-light text-dark p-2 rounded me-2 d-inline-block">
       {genre}
     </h6>
   );

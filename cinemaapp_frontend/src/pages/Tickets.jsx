@@ -9,7 +9,7 @@ const Tickets = () => {
       <MyNavbar />
 
       <div className="d-flex flex-column justify-content-center align-items-center">
-        <h2 style={{ fontFamily: "Urbanist Bold" }} className="p-5">
+        <h2 className="p-5 fw-bold">
           Pricing
         </h2>
 

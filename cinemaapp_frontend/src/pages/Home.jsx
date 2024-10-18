@@ -12,9 +12,9 @@ const Home = () => {
       <MyNavbar />
       <Hero />
       <VenuesCarousel />
-      <PaginatedList title="Currently Showing"/>
-      <PaginatedList title="Upcoming Movies"/>
-      <PaginatedList title="Venues"/>
+      <PaginatedList title="Currently Showing" />
+      <PaginatedList title="Upcoming Movies" />
+      <PaginatedList title="Venues" />
       <Footer />
     </div>
   );

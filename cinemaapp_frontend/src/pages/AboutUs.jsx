@@ -3,7 +3,7 @@ import React from "react";
 import MyNavbar from "../components/MyNavbar";
 import Footer from "../components/Footer";
 
-import backgroundImage from "../assets/images/cinema-background.jpg";
+import "../styles/AboutUs.css";
 
 const AboutUs = () => {
   return (
@@ -14,7 +14,7 @@ const AboutUs = () => {
         className="d-flex justify-content-between align-items-center"
         style={{ padding: "150px 150px 2rem 150px" }}
       >
-        <h2 style={{ fontFamily: "Urbanist Bold" }}>
+        <h2 className="fw-bold">
           About Our Dream. <br />
           Our History.
           <br />
@@ -22,10 +22,8 @@ const AboutUs = () => {
         </h2>
 
         <div className="w-75">
-          <h1 style={{ fontSize: "64px", fontFamily: "Urbanist Bold" }}>
-            About us
-          </h1>
-          <p style={{ fontSize: "1rem", marginTop: "2rem" }}>
+          <h1 className="fw-bold title">About us</h1>
+          <p className="fs-6 mt-5">
             Welcome to Cinebh where movie magic comes to life.
             <br />
             At Cinebh, we're not just about screening films; we're passionate
@@ -51,14 +49,7 @@ const AboutUs = () => {
         </div>
       </div>
 
-      <div
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          minHeight: "500px",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      ></div>
+      <div className="about-us-image"></div>
 
       <Footer />
     </div>

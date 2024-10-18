@@ -1,48 +1,37 @@
 @font-face {
     font-family: "Urbanist";
     src: url('./assets/fonts/Urbanist-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
 }
 
 @font-face {
-    font-family: "Urbanist Bold";
+    font-family: "Urbanist";
     src: url('./assets/fonts/Urbanist-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
 }
 
-.bold-title {
-    font-family: "Urbanist Bold";
+.title {
+    font-size: 64px;
 }
 
-.hero-title {
-    font-size: 48px;
+.primary-red {
+    color: #B22222;
 }
 
-.card {
-    width: 280px;
-    min-height: 350px;
-    background: url('https://images6.alphacoders.com/130/1307795.jpg');
-    background-size: cover;
-    background-position: center;
+.primary-red-background {
+    background-color: #B22222;
 }
 
-.footer {
-    background: linear-gradient(to right, #1A1A1A, #B22222);
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.logo-rounded {
+    border-radius: 12px;
 }
 
-.hero-item {
-    min-height: 810px;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: flex-end;
-    padding: 8rem;
+.main-font {
+    font-family: "Urbanist";
 }
 
-.hero-item-content {
-    color: white;
-    border-radius: 10px;
-    width: fit-content;
+.navbar-background {
+    background-color: #1D2939;
 }

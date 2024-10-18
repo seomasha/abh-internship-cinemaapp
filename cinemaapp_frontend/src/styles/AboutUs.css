@@ -1,0 +1,6 @@
+.about-us-image {
+  background-image: url("../assets/images/cinema-background.jpg");
+  min-height: 500px;
+  background-size: cover;
+  background-position: center;
+}

@@ -1,0 +1,70 @@
+.hero-item {
+  min-height: 810px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 8rem;
+}
+
+.hero-item-content {
+  color: white;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.genres-container {
+  gap: 10px;
+}
+
+.title {
+  font-size: 2.5rem;
+}
+
+.description {
+  font-size: 1.25rem;
+  max-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .hero-item {
+    height: 300px;
+  }
+
+  .hero-item-content {
+    padding: 10px;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .genres-container {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-item {
+    height: 400px;
+  }
+
+  .hero-item-content {
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .description {
+    font-size: 1.1rem;
+  }
+}

@@ -14,7 +14,7 @@ import ScrollToTop from "./utils/ScrollToTop";
 
 function App() {
   return (
-    <div style={{ fontFamily: "Urbanist" }}>
+    <div className="main-font">
       <Router>
         <ScrollToTop />
         <Routes>

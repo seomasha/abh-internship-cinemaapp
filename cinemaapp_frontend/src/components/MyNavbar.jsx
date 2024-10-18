@@ -4,32 +4,27 @@ import { Link } from "react-router-dom";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
-import colors from "../utils/colors";
 
 const MyNavbar = () => {
   return (
     <Navbar
       expand="lg"
-      className="p-4"
-      style={{ backgroundColor: colors.dark_gray }}
+      className="p-4 main-font navbar-background"
     >
       <Link to="/" className="text-decoration-none d-flex align-items-center">
         <Navbar.Brand className="text-light">
           <div className="d-flex">
             <span
-              className="d-flex justify-content-center align-items-center bg-white p-2 mx-1"
-              style={{ borderRadius: "12px" }}
+              className="d-flex justify-content-center align-items-center bg-white p-2 mx-1 logo-rounded"
             >
-              <BsCameraReelsFill
-                style={{ color: colors.primary_red }}
+              <BsCameraReelsFill className="primary-red"
                 size={14}
               />
             </span>
             <h4
-              className="d-flex my-auto"
-              style={{ fontFamily: "Urbanist Bold" }}
+              className="d-flex my-auto fw-bold"
             >
-              Cine<span style={{ color: colors.primary_red }}>bh.</span>
+              Cine<span className="primary-red">bh.</span>
             </h4>
           </div>
         </Navbar.Brand>

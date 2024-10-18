@@ -44,10 +44,10 @@ const PaginatedList = ({ title }) => {
   return (
     <div style={{ padding: "3rem 8rem" }}>
       <div className="d-flex justify-content-between align-items-center">
-        <h3 className="mb-4" style={{ fontFamily: "Urbanist Bold" }}>
+        <h3 className="mb-4 fw-bold">
           {title}
         </h3>
-        <h6 style={{ color: colors.primary_red }} className="fw-bold">
+        <h6 className="fw-bold primary-red">
           See all
         </h6>
       </div>

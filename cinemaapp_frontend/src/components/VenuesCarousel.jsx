@@ -2,7 +2,6 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import colors from "../utils/colors";
 import VenueButton from "./VenueButton";
 
 const venues = [
@@ -24,12 +23,42 @@ const VenuesCarousel = () => {
     slidesToScroll: 2,
     draggable: true,
     cssEase: "linear",
+    responsive: [
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: 5,
+          slidesToScroll: 2,
+        },
+      },
+      {
+        breakpoint: 992,
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 576,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
 
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>
       <Slider {...settings}>
-        {venues.map((venue, index) => (
+        {venues.map((venue) => (
           <VenueButton key={venue.id} name={venue.name} />
         ))}
       </Slider>

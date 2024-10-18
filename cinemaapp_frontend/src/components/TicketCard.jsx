@@ -13,9 +13,9 @@ const TicketCard = ({ promo, title, price, features }) => {
       style={{ width: "400px", height: promo ? "600px" : "500px" }}
     >
       <div className="text-center">
-        <h5 className="bold-title">{title}</h5>
+        <h5 className="fw-bold">{title}</h5>
         <h3
-          className="bold-title"
+          className="fw-bold"
           style={{
             color: promo ? colors.primary_red : colors.text_dark,
           }}
@@ -28,7 +28,7 @@ const TicketCard = ({ promo, title, price, features }) => {
       <ul className="d-flex flex-column">
         {features.map((feature, index) => (
           <div key={index} className="d-flex gap-3">
-            <IoMdCheckmark size={20} style={{ color: colors.primary_red }} />
+            <IoMdCheckmark size={20} className="primary-red" />
             <p>{feature}</p>
           </div>
         ))}

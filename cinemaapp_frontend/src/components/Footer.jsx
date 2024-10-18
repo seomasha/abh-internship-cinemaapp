@@ -2,7 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import { BsCameraReelsFill } from "react-icons/bs";
-import colors from "../utils/colors";
+
+import "../styles/Footer.css";
 
 const Footer = () => {
   return (
@@ -10,11 +11,9 @@ const Footer = () => {
       <Link to="/" className="text-decoration-none">
         <div className="d-flex justify-content-center p-4">
           <span
-            className="d-flex justify-content-center bg-white p-2 mx-1"
-            style={{ borderRadius: "12px" }}
+            className="d-flex justify-content-center bg-white p-2 mx-1 logo-rounded"
           >
-            <BsCameraReelsFill
-              style={{ color: colors.primary_red }}
+            <BsCameraReelsFill className="primary-red"
               size={14}
             />
           </span>
