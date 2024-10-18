@@ -24,9 +24,9 @@ const HeroItem = ({ imageUrl, title, description, genre }) => {
           {description}
         </p>
         <Button
-          variant=""
+          variant="danger"
           size="lg"
-          className="text-white primary-red-background"
+          className="text-white primary-red-background border-0"
         >
           Buy Ticket
         </Button>

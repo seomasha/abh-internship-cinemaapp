@@ -5,7 +5,7 @@ import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
 
-const MyNavbar = () => {
+const NavBar = () => {
   return (
     <Navbar
       expand="lg"
@@ -57,4 +57,4 @@ const MyNavbar = () => {
   );
 };
 
-export default MyNavbar;
+export default NavBar;

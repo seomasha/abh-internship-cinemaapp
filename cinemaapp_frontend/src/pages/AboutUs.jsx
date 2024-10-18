@@ -1,6 +1,6 @@
 import React from "react";
 
-import MyNavbar from "../components/MyNavbar";
+import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 import "../styles/AboutUs.css";
@@ -8,7 +8,7 @@ import "../styles/AboutUs.css";
 const AboutUs = () => {
   return (
     <div>
-      <MyNavbar />
+      <NavBar />
 
       <div
         className="d-flex justify-content-between align-items-center"

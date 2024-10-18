@@ -1,17 +1,15 @@
 import React from "react";
-import MyNavbar from "../components/MyNavbar";
+import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import TicketCard from "../components/TicketCard";
 
 const Tickets = () => {
   return (
     <div>
-      <MyNavbar />
+      <NavBar />
 
       <div className="d-flex flex-column justify-content-center align-items-center">
-        <h2 className="p-5 fw-bold">
-          Pricing
-        </h2>
+        <h2 className="p-5 fw-bold">Pricing</h2>
 
         <p style={{ maxWidth: "600px" }} className="text-center">
           Welcome to our cinema ticket pricing options! We offer three tiers to
