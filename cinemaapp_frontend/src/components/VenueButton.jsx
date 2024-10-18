@@ -4,12 +4,12 @@ import colors from "../utils/colors";
 
 const VenueButton = ({ id, name }) => {
   return (
-    <div style={{ display: "inline-block", margin: "0 1rem" }}>
+    <div style={{ margin: "0 1rem" }}>
       <h5
         key={id}
         style={{
-          display: "inline-block",
-          border: `1px solid ${colors.bg_gray}`,
+          width: "fit-content",
+          border: `1px solid ${colors.gray}`,
           padding: "0.5rem 1rem",
           borderRadius: "5px",
           color: colors.text_gray,
