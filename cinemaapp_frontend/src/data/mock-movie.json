@@ -1,0 +1,44 @@
+{
+  "movies": [
+    {
+      "id": 1,
+      "title": "Inception",
+      "image": "https://m.media-amazon.com/images/I/81p+xe8cbnL._AC_SL1500_.jpg",
+      "duration": 148,
+      "genre": ["Action"],
+      "description": "Test"
+    },
+    {
+      "id": 2,
+      "title": "The Dark Knight",
+      "image": "https://artfiles.alphacoders.com/754/thumb-1920-75479.jpg",
+      "duration": 152,
+      "genre": ["Sci-Fi", "Action"],
+      "description": "Test"
+    },
+    {
+      "id": 3,
+      "title": "Interstellar",
+      "image": "https://images.alphacoders.com/129/1299427.jpg",
+      "duration": 169,
+      "genre": ["Drama", "Action"],
+      "description": "Test"
+    },
+    {
+      "id": 4,
+      "title": "The Matrix",
+      "image": "https://m.media-amazon.com/images/I/51EG732BV3L._AC_.jpg",
+      "duration": 136,
+      "genre": ["SF", "Action"],
+      "description": "Test"
+    },
+    {
+      "id": 5,
+      "title": "Pulp Fiction",
+      "image": "https://i0.wp.com/elementsofmadness.com/wp-content/uploads/2022/12/Pulp-Fiction-featured-image.png?fit=1640%2C924&ssl=1",
+      "duration": 154,
+      "genre": ["Crime", "Action"],
+      "description": "Test"
+    }
+  ]
+}

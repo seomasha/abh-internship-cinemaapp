@@ -15,6 +15,7 @@ The following dependencies have been installed for the frontend part of the Cine
 - **Yup:** A JavaScript schema builder for value parsing and validation.
 - **React Router:** A library for routing in React applications, allowing navigation between different components and views.
 - **React icons:**: A library containing various types of icons.
+- **React Toastify:** Library for showing toast notifications.
 
 ## Backend Dependencies Used
 
@@ -95,6 +96,16 @@ Ensure you have the following installed on your system:
      ```
 
    The frontend should now be running on `http://localhost:5173` (this is the default port used by Vite).
+
+### Running the JSON Server for Mock Data
+To fetch mock movie data while developing the application, you can set up a JSON server to serve your `mock-movie.json` file.
+#### JSON Server Setup
+1. **Install JSON Server** (if you haven't already):
+   ```bash
+   npm install -g json-server
+2. Run the following command to start the JSON server on port **8888**:
+   ```bash
+   json-server --watch data/mock-movie.json --port 888
 
 ### Running the Application Together
 
