@@ -5,7 +5,7 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import SmallButton from "./SmallButton";
 
 const PaginatedList = ({ title, data }) => {
-  const [itemsPerPage, setItemsPerPage] = useState(4); // Default to 4 items per page
+  const [itemsPerPage, setItemsPerPage] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
 
   const indexOfLastCard = currentPage * itemsPerPage;
