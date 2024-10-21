@@ -1,4 +1,5 @@
 import axios from "axios";
+import ErrorHandler from "./errorHandler";
 
 const BASE_URL = "http://localhost:8888";
 
@@ -7,13 +8,7 @@ const request = async (url, options = {}) => {
     const response = await axios({ url: `${BASE_URL}${url}`, ...options });
     return response.data;
   } catch (error) {
-    if (error.response) {
-      const errorMessage =
-        error.response.data.message || "Something went wrong";
-      throw new Error(`Error: ${error.response.status} - ${errorMessage}`);
-    } else {
-      throw new Error("API Error: " + error.message);
-    }
+    ErrorHandler.handleError(error);
   }
 };
 

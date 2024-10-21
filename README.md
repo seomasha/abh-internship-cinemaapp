@@ -15,6 +15,7 @@ The following dependencies have been installed for the frontend part of the Cine
 - **Yup:** A JavaScript schema builder for value parsing and validation.
 - **React Router:** A library for routing in React applications, allowing navigation between different components and views.
 - **React icons:**: A library containing various types of icons.
+- **React Toastify:** Library for showing toast notifications.
 
 ## Backend Dependencies Used
 

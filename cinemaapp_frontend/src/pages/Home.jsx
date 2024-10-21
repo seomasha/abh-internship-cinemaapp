@@ -7,6 +7,8 @@ import PaginatedList from "../components/PaginatedList";
 import Footer from "../components/Footer";
 
 import { movieService } from "../services/movieService";
+import ToastService from "../services/toastService";
+import ErrorHandler from "../services/errorHandler";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
@@ -17,7 +19,7 @@ const Home = () => {
         const data = await movieService.getAll();
         setMovies(data);
       } catch (error) {
-        console.error("Error fetching movies:", error);
+        ErrorHandler.handleError(error);
       }
     };
 
@@ -27,11 +29,11 @@ const Home = () => {
   return (
     <div>
       <NavBar />
-      <Hero data={movies}/>
+      <Hero data={movies} />
       <VenuesCarousel />
-      <PaginatedList title="Currently Showing" data={movies}/>
-      <PaginatedList title="Upcoming Movies" data={movies}/>
-      <PaginatedList title="Venues" data={movies}/>
+      <PaginatedList title="Currently Showing" data={movies} />
+      <PaginatedList title="Upcoming Movies" data={movies} />
+      <PaginatedList title="Venues" data={movies} />
       <Footer />
     </div>
   );
