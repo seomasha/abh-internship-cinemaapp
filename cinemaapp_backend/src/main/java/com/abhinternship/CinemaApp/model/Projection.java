@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
-@Table(name = "projection")
 @Data
 public class Projection {
     @Id
@@ -26,9 +24,7 @@ public class Projection {
     @JoinColumn(name = "hall_id", referencedColumnName = "id")
     private Hall hallId;
 
-    @Column(name = "projection_time")
     private LocalDateTime projectionTime;
 
-    @Column(name = "projection_date")
     private LocalDateTime projectionDate;
 }

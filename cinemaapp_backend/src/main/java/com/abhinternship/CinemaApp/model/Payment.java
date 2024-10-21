@@ -6,7 +6,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payment")
 @Data
 public class Payment {
     @Id
@@ -23,9 +22,7 @@ public class Payment {
 
     private int amount;
 
-    @Column(name = "dpm_checker_link")
     private String dpmCheckerLink;
 
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

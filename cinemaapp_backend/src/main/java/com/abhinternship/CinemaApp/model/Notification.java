@@ -6,7 +6,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notification")
 @Data
 public class Notification {
     @Id
@@ -21,6 +20,5 @@ public class Notification {
     @JoinColumn(name = "movie_id", referencedColumnName = "id")
     private Movie movieId;
 
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

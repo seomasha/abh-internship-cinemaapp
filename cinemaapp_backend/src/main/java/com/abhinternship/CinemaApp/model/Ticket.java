@@ -6,7 +6,6 @@ import lombok.Data;
 import java.util.Date;
 
 @Entity
-@Table(name = "ticket")
 @Data
 public class Ticket {
     @Id
@@ -21,11 +20,9 @@ public class Ticket {
     @JoinColumn(name = "projection_id", referencedColumnName = "id")
     private Projection projectionId;
 
-    @Column(name = "seat_no", length = 5)
     private String seatNo;
 
     private int price;
 
-    @Column(name = "purchase_date")
     private Date purchaseDate;
 }

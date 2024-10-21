@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "venue")
 @Data
 public class Venue {
     @Id
@@ -13,12 +12,10 @@ public class Venue {
 
     private String name;
 
-    @Column(name = "phone_no")
     private String phoneNo;
 
     private String street;
 
-    @Column(name = "street_no")
     private int streetNo;
 
     private String city;
