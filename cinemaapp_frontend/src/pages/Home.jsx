@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const data = await movieService.getAllMovies();
+        const data = await movieService.getAll();
         setMovies(data);
       } catch (error) {
         console.error("Error fetching movies:", error);

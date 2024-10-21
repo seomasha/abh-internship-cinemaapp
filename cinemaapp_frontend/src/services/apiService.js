@@ -1,37 +1,38 @@
+import axios from "axios";
+
 const BASE_URL = "http://localhost:8888";
 
 const request = async (url, options = {}) => {
   try {
-    const response = await fetch(`${BASE_URL}${url}`, options);
-    if (!response.ok) {
-      const errorDetails = await response.json();
-      throw new Error(
-        `Error: ${response.status} - ${
-          errorDetails.message || "Something went wrong"
-        }`
-      );
-    }
-    return await response.json();
+    const response = await axios({ url: `${BASE_URL}${url}`, ...options });
+    return response.data;
   } catch (error) {
-    console.error("API Error:", error);
-    throw error;
+    if (error.response) {
+      const errorMessage =
+        error.response.data.message || "Something went wrong";
+      throw new Error(`Error: ${error.response.status} - ${errorMessage}`);
+    } else {
+      throw new Error("API Error: " + error.message);
+    }
   }
 };
 
-export const apiService = {
-  get: (endpoint) => request(endpoint),
-  getAll: (endpoint) => request(endpoint),
-  create: (endpoint, data) =>
-    request(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
-  update: (endpoint, data) =>
-    request(endpoint, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
-  delete: (endpoint) => request(endpoint, { method: "DELETE" }),
+export const apiService = (endpoint) => {
+  return {
+    get: () => request(endpoint),
+    getAll: () => request(endpoint),
+    create: (data) =>
+      request(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    update: (data) =>
+      request(endpoint, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    delete: () => request(endpoint, { method: "DELETE" }),
+  };
 };
