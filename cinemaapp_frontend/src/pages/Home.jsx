@@ -7,20 +7,14 @@ import PaginatedList from "../components/PaginatedList";
 import Footer from "../components/Footer";
 
 import { movieService } from "../services/movieService";
-import ToastService from "../services/toastService";
-import ErrorHandler from "../services/errorHandler";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      try {
-        const data = await movieService.getAll();
-        setMovies(data);
-      } catch (error) {
-        ErrorHandler.handleError(error);
-      }
+      const data = await movieService.getAll();
+      setMovies(data);
     };
 
     fetchMovies();

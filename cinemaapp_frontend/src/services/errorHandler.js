@@ -10,10 +10,9 @@ class ErrorHandler {
       ToastService.error(`Error: ${error.response.status} - ${errorMsg}`);
     } else if (error.request) {
       errorMsg = "No response received back from the server.";
-      ToastService.error("Error: No response received | ", error.request);
-      console.error("Error: No response received | ", error.request)
+      ToastService.error(`Error: ${errorMsg} | ",${error.request}`);
+      console.error(`Error: ${errorMsg} | ",${error.request}`)
     } else {
-      errorMsg = error.message;
       ToastService.error("Error: ", error.message);
       console.error("Error: ", error.message)
     }
