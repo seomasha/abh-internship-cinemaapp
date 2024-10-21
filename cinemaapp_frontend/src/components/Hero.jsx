@@ -2,34 +2,22 @@ import React from "react";
 import { Carousel } from "react-bootstrap";
 import HeroItem from "./HeroItem";
 
-const Hero = () => {
+const Hero = ({ data }) => {
+  const displayedItems = data.length >= 3 ? data.slice(0, 3) : data;
+
   return (
     <div>
       <Carousel controls={false}>
-        <Carousel.Item>
-          <HeroItem
-            imageUrl="https://images6.alphacoders.com/130/1307795.jpg"
-            title="Avatar: The way of water"
-            description="Jake Sully lives with his newfound family formed on the extrasolar moon Pandora."
-            genre={["Adventure", "Comedy"]}
-          />
-        </Carousel.Item>
-        <Carousel.Item>
-          <HeroItem
-            imageUrl="https://m.media-amazon.com/images/M/MV5BMTY2ODQ3NjMyMl5BMl5BanBnXkFtZTcwODg0MTUzNA@@._V1_.jpg"
-            title="Upcoming Movies"
-            description="Don't miss out on the latest releases!"
-            genre={["Adventure"]}
-          />
-        </Carousel.Item>
-        <Carousel.Item>
-          <HeroItem
-            imageUrl="https://m.media-amazon.com/images/M/MV5BMTY2ODQ3NjMyMl5BMl5BanBnXkFtZTcwODg0MTUzNA@@._V1_.jpg"
-            title="Join Us Now"
-            description="Sign up to get the latest updates."
-            genre={["Adventure"]}
-          />
-        </Carousel.Item>
+        {displayedItems.map((item) => (
+          <Carousel.Item key={item.id}>
+            <HeroItem
+              title={item.title}
+              description={item.description}
+              imageUrl={item.image}
+              genre={item.genre}
+            />
+          </Carousel.Item>
+        ))}
       </Carousel>
     </div>
   );

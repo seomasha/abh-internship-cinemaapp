@@ -20,9 +20,7 @@ const HeroItem = ({ imageUrl, title, description, genre }) => {
         </div>
 
         <h1 className="title fw-bold">{title}</h1>
-        <p className="description fw-bold">
-          {description}
-        </p>
+        <p className="description fw-bold">{description}</p>
         <Button
           variant="danger"
           size="lg"

@@ -13,6 +13,12 @@
   width: fit-content;
 }
 
+.hero-image {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .genres-container {
   gap: 10px;
 }

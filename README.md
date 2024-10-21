@@ -96,6 +96,16 @@ Ensure you have the following installed on your system:
 
    The frontend should now be running on `http://localhost:5173` (this is the default port used by Vite).
 
+### Running the JSON Server for Mock Data
+To fetch mock movie data while developing the application, you can set up a JSON server to serve your `mock-movie.json` file.
+#### JSON Server Setup
+1. **Install JSON Server** (if you haven't already):
+   ```bash
+   npm install -g json-server
+2. Run the following command to start the JSON server on port **8888**:
+   ```bash
+   json-server --watch data/mock-movie.json --port 888
+
 ### Running the Application Together
 
 Once both the frontend and backend are running, you can navigate to the frontend URL (`http://localhost:5173`), and it should interact with the backend API hosted at `http://localhost:8080`.
