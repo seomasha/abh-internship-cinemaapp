@@ -1,0 +1,8 @@
+.day-picker {
+  cursor: pointer;
+}
+
+.bg-picker {
+  background-color: #b22222;
+  color: white;
+}
