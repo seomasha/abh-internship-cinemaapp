@@ -5,6 +5,7 @@ import SearchBar from "../components/SearchBar";
 import Dropdown from "../components/Dropdown";
 import { CiLocationOn, CiClock1 } from "react-icons/ci";
 import DayPicker from "../components/DayPicker";
+import MovieCard from "../components/MovieCard";
 
 const CurrentlyShowing = () => {
   const today = new Date();
@@ -75,6 +76,8 @@ const CurrentlyShowing = () => {
         <div className="d-flex flex-wrap justify-content-between mt-4">
           {dayPickers}
         </div>
+
+        <MovieCard />
       </div>
 
       <Footer />
