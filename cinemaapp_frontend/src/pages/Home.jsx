@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       const data = await movieService.getAll();
-      console.log(data);
+      setMovies(data);
     };
 
     fetchMovies();
@@ -25,9 +25,10 @@ const Home = () => {
       <NavBar />
       <Hero data={movies} />
       <VenuesCarousel />
-      <PaginatedList title="Currently Showing" data={movies} />
+      {/*<PaginatedList title="Currently Showing" data={movies} />
       <PaginatedList title="Upcoming Movies" data={movies} />
       <PaginatedList title="Venues" data={movies} />
+      */}
       <Footer />
     </div>
   );
