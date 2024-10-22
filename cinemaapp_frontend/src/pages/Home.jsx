@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       const data = await movieService.getAll();
-      setMovies(data);
+      console.log(data);
     };
 
     fetchMovies();
