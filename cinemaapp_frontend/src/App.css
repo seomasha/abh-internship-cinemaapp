@@ -12,6 +12,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: "Urbanist";
+    src: url('./assets/fonts/Urbanist-Light.ttf') format('truetype');
+    font-weight: 100;
+    font-style: light;
+}
+
 .title {
     font-size: 64px;
 }
