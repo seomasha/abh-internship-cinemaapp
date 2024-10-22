@@ -8,18 +8,14 @@ import "../styles/Footer.css";
 const Footer = () => {
   return (
     <div className="footer">
-      <Link to="/" className="text-decoration-none">
-        <div className="d-flex justify-content-center p-4">
-          <span
-            className="d-flex justify-content-center bg-white p-2 mx-1 logo-rounded"
-          >
-            <BsCameraReelsFill className="primary-red"
-              size={14}
-            />
-          </span>
+      <div className="d-flex justify-content-center p-4">
+        <span className="d-flex justify-content-center bg-white p-2 mx-1 logo-rounded">
+          <BsCameraReelsFill className="primary-red" size={14} />
+        </span>
+        <Link to="/" className="text-decoration-none">
           <h4 className="d-flex my-auto text-white">Cinebh.</h4>
-        </div>
-      </Link>
+        </Link>
+      </div>
       <div className="d-flex justify-content-center gap-4 text-white">
         <Link to="/about" className="text-decoration-none">
           <h6 className="fw-bold text-white">ABOUT US</h6>
