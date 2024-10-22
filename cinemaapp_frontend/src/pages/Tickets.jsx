@@ -18,7 +18,7 @@ const Tickets = () => {
         </p>
       </div>
 
-      <div className="d-flex justify-content-center align-items-center gap-5 py-5">
+      <div className="d-flex flex-column flex-md-column flex-lg-row justify-content-center align-items-center gap-5 py-5">
         <TicketCard
           promo={false}
           title="Regular seats"

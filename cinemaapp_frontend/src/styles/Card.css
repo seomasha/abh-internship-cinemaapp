@@ -1,7 +1,12 @@
 .card {
-  width: 280px;
+  width: 100%;
   height: 350px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.card-container {
+  max-width: 500px;
 }
