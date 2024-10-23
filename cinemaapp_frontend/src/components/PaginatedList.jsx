@@ -51,12 +51,20 @@ const PaginatedList = ({ title, data }) => {
       <div className="row">
         {currentCards.map((card) => (
           <div className="col-12 col-lg-3 col-lg-3" key={card.id}>
-            <Card
-              title={card.title}
-              duration={card.duration}
-              genre={card.genre.join(", ")}
-              imageUrl={card.image}
-            />
+            {card.street ? (
+              <Card
+                title={card.name}
+                subtitle={`${card.street} ${card.streetNo}, ${card.city}`}
+                imageUrl={card.photoImageId.url}
+              />
+            ) : (
+              <Card
+                title={card.name}
+                subtitle={`${card.movieDuration} mins`}
+                genre={card.genres.map((genre) => genre.name).join(", ")}
+                imageUrl={card.photos[0].url}
+              />
+            )}
           </div>
         ))}
       </div>

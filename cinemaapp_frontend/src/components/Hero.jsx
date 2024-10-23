@@ -10,7 +10,6 @@ const Hero = ({ data }) => {
       <Carousel controls={false}>
         {displayedItems.map((item) => (
           <Carousel.Item key={item.id}>
-            {console.log(item)}
             <HeroItem
               title={item.name}
               description={item.synopsis}
