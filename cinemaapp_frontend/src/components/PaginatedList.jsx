@@ -54,7 +54,7 @@ const PaginatedList = ({ title, data }) => {
             {card.street ? (
               <Card
                 title={card.name}
-                subtitle={`${card.street} ${card.streetNo}, ${card.city}`}
+                subtitle={`${card.street} ${card.streetNo === 0 ? 'bb' : card.streetNo}, ${card.city}`}
                 imageUrl={card.photoImageId.url}
               />
             ) : (

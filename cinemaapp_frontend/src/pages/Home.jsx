@@ -12,6 +12,7 @@ import { venueService } from "../services/venueService";
 const Home = () => {
   const [movies, setMovies] = useState([]);
   const [venues, setVenues] = useState([]);
+  const [selectedVenueId, setSelectedVenueId] = useState(null);
 
   useEffect(() => {
     const fetchMoviesAndVenues = async () => {
@@ -30,7 +31,7 @@ const Home = () => {
       {console.log(venues)}
       <NavBar />
       <Hero data={movies} />
-      <VenuesCarousel />
+      <VenuesCarousel data={venues} setMovies={setMovies} setSelectedVenueId={setSelectedVenueId}/>
       <PaginatedList title="Currently Showing" data={movies} />
       <PaginatedList title="Upcoming Movies" data={movies} />
       <PaginatedList title="Venues" data={venues} />
