@@ -44,17 +44,24 @@ const Home = () => {
         selectedVenueId
       );
 
-      const todaysMovies = movies.filter(
-        (movie) =>
-          movie.projectionDate.split("T")[0] ===
-          new Date().toISOString().split("T")[0]
-      );
+      const todaysMovies = movies.filter((movie) => {
+        if (movie.projectionDate) {
+          return (
+            movie.projectionDate.split("T")[0] ===
+            new Date().toISOString().split("T")[0]
+          );
+        }
+        return false;
+      });
 
-      const upcomingMovies = movies.filter(
-        (movie) =>
-          movie.projectionDate.split("T")[0] !==
-          new Date().toISOString().split("T")[0]
-      );
+      const upcomingMovies = movies.filter((movie) => {
+        if (!movie.projectionDate) {
+          return (
+            movie.projectionDate === null
+          );
+        }
+        return false;
+      });
 
       setCurrentlyShowingMovies(todaysMovies.map((movie) => movie.movieId));
       setUpcomingMovies(upcomingMovies.map((movie) => movie.movieId));
@@ -67,7 +74,7 @@ const Home = () => {
 
   return (
     <div>
-      {console.log(currentlyShowingMovies)}
+      {console.log(upcomingMovies)}
       <NavBar />
       <Hero data={heroMovies} />
       <VenuesCarousel
