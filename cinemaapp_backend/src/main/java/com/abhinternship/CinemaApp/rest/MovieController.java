@@ -43,7 +43,6 @@ public class MovieController {
         return ResponseEntity.ok(movies);
     }
 
-
     @PostMapping
     public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
         Movie savedMovie = movieService.saveMovie(movie);

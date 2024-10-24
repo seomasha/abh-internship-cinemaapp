@@ -6,7 +6,7 @@ import VenueButton from "./VenueButton";
 import ErrorHandler from "../services/errorHandler";
 import { movieService } from "../services/movieService";
 
-const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
+const VenuesCarousel = ({ data, setMovies, setSelectedVenueId, id }) => {
   const settings = {
     infinite: true,
     speed: 500,
@@ -47,14 +47,9 @@ const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
   };
 
   const handleVenueClick = async (venueId) => {
-    try {
-      const response = await movieService.getMoviesByVenueId(venueId);
-      setMovies(response.data);
-      setMovies(response);
-      setSelectedVenueId(venueId);
-    } catch (error) {
-      ErrorHandler.handleError(error);
-    }
+    const response = await movieService.getMoviesByVenueId(venueId);
+    setMovies(response);
+    setSelectedVenueId(venueId);
   };
 
   return (
