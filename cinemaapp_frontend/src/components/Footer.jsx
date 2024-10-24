@@ -9,10 +9,10 @@ const Footer = () => {
   return (
     <div className="footer">
       <div className="d-flex justify-content-center p-4">
-        <span className="d-flex justify-content-center bg-white p-2 mx-1 logo-rounded">
-          <BsCameraReelsFill className="primary-red" size={14} />
-        </span>
-        <Link to="/" className="text-decoration-none">
+        <Link to="/" className="text-decoration-none d-flex">
+          <span className="d-flex justify-content-center bg-white p-2 mx-1 logo-rounded">
+            <BsCameraReelsFill className="primary-red" size={14} />
+          </span>
           <h4 className="d-flex my-auto text-white">Cinebh.</h4>
         </Link>
       </div>

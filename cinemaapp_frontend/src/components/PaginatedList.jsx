@@ -48,50 +48,60 @@ const PaginatedList = ({ title, data }) => {
         <h6 className="fw-bold primary-red">See all</h6>
       </div>
 
-      <div className="row">
-        {currentCards.map((card) => (
-          <div className="col-12 col-lg-3 col-lg-3" key={card.id}>
-            {card.street ? (
-              <Card
-                title={card.name}
-                subtitle={`${card.street} ${card.streetNo === 0 ? 'bb' : card.streetNo}, ${card.city}`}
-                imageUrl={card.photoImageId.url}
-              />
-            ) : (
-              <Card
-                title={card.name}
-                subtitle={`${card.movieDuration} mins`}
-                genre={card.genres.map((genre) => genre.name).join(", ")}
-                imageUrl={card.photos[0].url}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="d-flex flex-column flex-md-row justify-content-end align-items-center mt-4 pl-4">
-        <div className="text-center mb-3 my-auto mx-4">
-          <h6>
-            Showing{" "}
-            <span className="fw-bold">
-              {Math.min(indexOfLastCard, data.length)}
-            </span>{" "}
-            out of <span className="fw-bold">{data.length}</span>
-          </h6>
+      {data.length === 0 ? (
+        <div className="text-center">
+          <h6>No movies available</h6>
         </div>
-        <Pagination className="gap-4 mt-2">
-          <SmallButton
-            onClick={handlePreviousPage}
-            icon={<FaArrowLeft />}
-            disabled={currentPage === 1}
-          />
-          <SmallButton
-            onClick={handleNextPage}
-            icon={<FaArrowRight />}
-            disabled={currentPage === totalPages}
-          />
-        </Pagination>
-      </div>
+      ) : (
+        <>
+          <div className="row">
+            {currentCards.map((card) => (
+              <div className="col-12 col-lg-3" key={card.id}>
+                {card.street ? (
+                  <Card
+                    title={card.name}
+                    subtitle={`${card.street} ${
+                      card.streetNo === 0 ? "bb" : card.streetNo
+                    }, ${card.city}`}
+                    imageUrl={card.photoImageId.url}
+                  />
+                ) : (
+                  <Card
+                    title={card.name}
+                    subtitle={`${card.movieDuration} mins`}
+                    genre={card.genres.map((genre) => genre.name).join(", ")}
+                    imageUrl={card.photos[0].url}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="d-flex flex-column flex-md-row justify-content-end align-items-center mt-4 pl-4">
+            <div className="text-center mb-3 my-auto mx-4">
+              <h6>
+                Showing{" "}
+                <span className="fw-bold">
+                  {Math.min(indexOfLastCard, data.length)}
+                </span>{" "}
+                out of <span className="fw-bold">{data.length}</span>
+              </h6>
+            </div>
+            <Pagination className="gap-4 mt-2">
+              <SmallButton
+                onClick={handlePreviousPage}
+                icon={<FaArrowLeft />}
+                disabled={currentPage === 1}
+              />
+              <SmallButton
+                onClick={handleNextPage}
+                icon={<FaArrowRight />}
+                disabled={currentPage === totalPages}
+              />
+            </Pagination>
+          </div>
+        </>
+      )}
     </div>
   );
 };
