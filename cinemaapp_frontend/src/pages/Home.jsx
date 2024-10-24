@@ -27,8 +27,12 @@ const Home = () => {
       setHeroMovies(movies);
       setVenues(venues);
 
-      setCurrentlyShowingMovies(movies);
-      setUpcomingMovies(movies);
+      setCurrentlyShowingMovies(
+        movies.filter((movie) => movie.status === "Released")
+      );
+      setUpcomingMovies(
+        movies.filter((movie) => movie.status === "Unreleased")
+      );
     };
 
     fetchMoviesAndVenues();
