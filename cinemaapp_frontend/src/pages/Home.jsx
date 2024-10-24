@@ -15,7 +15,8 @@ const Home = () => {
   const [heroMovies, setHeroMovies] = useState([]);
   const [venues, setVenues] = useState([]);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
-  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState(movies);
+  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
 
   useEffect(() => {
     const fetchMoviesAndVenues = async () => {
@@ -27,13 +28,14 @@ const Home = () => {
       setVenues(venues);
 
       setCurrentlyShowingMovies(movies);
+      setUpcomingMovies(movies);
     };
 
     fetchMoviesAndVenues();
   }, []);
 
   useEffect(() => {
-    const fetchCurrentlyShowingMovies = async () => {
+    const fetchCurrentlyShowingAndUpcomingMovies = async () => {
       const movies = await projectionService.getProjectionsByVenueId(
         selectedVenueId
       );
@@ -43,11 +45,19 @@ const Home = () => {
           movie.projectionDate.split("T")[0] ===
           new Date().toISOString().split("T")[0]
       );
+
+      const upcomingMovies = movies.filter(
+        (movie) =>
+          movie.projectionDate.split("T")[0] !==
+          new Date().toISOString().split("T")[0]
+      );
+
       setCurrentlyShowingMovies(todaysMovies.map((movie) => movie.movieId));
+      setUpcomingMovies(upcomingMovies.map((movie) => movie.movieId));
     };
 
     if (selectedVenueId !== null) {
-      fetchCurrentlyShowingMovies();
+      fetchCurrentlyShowingAndUpcomingMovies();
     }
   }, [selectedVenueId]);
 
@@ -62,7 +72,7 @@ const Home = () => {
         setSelectedVenueId={setSelectedVenueId}
       />
       <PaginatedList title="Currently Showing" data={currentlyShowingMovies} />
-      <PaginatedList title="Upcoming Movies" data={movies} />
+      <PaginatedList title="Upcoming Movies" data={upcomingMovies} />
       <PaginatedList title="Venues" data={venues} />
       <Footer />
     </div>
