@@ -23,7 +23,6 @@ const Home = () => {
       const movies = await movieService.getAll();
       const venues = await venueService.getAll();
 
-      setMovies(movies);
       setHeroMovies(movies);
       setVenues(venues);
 
@@ -44,24 +43,16 @@ const Home = () => {
         selectedVenueId
       );
 
-      const todaysMovies = movies.filter((movie) => {
-        if (movie.projectionDate) {
-          return (
-            movie.projectionDate.split("T")[0] ===
+      const todaysMovies = movies.filter(
+        (movie) =>
+          movie.projectionDate &&
+          movie.projectionDate.split("T")[0] ===
             new Date().toISOString().split("T")[0]
-          );
-        }
-        return false;
-      });
+      );
 
-      const upcomingMovies = movies.filter((movie) => {
-        if (!movie.projectionDate) {
-          return (
-            movie.projectionDate === null
-          );
-        }
-        return false;
-      });
+      const upcomingMovies = movies.filter(
+        (movie) => movie.projectionDate === null
+      );
 
       setCurrentlyShowingMovies(todaysMovies.map((movie) => movie.movieId));
       setUpcomingMovies(upcomingMovies.map((movie) => movie.movieId));

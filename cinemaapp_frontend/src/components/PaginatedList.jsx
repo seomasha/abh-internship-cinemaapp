@@ -71,7 +71,8 @@ const PaginatedList = ({ title, data }) => {
                     subtitle={`${card.movieDuration} mins`}
                     genre={card.genres.map((genre) => genre.name).join(", ")}
                     imageUrl={
-                      card.photos.find((photo) => photo.entityType === "movie")?.url
+                      card.photos.find((photo) => photo.entityType === "movie")
+                        ?.url
                     }
                   />
                 )}

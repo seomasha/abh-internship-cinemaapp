@@ -8,7 +8,8 @@ const Card = ({ title, subtitle, genre, imageUrl }) => {
       <img src={imageUrl} className="card" />
       <h5 className="mt-2 fw-bold">{title}</h5>
       <h6>
-        {subtitle}{genre ? `| ${genre}` : ""}
+        {subtitle}
+        {genre ? `| ${genre}` : ""}
       </h6>
     </div>
   );
