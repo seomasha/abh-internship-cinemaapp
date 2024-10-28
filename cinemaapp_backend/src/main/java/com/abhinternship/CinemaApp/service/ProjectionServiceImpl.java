@@ -21,22 +21,22 @@ public class ProjectionServiceImpl implements ProjectionService{
     }
 
     @Override
-    public Optional<Projection> findProjectionById(Long id) {
+    public Optional<Projection> findProjectionById(final Long id) {
         return projectionRepository.findById(id);
     }
 
     @Override
-    public Projection saveProjection(Projection projection) {
+    public Projection saveProjection(final Projection projection) {
         return projectionRepository.save(projection);
     }
 
     @Override
-    public void deleteProjection(Long id) {
+    public void deleteProjection(final Long id) {
         projectionRepository.deleteById(id);
     }
 
     @Override
-    public List<Projection> findAllByVenueId(Venue venueId) {
+    public List<Projection> findAllByVenueId(final Venue venueId) {
         return projectionRepository.findAllByVenueId(venueId);
     }
 }

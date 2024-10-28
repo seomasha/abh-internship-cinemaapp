@@ -3,43 +3,45 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import VenueButton from "./VenueButton";
-import ErrorHandler from "../services/errorHandler";
 import { movieService } from "../services/movieService";
 
-const VenuesCarousel = ({ data, setMovies, setSelectedVenueId, id }) => {
+const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
   const settings = {
     infinite: true,
+    dots: true,
     speed: 500,
-    centerMode: true,
-    slidesToShow: 4,
+    slidesToShow: 5,
     slidesToScroll: 1,
     swipeToSlide: true,
+    centerMode: true,
+    centerPadding: "0px",
+    focusOnSelect: true,
     responsive: [
       {
         breakpoint: 1200,
         settings: {
-          slidesToShow: 5,
+          slidesToShow: 4,
           slidesToScroll: 2,
         },
       },
       {
         breakpoint: 992,
         settings: {
-          slidesToShow: 4,
+          slidesToShow: 3,
           slidesToScroll: 1,
         },
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 2,
           slidesToScroll: 1,
         },
       },
       {
         breakpoint: 576,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 1,
           slidesToScroll: 1,
         },
       },
@@ -53,18 +55,16 @@ const VenuesCarousel = ({ data, setMovies, setSelectedVenueId, id }) => {
   };
 
   return (
-    <div
-      style={{ padding: "2rem", textAlign: "center" }}
-      className="slider-container"
-    >
+    <div style={{ padding: "2rem" }}>
       <Slider {...settings}>
         {data.map((venue) => (
-          <VenueButton
-            id={venue.id}
-            key={venue.id}
-            name={venue.name}
-            onClick={handleVenueClick}
-          />
+          <div key={venue.id} className="d-flex justify-content-center">
+            <VenueButton
+              id={venue.id}
+              name={venue.name}
+              onClick={() => handleVenueClick(venue.id)}
+            />
+          </div>
         ))}
       </Slider>
     </div>

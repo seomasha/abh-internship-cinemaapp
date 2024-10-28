@@ -31,8 +31,6 @@ public class Movie {
 
     private String actors;
 
-    private String status;
-
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
             name = "movie_genre",

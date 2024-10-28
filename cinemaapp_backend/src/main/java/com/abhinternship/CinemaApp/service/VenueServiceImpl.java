@@ -19,17 +19,17 @@ public class VenueServiceImpl implements VenueService{
     }
 
     @Override
-    public Optional<Venue> findVenueById(Long id) {
+    public Optional<Venue> findVenueById(final Long id) {
         return venueRepository.findById(id);
     }
 
     @Override
-    public Venue saveVenue(Venue venue) {
+    public Venue saveVenue(final Venue venue) {
         return venueRepository.save(venue);
     }
 
     @Override
-    public void deleteVenue(Long id) {
+    public void deleteVenue(final Long id) {
         venueRepository.deleteById(id);
     }
 }

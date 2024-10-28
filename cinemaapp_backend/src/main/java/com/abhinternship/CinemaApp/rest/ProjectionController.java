@@ -3,7 +3,9 @@ package com.abhinternship.CinemaApp.rest;
 import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.service.ProjectionService;
+import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,13 +22,26 @@ public class ProjectionController {
 
     @GetMapping
     public ResponseEntity<List<Projection>> getAllProjections() {
-        List<Projection> projections = projectionService.findAllProjections();
-        return ResponseEntity.ok(projections);
+        try {
+            List<Projection> projections = projectionService.findAllProjections();
+            return ResponseEntity.ok(projections);
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to fetch projections");
+        }
     }
 
     @GetMapping("/venue/{venueId}")
-    public ResponseEntity<List<Projection>> getAllProjectionsByVenueId(@PathVariable Venue venueId) {
-        List<Projection> projections = projectionService.findAllByVenueId(venueId);
-        return ResponseEntity.ok(projections);
+    public ResponseEntity<List<Projection>> getAllProjectionsByVenueId(@PathVariable Venue venueId) throws ResourceNotFoundException {
+        try {
+            List<Projection> projections = projectionService.findAllByVenueId(venueId);
+            if (projections.isEmpty()) {
+                throw new ResourceNotFoundException("No projections found for venue with id: " + venueId);
+            }
+            return ResponseEntity.ok(projections);
+        } catch (ResourceNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to fetch projections for venue with id: " + venueId);
+        }
     }
 }

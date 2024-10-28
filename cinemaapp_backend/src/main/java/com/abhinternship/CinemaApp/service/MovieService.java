@@ -1,7 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.Movie;
-import org.springframework.stereotype.Service;
+import com.abhinternship.CinemaApp.model.Venue;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +11,5 @@ public interface MovieService {
     Optional<Movie> findMovieById(Long id);
     Movie saveMovie(Movie movie);
     void deleteMovie(Long id);
+    List<Movie> findMoviesByVenueId(Venue venueId);
 }

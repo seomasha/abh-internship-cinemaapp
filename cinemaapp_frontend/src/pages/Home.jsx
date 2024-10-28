@@ -22,17 +22,38 @@ const Home = () => {
     const fetchMoviesAndVenues = async () => {
       const movies = await movieService.getAll();
       const venues = await venueService.getAll();
+      const projections = await projectionService.getAll();
 
-      setMovies(movies);
+      const today = new Date();
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + 10);
+
+      const currentlyShowingSet = new Set();
+      const upcomingSet = new Set();
+      const currentlyShowing = [];
+      const upcoming = [];
+
+      projections.forEach((projection) => {
+        const projectionDate = new Date(projection.projectionDate);
+        const movie = projection.movieId;
+
+        if (projectionDate >= today && projectionDate <= endDate) {
+          if (!currentlyShowingSet.has(movie.name)) {
+            currentlyShowingSet.add(movie.name);
+            currentlyShowing.push(movie);
+          }
+        } else if (projectionDate > endDate) {
+          if (!upcomingSet.has(movie.name)) {
+            upcomingSet.add(movie.name);
+            upcoming.push(movie);
+          }
+        }
+      });
+
       setHeroMovies(movies);
       setVenues(venues);
-
-      setCurrentlyShowingMovies(
-        movies.filter((movie) => movie.status === "Released")
-      );
-      setUpcomingMovies(
-        movies.filter((movie) => movie.status === "Unreleased")
-      );
+      setCurrentlyShowingMovies(currentlyShowing);
+      setUpcomingMovies(upcoming);
     };
 
     fetchMoviesAndVenues();
@@ -44,20 +65,22 @@ const Home = () => {
         selectedVenueId
       );
 
-      const todaysMovies = movies.filter(
-        (movie) =>
-          movie.projectionDate.split("T")[0] ===
-          new Date().toISOString().split("T")[0]
-      );
+      const today = new Date();
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + 10);
 
-      const upcomingMovies = movies.filter(
-        (movie) =>
-          movie.projectionDate.split("T")[0] !==
-          new Date().toISOString().split("T")[0]
-      );
+      const currentlyShowing = movies.filter((movie) => {
+        const projectionDate = new Date(movie.projectionDate);
+        return projectionDate >= today && projectionDate <= endDate;
+      });
 
-      setCurrentlyShowingMovies(todaysMovies.map((movie) => movie.movieId));
-      setUpcomingMovies(upcomingMovies.map((movie) => movie.movieId));
+      const upcoming = movies.filter((movie) => {
+        const projectionDate = new Date(movie.projectionDate);
+        return projectionDate > endDate;
+      });
+
+      setCurrentlyShowingMovies(currentlyShowing.map((movie) => movie.movieId));
+      setUpcomingMovies(upcoming.map((movie) => movie.movieId));
     };
 
     if (selectedVenueId !== null) {
@@ -67,7 +90,7 @@ const Home = () => {
 
   return (
     <div>
-      {console.log(currentlyShowingMovies)}
+      {console.log(upcomingMovies)}
       <NavBar />
       <Hero data={heroMovies} />
       <VenuesCarousel
