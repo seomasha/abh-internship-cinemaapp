@@ -41,15 +41,6 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public List<Movie> findMoviesByVenueId(Venue venueId) {
-        final List<Projection> projections = projectionService.findAllByVenueId(venueId);
-        return projections.stream()
-                .map(Projection::getMovieId)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<Movie> findMovieByProjectionDateRange() {
         final LocalDate today = LocalDate.now();
         return movieRepository.findMovieByProjectionDateRange(today, today.plusDays(10));

@@ -44,33 +44,9 @@ const Home = () => {
         const projections = await projectionService.getProjectionsByVenueId(
           selectedVenueId
         );
-        const today = new Date();
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + 10);
 
-        const currentlyShowing = projections
-          .filter((projection) => {
-            const projectionStartDate = new Date(
-              projection.movieId.projectionStartDate
-            );
-            const projectionEndDate = new Date(
-              projection.movieId.projectionEndDate
-            );
-            return projectionStartDate <= endDate && projectionEndDate >= today;
-          })
-          .map((projection) => projection.movieId);
-
-        const upcoming = projections
-          .filter((projection) => {
-            const projectionStartDate = new Date(
-              projection.movieId.projectionStartDate
-            );
-            return projectionStartDate > endDate;
-          })
-          .map((projection) => projection.movieId);
-
-        setCurrentlyShowingMovies(currentlyShowing);
-        setUpcomingMovies(upcoming);
+        setCurrentlyShowingMovies(projections.currentlyShowing);
+        setUpcomingMovies(projections.upcoming);
       }
     };
 

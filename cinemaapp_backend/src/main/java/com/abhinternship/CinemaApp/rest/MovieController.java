@@ -40,12 +40,6 @@ public class MovieController {
         return ResponseEntity.ok(heroMovies);
     }
 
-    @GetMapping("/venue/{venueId}")
-    public ResponseEntity<List<Movie>> getMoviesByVenue(@PathVariable Venue venueId) {
-        final List<Movie> movies = movieService.findMoviesByVenueId(venueId);
-        return ResponseEntity.ok(movies);
-    }
-
     @GetMapping("/currently-showing")
     public ResponseEntity<List<Movie>> getCurrentlyShowingMovies() {
         final List<Movie> currentlyShowingMovies = movieService.findMovieByProjectionDateRange();

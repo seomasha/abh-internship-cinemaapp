@@ -1,18 +1,19 @@
 package com.abhinternship.CinemaApp.service;
 
+import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class ProjectionServiceImpl implements ProjectionService{
+public class ProjectionServiceImpl implements ProjectionService {
 
     private final ProjectionRepository projectionRepository;
 
@@ -22,26 +23,49 @@ public class ProjectionServiceImpl implements ProjectionService{
     }
 
     @Override
-    public Optional<Projection> findProjectionById(final Long id) {
+    public Optional<Projection> findProjectionById(Long id) {
         return projectionRepository.findById(id);
     }
 
     @Override
-    public Projection saveProjection(final Projection projection) {
+    public Projection saveProjection(Projection projection) {
         return projectionRepository.save(projection);
     }
 
     @Override
-    public void deleteProjection(final Long id) {
+    public void deleteProjection(Long id) {
         projectionRepository.deleteById(id);
     }
 
     @Override
-    public List<Projection> findAllByVenueId(final Venue venueId) {
-        final List<Projection> projections = projectionRepository.findAllByVenueId(venueId);
-        if(projections.isEmpty()) {
-            return new ArrayList<>();
+    public Map<String, List<Movie>> getMoviesByVenue(Venue venue) {
+        List<Projection> projections = projectionRepository.findAllByVenueId(venue);
+        List<Movie> currentlyShowing = new ArrayList<>();
+        List<Movie> upcoming = new ArrayList<>();
+
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusDays(10);
+
+        // Filter projections based on their start and end dates
+        for (Projection projection : projections) {
+            Movie movie = projection.getMovieId();
+
+            // Parse the strings to LocalDate
+            LocalDate projectionStartDate = movie.getProjectionStartDate();
+            LocalDate projectionEndDate = movie.getProjectionEndDate();
+
+            if (projectionStartDate.isBefore(endDate) && projectionEndDate.isAfter(today)) {
+                currentlyShowing.add(movie);
+            } else if (projectionStartDate.isAfter(endDate)) {
+                upcoming.add(movie);
+            }
         }
-        return projections;
+
+        Map<String, List<Movie>> response = new HashMap<>();
+        response.put("currentlyShowing", currentlyShowing);
+        response.put("upcoming", upcoming);
+
+        return response;
     }
+
 }
