@@ -23,24 +23,16 @@ public class ProjectionController {
 
     @GetMapping
     public ResponseEntity<List<Projection>> getAllProjections() {
-        try {
-            List<Projection> projections = projectionService.findAllProjections();
-            return ResponseEntity.ok(projections);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to fetch projections");
-        }
+        final List<Projection> projections = projectionService.findAllProjections();
+        return ResponseEntity.ok(projections);
     }
 
     @GetMapping("/venue/{venueId}")
-    public ResponseEntity<List<Projection>> getAllProjectionsByVenueId(@PathVariable Venue venueId) throws ResourceNotFoundException {
-        try {
-            List<Projection> projections = projectionService.findAllByVenueId(venueId);
-            if (projections.isEmpty()) {
-                return ResponseEntity.ok(new ArrayList<>());
-            }
-            return ResponseEntity.ok(projections);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to fetch projections for venue with id: " + venueId);
+    public ResponseEntity<List<Projection>> getAllProjectionsByVenueId(@PathVariable Venue venueId) {
+        final List<Projection> projections = projectionService.findAllByVenueId(venueId);
+        if (projections.isEmpty()) {
+            return ResponseEntity.ok(new ArrayList<>());
         }
+        return ResponseEntity.ok(projections);
     }
 }

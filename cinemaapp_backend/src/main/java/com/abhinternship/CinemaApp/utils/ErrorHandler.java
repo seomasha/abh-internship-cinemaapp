@@ -14,15 +14,6 @@ import java.util.Map;
 @ControllerAdvice
 public class ErrorHandler {
 
-    private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("timestamp", LocalDateTime.now());
-        errorDetails.put("status", status.value());
-        errorDetails.put("error", status.getReasonPhrase());
-        errorDetails.put("message", message);
-        return errorDetails;
-    }
-
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Object> handleResourceNotFound(final ResourceNotFoundException ex, final WebRequest request) {
         return new ResponseEntity<>(buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
@@ -48,5 +39,14 @@ public class ErrorHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGlobalException(final Exception ex, final WebRequest request) {
         return new ResponseEntity<>(buildErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("timestamp", LocalDateTime.now());
+        errorDetails.put("status", status.value());
+        errorDetails.put("error", status.getReasonPhrase());
+        errorDetails.put("message", message);
+        return errorDetails;
     }
 }

@@ -18,44 +18,26 @@ public class VenueController {
 
     @GetMapping
     public ResponseEntity<List<Venue>> getAllVenues() {
-        try {
-            final List<Venue> venues = venueService.findAllVenues();
-            return ResponseEntity.ok(venues);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to fetch venues");
-        }
+        final List<Venue> venues = venueService.findAllVenues();
+        return ResponseEntity.ok(venues);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Venue> getVenueById(final @PathVariable Long id) {
-        try {
-            return venueService.findVenueById(id)
-                    .map(ResponseEntity::ok)
-                    .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + id));
-        } catch (Exception | ResourceNotFoundException ex) {
-            throw new RuntimeException("Error occurred while fetching the venue.");
-        }
+    public ResponseEntity<Venue> getVenueById(final @PathVariable Long id) throws ResourceNotFoundException {
+        return venueService.findVenueById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + id));
     }
 
     @PostMapping
     public ResponseEntity<Venue> createVenue(final @RequestBody Venue venue) {
-        try {
-            final Venue savedVenue = venueService.saveVenue(venue);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedVenue);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Invalid venue details provided: " + ex.getMessage());
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to create venue.");
-        }
+        final Venue savedVenue = venueService.saveVenue(venue);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedVenue);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVenue(final @PathVariable Long id) {
-        try {
-            venueService.deleteVenue(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to delete venue.");
-        }
+        venueService.deleteVenue(id);
+        return ResponseEntity.noContent().build();
     }
 }

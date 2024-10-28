@@ -19,58 +19,36 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovieController {
     private final MovieService movieService;
-    private final ProjectionService projectionService;
 
     @GetMapping
     public ResponseEntity<List<Movie>> getAllMovies() {
-        try {
-            List<Movie> movies = movieService.findAllMovies();
-            return ResponseEntity.ok(movies);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to fetch movies.");
-        }
+        final List<Movie> movies = movieService.findAllMovies();
+        return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable Long id) throws ResourceNotFoundException {
-        try {
-            return movieService.findMovieById(id)
-                    .map(ResponseEntity::ok)
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
-        } catch (ResourceNotFoundException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to fetch movie with id: " + id);
-        }
+        return movieService.findMovieById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+
     }
 
     @GetMapping("/venue/{venueId}")
     public ResponseEntity<List<Movie>> getMoviesByVenue(@PathVariable Venue venueId) {
-        try {
-            List<Movie> movies = movieService.findMoviesByVenueId(venueId);
-            return ResponseEntity.ok(movies);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to fetch movies for venue with id: " + venueId);
-        }
+        final List<Movie> movies = movieService.findMoviesByVenueId(venueId);
+        return ResponseEntity.ok(movies);
     }
 
     @PostMapping
     public ResponseEntity<Movie> createMovie(final @RequestBody Movie movie) {
-        try {
-            final Movie savedMovie = movieService.saveMovie(movie);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to create movie");
-        }
+        final Movie savedMovie = movieService.saveMovie(movie);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(final @PathVariable Long id) {
-        try {
-            movieService.deleteMovie(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to delete movie");
-        }
+        movieService.deleteMovie(id);
+        return ResponseEntity.noContent().build();
     }
 }
