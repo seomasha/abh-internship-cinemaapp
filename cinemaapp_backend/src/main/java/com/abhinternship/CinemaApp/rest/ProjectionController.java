@@ -30,9 +30,6 @@ public class ProjectionController {
     @GetMapping("/venue/{venueId}")
     public ResponseEntity<List<Projection>> getAllProjectionsByVenueId(@PathVariable Venue venueId) {
         final List<Projection> projections = projectionService.findAllByVenueId(venueId);
-        if (projections.isEmpty()) {
-            return ResponseEntity.ok(new ArrayList<>());
-        }
         return ResponseEntity.ok(projections);
     }
 }

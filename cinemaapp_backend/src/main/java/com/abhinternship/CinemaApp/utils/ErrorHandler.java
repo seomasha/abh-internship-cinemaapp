@@ -26,7 +26,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(final MethodArgumentNotValidException ex, final WebRequest request) {
-        StringBuilder message = new StringBuilder("Validation failed: ");
+        final StringBuilder message = new StringBuilder("Validation failed: ");
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             message.append(error.getField())
                     .append(": ")
@@ -42,7 +42,7 @@ public class ErrorHandler {
     }
 
     private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {
-        Map<String, Object> errorDetails = new HashMap<>();
+        final Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put("timestamp", LocalDateTime.now());
         errorDetails.put("status", status.value());
         errorDetails.put("error", status.getReasonPhrase());

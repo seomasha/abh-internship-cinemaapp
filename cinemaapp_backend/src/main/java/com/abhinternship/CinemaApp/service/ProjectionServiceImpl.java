@@ -6,6 +6,7 @@ import com.abhinternship.CinemaApp.repository.ProjectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,10 @@ public class ProjectionServiceImpl implements ProjectionService{
 
     @Override
     public List<Projection> findAllByVenueId(final Venue venueId) {
-        return projectionRepository.findAllByVenueId(venueId);
+        final List<Projection> projections = projectionRepository.findAllByVenueId(venueId);
+        if(projections.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return projections;
     }
 }

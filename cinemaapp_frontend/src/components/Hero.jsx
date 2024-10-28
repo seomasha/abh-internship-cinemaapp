@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Carousel } from "react-bootstrap";
 import HeroItem from "./HeroItem";
+import { screenSizes } from "../utils/screenSizes";
 
 const Hero = ({ data }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth <= 768);
+      setIsSmallScreen(window.innerWidth <= screenSizes.medium);
     };
 
     handleResize();
