@@ -12,39 +12,30 @@ import { projectionService } from "../services/projectionService";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
-  const [heroMovies, setHeroMovies] = useState([]);
   const [venues, setVenues] = useState([]);
+  const [heroMovies, setHeroMovies] = useState([]);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
   const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
 
   useEffect(() => {
-    const fetchMoviesAndVenues = async () => {
-      const movies = await movieService.getAll();
+    const fetchVenues = async () => {
       const venues = await venueService.getAll();
-
-      const today = new Date();
-      const endDate = new Date(today);
-      endDate.setDate(today.getDate() + 10);
-
-      const currentlyShowing = movies.filter((movie) => {
-        const projectionStartDate = new Date(movie.projectionStartDate);
-        const projectionEndDate = new Date(movie.projectionEndDate);
-        return projectionStartDate <= endDate && projectionEndDate >= today;
-      });
-
-      const upcoming = movies.filter((movie) => {
-        const projectionStartDate = new Date(movie.projectionStartDate);
-        return projectionStartDate > endDate;
-      });
-
-      setHeroMovies(movies);
       setVenues(venues);
-      setCurrentlyShowingMovies(currentlyShowing);
-      setUpcomingMovies(upcoming);
     };
 
-    fetchMoviesAndVenues();
+    const fetchMovies = async () => {
+      const currentlyShowing = await movieService.getCurrentlyShowingMovies();
+      const upcoming = await movieService.getUpcomingMovies();
+      const heroMovies = await movieService.getHeroMovies();
+
+      setCurrentlyShowingMovies(currentlyShowing);
+      setUpcomingMovies(upcoming);
+      setHeroMovies(heroMovies);
+    };
+
+    fetchMovies();
+    fetchVenues();
   }, []);
 
   useEffect(() => {

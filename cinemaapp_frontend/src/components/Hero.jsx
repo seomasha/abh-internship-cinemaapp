@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Carousel } from "react-bootstrap";
 import HeroItem from "./HeroItem";
-import { screenSizes } from "../utils/screenSizes";
+import screenSizes from "../utils/screenSizes";
 
 const Hero = ({ data }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -32,7 +32,9 @@ const Hero = ({ data }) => {
                     (item.synopsis.length > 45 ? "..." : "")
                   : item.synopsis
               }
-              imageUrl={item.photos[0].url}
+              imageUrl={
+                item.photos.find((photo) => photo.entityType === "movie")?.url
+              }
               genre={item.genres}
             />
           </Carousel.Item>

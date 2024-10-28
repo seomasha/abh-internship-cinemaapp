@@ -7,8 +7,10 @@ import com.abhinternship.CinemaApp.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,5 +47,32 @@ public class MovieServiceImpl implements MovieService{
                 .map(Projection::getMovieId)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Movie> findMovieByProjectionDateRange() {
+        final LocalDate today = LocalDate.now();
+        return movieRepository.findMovieByProjectionDateRange(today, today.plusDays(10));
+    }
+
+    @Override
+    public List<Movie> findUpcomingMovies() {
+        LocalDate endDate = LocalDate.now().plusDays(10);
+        return movieRepository.findUpcomingMovies(endDate);
+    }
+
+    @Override
+    public List<Movie> findHeroMovies(final int count) {
+        final List<Movie> allMovies = movieRepository.findAll();
+        if (allMovies.size() <= count) {
+            return allMovies;
+        }
+
+        final Random random = new Random();
+        return random.ints(0, allMovies.size())
+                .distinct()
+                .limit(count)
+                .mapToObj(allMovies::get)
+                .toList();
     }
 }

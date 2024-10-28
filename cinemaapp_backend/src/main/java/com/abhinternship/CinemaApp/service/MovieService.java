@@ -3,6 +3,7 @@ package com.abhinternship.CinemaApp.service;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Venue;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,4 +13,7 @@ public interface MovieService {
     Movie saveMovie(Movie movie);
     void deleteMovie(Long id);
     List<Movie> findMoviesByVenueId(Venue venueId);
+    List<Movie> findMovieByProjectionDateRange();
+    List<Movie> findUpcomingMovies();
+    List<Movie> findHeroMovies(int count);
 }

@@ -34,10 +34,28 @@ public class MovieController {
 
     }
 
+    @GetMapping("/hero-movies")
+    public ResponseEntity<List<Movie>> getHeroMovies() {
+        final List<Movie> heroMovies = movieService.findHeroMovies(3);
+        return ResponseEntity.ok(heroMovies);
+    }
+
     @GetMapping("/venue/{venueId}")
     public ResponseEntity<List<Movie>> getMoviesByVenue(@PathVariable Venue venueId) {
         final List<Movie> movies = movieService.findMoviesByVenueId(venueId);
         return ResponseEntity.ok(movies);
+    }
+
+    @GetMapping("/currently-showing")
+    public ResponseEntity<List<Movie>> getCurrentlyShowingMovies() {
+        final List<Movie> currentlyShowingMovies = movieService.findMovieByProjectionDateRange();
+        return ResponseEntity.ok(currentlyShowingMovies);
+    }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<Movie>> getUpcomingMovies() {
+        final List<Movie> upcomingMovies = movieService.findUpcomingMovies();
+        return ResponseEntity.ok(upcomingMovies);
     }
 
     @PostMapping

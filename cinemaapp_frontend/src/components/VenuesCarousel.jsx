@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import VenueButton from "./VenueButton";
 import { movieService } from "../services/movieService";
-import { screenSizes } from "../utils/screenSizes";
+import screenSizes from "../utils/screenSizes";
 
 const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
   const settings = {

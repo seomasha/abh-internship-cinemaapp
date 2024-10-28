@@ -13,4 +13,20 @@ export const movieService = {
     );
     return response.data;
   },
+  getCurrentlyShowingMovies: async () => {
+    const response = await axios.get(
+      BASE_URL + MOVIE_ENDPOINT + "/currently-showing"
+    );
+    return response.data;
+  },
+  getUpcomingMovies: async () => {
+    const response = await axios.get(BASE_URL + MOVIE_ENDPOINT + "/upcoming");
+    return response.data;
+  },
+  getHeroMovies: async () => {
+    const response = await axios.get(
+      BASE_URL + MOVIE_ENDPOINT + "/hero-movies"
+    );
+    return response.data;
+  },
 };
