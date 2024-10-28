@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,11 +36,9 @@ public class ProjectionController {
         try {
             List<Projection> projections = projectionService.findAllByVenueId(venueId);
             if (projections.isEmpty()) {
-                throw new ResourceNotFoundException("No projections found for venue with id: " + venueId);
+                return ResponseEntity.ok(new ArrayList<>());
             }
             return ResponseEntity.ok(projections);
-        } catch (ResourceNotFoundException ex) {
-            throw ex;
         } catch (Exception ex) {
             throw new RuntimeException("Failed to fetch projections for venue with id: " + venueId);
         }
