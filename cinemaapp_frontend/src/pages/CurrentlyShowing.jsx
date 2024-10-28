@@ -1,39 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
 import Dropdown from "../components/Dropdown";
+
 import { CiLocationOn, CiClock1 } from "react-icons/ci";
 import DayPicker from "../components/DayPicker";
 import MovieCard from "../components/MovieCard";
 
 const CurrentlyShowing = () => {
-  const today = new Date();
-  const [selectedDay, setSelectedDay] = useState(null);
-
-  const dayPickers = [];
-
-  for (let i = 0; i < 10; i++) {
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + i);
-
-    const dateOptions = { month: "short", day: "numeric" };
-    const dayOptions = { weekday: "short" };
-
-    const date = nextDate.toLocaleDateString("en-US", dateOptions);
-    const day = nextDate.toLocaleDateString("en-US", dayOptions);
-
-    dayPickers.push(
-      <DayPicker
-        key={i}
-        date={date}
-        day={day}
-        isSelected={selectedDay === i}
-        onSelect={() => setSelectedDay(i)}
-      />
-    );
-  }
-
   return (
     <div>
       <NavBar />
@@ -73,9 +48,7 @@ const CurrentlyShowing = () => {
           </div>
         </div>
 
-        <div className="d-flex flex-wrap justify-content-between mt-4">
-          {dayPickers}
-        </div>
+        <div className="d-flex flex-wrap justify-content-between mt-4"></div>
 
         <MovieCard />
       </div>
