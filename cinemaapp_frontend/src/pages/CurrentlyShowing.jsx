@@ -12,6 +12,7 @@ import "../styles/CurrentlyShowing.css";
 const CurrentlyShowing = () => {
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
+  const [moviesToShow, setMoviesToShow] = useState(5);
 
   const dayPickers = [];
 
@@ -36,12 +37,18 @@ const CurrentlyShowing = () => {
     );
   }
 
+  const movieCards = Array(15).fill(<MovieCard />);
+
+  const loadMoreMovies = () => {
+    setMoviesToShow((prevMoviesToShow) => prevMoviesToShow + 5);
+  };
+
   return (
     <div>
       <NavBar />
 
       <div className="p-5">
-        <h2 className="fw-bold">Currently showing (9)</h2>
+        <h2 className="fw-bold">Currently showing (15)</h2>
 
         <SearchBar />
         <div className="row gx-4">
@@ -76,7 +83,7 @@ const CurrentlyShowing = () => {
         </div>
 
         <div className="mt-4 d-md-none">
-          <Carousel prevLabel="" nextLabel="">
+          <Carousel prevLabel="" nextLabel="" interval={null}>
             {dayPickers.map((picker, index) => (
               <Carousel.Item key={index}>
                 <div className="d-flex justify-content-center">{picker}</div>
@@ -89,7 +96,20 @@ const CurrentlyShowing = () => {
           {dayPickers}
         </div>
 
-        <MovieCard />
+        <div className="mt-4">
+          {movieCards.slice(0, moviesToShow)}
+
+          {moviesToShow < movieCards.length && (
+            <div className="text-center">
+              <button
+                className="btn primary-red text-decoration-underline fw-bold mt-4"
+                onClick={loadMoreMovies}
+              >
+                Load More
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <Footer />
