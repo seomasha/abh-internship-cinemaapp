@@ -13,7 +13,6 @@ import AboutUs from "./pages/AboutUs";
 import Tickets from "./pages/Tickets";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./utils/ScrollToTop";
-import CurrentlyShowing from "./pages/CurrentlyShowing";
 
 function App() {
   return (
@@ -25,7 +24,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/tickets" element={<Tickets />} />
-          <Route path="/currently-showing" element={<CurrentlyShowing />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
