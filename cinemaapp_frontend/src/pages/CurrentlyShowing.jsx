@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
@@ -7,6 +7,7 @@ import { CiLocationOn, CiClock1 } from "react-icons/ci";
 import DayPicker from "../components/DayPicker";
 import MovieCard from "../components/MovieCard";
 import { Carousel } from "react-bootstrap";
+
 import "../styles/CurrentlyShowing.css";
 
 const CurrentlyShowing = () => {
@@ -82,7 +83,7 @@ const CurrentlyShowing = () => {
           </div>
         </div>
 
-        <div className="mt-4 d-md-none">
+        <div className="mt-4 d-lg-none">
           <Carousel prevLabel="" nextLabel="" interval={null}>
             {dayPickers.map((picker, index) => (
               <Carousel.Item key={index}>
@@ -92,7 +93,7 @@ const CurrentlyShowing = () => {
           </Carousel>
         </div>
 
-        <div className="d-none d-md-flex justify-content-between mt-4 gap-1">
+        <div className="d-none flex-wrap d-lg-flex justify-content-start justify-content-xl-between mt-4 gap-1">
           {dayPickers}
         </div>
 
