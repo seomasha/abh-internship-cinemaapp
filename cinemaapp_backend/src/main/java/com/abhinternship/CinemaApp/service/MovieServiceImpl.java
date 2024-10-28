@@ -41,9 +41,9 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public List<Movie> findMovieByProjectionDateRange() {
+    public List<Movie> findMoviesByProjectionDateRange() {
         final LocalDate today = LocalDate.now();
-        return movieRepository.findMovieByProjectionDateRange(today, today.plusDays(10));
+        return movieRepository.findMoviesByProjectionDateRange(today, today.plusDays(10));
     }
 
     @Override

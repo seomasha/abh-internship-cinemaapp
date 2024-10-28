@@ -42,7 +42,7 @@ public class MovieController {
 
     @GetMapping("/currently-showing")
     public ResponseEntity<List<Movie>> getCurrentlyShowingMovies() {
-        final List<Movie> currentlyShowingMovies = movieService.findMovieByProjectionDateRange();
+        final List<Movie> currentlyShowingMovies = movieService.findMoviesByProjectionDateRange();
         return ResponseEntity.ok(currentlyShowingMovies);
     }
 

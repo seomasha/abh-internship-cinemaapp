@@ -12,7 +12,7 @@ public interface MovieService {
     Optional<Movie> findMovieById(Long id);
     Movie saveMovie(Movie movie);
     void deleteMovie(Long id);
-    List<Movie> findMovieByProjectionDateRange();
+    List<Movie> findMoviesByProjectionDateRange();
     List<Movie> findUpcomingMovies();
     List<Movie> findHeroMovies(int count);
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT m FROM Movie m WHERE m.projectionStartDate <= :endDate AND m.projectionEndDate >= :startDate")
-    List<Movie> findMovieByProjectionDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    List<Movie> findMoviesByProjectionDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     @Query("SELECT m FROM Movie m WHERE m.projectionStartDate >= :endDate")
     List<Movie> findUpcomingMovies(@Param("endDate") LocalDate endDate);
