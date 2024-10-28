@@ -3,6 +3,7 @@ package com.abhinternship.CinemaApp.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +31,10 @@ public class Movie {
     private String writers;
 
     private String actors;
+
+    private LocalDate projectionStartDate;
+
+    private LocalDate projectionEndDate;
 
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(

@@ -3,7 +3,7 @@ package com.abhinternship.CinemaApp.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Data
@@ -24,7 +24,5 @@ public class Projection {
     @JoinColumn(name = "hall_id", referencedColumnName = "id")
     private Hall hallId;
 
-    private LocalDateTime projectionTime;
-
-    private LocalDateTime projectionDate;
+    private LocalTime projectionTime;
 }
