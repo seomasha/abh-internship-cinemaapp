@@ -6,7 +6,6 @@ import Dropdown from "../components/Dropdown";
 
 import { CiLocationOn, CiClock1 } from "react-icons/ci";
 import DayPicker from "../components/DayPicker";
-import MovieCard from "../components/MovieCard";
 
 const CurrentlyShowing = () => {
   return (
@@ -50,7 +49,6 @@ const CurrentlyShowing = () => {
 
         <div className="d-flex flex-wrap justify-content-between mt-4"></div>
 
-        <MovieCard />
       </div>
 
       <Footer />
