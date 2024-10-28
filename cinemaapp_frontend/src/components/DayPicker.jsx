@@ -9,7 +9,7 @@ const DayPicker = ({ day, date, isSelected, onSelect }) => {
       }`}
       onClick={onSelect}
     >
-      <h5 className="fw-bold">{date}</h5>
+      <h6 className="fw-bold">{date}</h6>
       <h6 className="fw-light">{day}</h6>
     </div>
   );

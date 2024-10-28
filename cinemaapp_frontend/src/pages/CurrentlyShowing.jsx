@@ -6,6 +6,8 @@ import Dropdown from "../components/Dropdown";
 import { CiLocationOn, CiClock1 } from "react-icons/ci";
 import DayPicker from "../components/DayPicker";
 import MovieCard from "../components/MovieCard";
+import { Carousel } from "react-bootstrap";
+import "../styles/CurrentlyShowing.css";
 
 const CurrentlyShowing = () => {
   const today = new Date();
@@ -73,7 +75,17 @@ const CurrentlyShowing = () => {
           </div>
         </div>
 
-        <div className="d-flex flex-wrap justify-content-between mt-4">
+        <div className="mt-4 d-md-none">
+          <Carousel prevLabel="" nextLabel="">
+            {dayPickers.map((picker, index) => (
+              <Carousel.Item key={index}>
+                <div className="d-flex justify-content-center">{picker}</div>
+              </Carousel.Item>
+            ))}
+          </Carousel>
+        </div>
+
+        <div className="d-none d-md-flex justify-content-between mt-4 gap-1">
           {dayPickers}
         </div>
 
