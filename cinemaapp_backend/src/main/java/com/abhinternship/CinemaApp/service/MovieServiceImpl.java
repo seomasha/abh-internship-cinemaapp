@@ -1,24 +1,25 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.Movie;
-import com.abhinternship.CinemaApp.model.Projection;
-import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class MovieServiceImpl implements MovieService{
 
     private final MovieRepository movieRepository;
-    private final ProjectionService projectionService;
 
     @Override
     public List<Movie> findAllMovies() {
@@ -41,15 +42,19 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public List<Movie> findMoviesByProjectionDateRange() {
+    public List<Movie> findCurrentlyShowingMovies(int page, int size) {
         final LocalDate today = LocalDate.now();
-        return movieRepository.findMoviesByProjectionDateRange(today, today.plusDays(10));
+        final Pageable pageable = PageRequest.of(page, size);
+        final Page<Movie> currentlyShowingMoviesPage = movieRepository.findMoviesByProjectionDateRange(today, today.plusDays(10), pageable);
+        return currentlyShowingMoviesPage.getContent();
     }
 
     @Override
-    public List<Movie> findUpcomingMovies() {
-        LocalDate endDate = LocalDate.now().plusDays(10);
-        return movieRepository.findUpcomingMovies(endDate);
+    public List<Movie> findUpcomingMovies(int page, int size) {
+        final LocalDate endDate = LocalDate.now().plusDays(10);
+        final Pageable pageable = PageRequest.of(page, size);
+        final Page<Movie> upcomingMoviesPage = movieRepository.findUpcomingMovies(endDate, pageable);
+        return upcomingMoviesPage.getContent();
     }
 
     @Override
