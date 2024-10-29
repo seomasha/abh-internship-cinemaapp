@@ -1,7 +1,10 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.Movie;
+import com.abhinternship.CinemaApp.model.Venue;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface MovieService {
@@ -11,4 +14,5 @@ public interface MovieService {
     void deleteMovie(Long id);
     List<Movie> findCurrentlyShowingMovies(int page, int size);
     List<Movie> findUpcomingMovies(int page, int size);
+    Map<String, List<Movie>> getMoviesByVenue(Venue venue, int page, int size);
 }

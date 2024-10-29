@@ -43,12 +43,12 @@ const Home = () => {
   useEffect(() => {
     const fetchCurrentlyShowingAndUpcomingMovies = async () => {
       if (selectedVenueId) {
-        const projections = await projectionService.getProjectionsByVenueId(
+        const movies = await movieService.getMoviesByVenueId(
           selectedVenueId
         );
 
-        setCurrentlyShowingMovies(projections.currentlyShowing);
-        setUpcomingMovies(projections.upcoming);
+        setCurrentlyShowingMovies(movies.currentlyShowing);
+        setUpcomingMovies(movies.upcoming);
       }
     };
 

@@ -13,5 +13,4 @@ public interface ProjectionService {
     Optional<Projection> findProjectionById(Long id);
     Projection saveProjection(Projection projection);
     void deleteProjection(Long id);
-    Map<String, List<Movie>> getMoviesByVenue(Venue venue, int page, int size);
 }

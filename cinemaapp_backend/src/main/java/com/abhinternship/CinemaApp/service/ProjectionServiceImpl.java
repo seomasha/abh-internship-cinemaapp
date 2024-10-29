@@ -37,35 +37,4 @@ public class ProjectionServiceImpl implements ProjectionService {
     public void deleteProjection(Long id) {
         projectionRepository.deleteById(id);
     }
-
-    @Override
-    public Map<String, List<Movie>> getMoviesByVenue(final Venue venue, final int page, final int size) {
-        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
-        final List<Projection> projections = projectionPage.getContent();
-        final List<Movie> currentlyShowing = new ArrayList<>();
-        final List<Movie> upcoming = new ArrayList<>();
-
-        final LocalDate today = LocalDate.now();
-        final LocalDate endDate = today.plusDays(10);
-
-        for (Projection projection : projections) {
-            final Movie movie = projection.getMovieId();
-
-            final LocalDate projectionStartDate = movie.getProjectionStartDate();
-            final LocalDate projectionEndDate = movie.getProjectionEndDate();
-
-            if (projectionStartDate.isBefore(endDate) && projectionEndDate.isAfter(today)) {
-                currentlyShowing.add(movie);
-            } else if (projectionStartDate.isAfter(endDate)) {
-                upcoming.add(movie);
-            }
-        }
-
-        final Map<String, List<Movie>> response = new HashMap<>();
-        response.put("currentlyShowing", currentlyShowing);
-        response.put("upcoming", upcoming);
-
-        return response;
-    }
-
 }

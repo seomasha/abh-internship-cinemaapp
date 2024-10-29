@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.rest;
 
 import com.abhinternship.CinemaApp.model.Movie;
+import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.service.MovieService;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,14 @@ public class MovieController {
     public ResponseEntity<List<Movie>> getUpcomingMovies(final @RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
         List<Movie> upcomingMovies = movieService.findUpcomingMovies(page, size);
         return ResponseEntity.ok(upcomingMovies);
+    }
+
+    @GetMapping("/venue/{venueId}")
+    public ResponseEntity<Map<String, List<Movie>>> getMoviesByVenue(final @PathVariable Venue venueId,
+                                                                     final @RequestParam(defaultValue = "0") int page,
+                                                                     final @RequestParam(defaultValue = "5") int size) {
+        final Map<String, List<Movie>> movies = movieService.getMoviesByVenue(venueId, page, size);
+        return ResponseEntity.ok(movies);
     }
 
     @PostMapping
