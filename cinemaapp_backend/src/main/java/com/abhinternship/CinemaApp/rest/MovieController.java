@@ -28,35 +28,37 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable Long id) throws ResourceNotFoundException {
-        return movieService.findMovieById(id).map(ResponseEntity::ok).orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+        return movieService.findMovieById(id).
+                map(ResponseEntity::ok).
+                orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
     }
 
     @GetMapping("/currently-showing")
-    public ResponseEntity<MoviePageResponse> getCurrentlyShowingMovies(final @RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
-        MoviePageResponse currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
+    public ResponseEntity<MoviePageResponse> getCurrentlyShowingMovies(@RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
+        final MoviePageResponse currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
         return ResponseEntity.ok(currentlyShowingMovies);
     }
 
     @GetMapping("/upcoming")
     public ResponseEntity<MoviePageResponse> getUpcomingMovies(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
-        MoviePageResponse upcomingMovies = movieService.findUpcomingMovies(page, size);
+        final MoviePageResponse upcomingMovies = movieService.findUpcomingMovies(page, size);
         return ResponseEntity.ok(upcomingMovies);
     }
 
     @GetMapping("/venue/{venueId}/currently-showing")
     public ResponseEntity<MoviePageResponse> getCurrentlyShowingMoviesByVenue(@PathVariable Venue venueId,
-                                                                        @RequestParam(defaultValue = "0") int page,
-                                                                        @RequestParam(defaultValue = "4") int size) {
-        MoviePageResponse movies = movieService.getCurrentlyShowingMoviesByVenue(venueId, page, size);
+                                                                              @RequestParam(defaultValue = "0") int page,
+                                                                              @RequestParam(defaultValue = "4") int size) {
+        final MoviePageResponse movies = movieService.getCurrentlyShowingMoviesByVenue(venueId, page, size);
         return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/venue/{venueId}/upcoming")
     public ResponseEntity<MoviePageResponse> getUpcomingMoviesByVenue(@PathVariable Venue venueId,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "4") int size) {
-        MoviePageResponse movies = movieService.getUpcomingMoviesByVenue(venueId, page, size);
+                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                      @RequestParam(defaultValue = "4") int size) {
+        final MoviePageResponse movies = movieService.getUpcomingMoviesByVenue(venueId, page, size);
         return ResponseEntity.ok(movies);
     }
 
@@ -64,7 +66,8 @@ public class MovieController {
     @PostMapping
     public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) {
         movieService.saveMovie(movie);
-        return ResponseEntity.status(HttpStatus.CREATED).body(movie.getId());
+        return ResponseEntity
+                .status(HttpStatus.CREATED).body(movie.getId());
     }
 
     @DeleteMapping("/{id}")

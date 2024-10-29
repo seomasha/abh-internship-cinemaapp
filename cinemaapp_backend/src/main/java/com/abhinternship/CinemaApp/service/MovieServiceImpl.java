@@ -19,7 +19,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class MovieServiceImpl implements MovieService{
+public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final ProjectionRepository projectionRepository;
@@ -60,7 +60,8 @@ public class MovieServiceImpl implements MovieService{
     public MoviePageResponse findUpcomingMovies(final int page, final int size) {
         final LocalDate endDate = LocalDate.now().plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
-        final Page<Movie> upcomingMoviesPage = movieRepository.findByProjectionStartDateGreaterThanEqual(endDate, pageable);
+        final Page<Movie> upcomingMoviesPage = movieRepository
+                .findByProjectionStartDateGreaterThanEqual(endDate, pageable);
 
         final List<Movie> movies = upcomingMoviesPage.getContent();
         long totalSize = upcomingMoviesPage.getTotalElements();
