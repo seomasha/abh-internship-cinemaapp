@@ -3,32 +3,34 @@ import Card from "./Card";
 import { Pagination } from "react-bootstrap";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import SmallButton from "./SmallButton";
+import screenSizes from "../utils/screenSizes";
 
-const PaginatedList = ({ title, data }) => {
+const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
   const [itemsPerPage, setItemsPerPage] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
 
   const indexOfLastCard = currentPage * itemsPerPage;
   const indexOfFirstCard = indexOfLastCard - itemsPerPage;
-  const currentCards = data.slice(indexOfFirstCard, indexOfLastCard);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(totalSize / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
+      onPageChange(page + 1);
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+      onPageChange(page - 1);
     }
   };
 
   useEffect(() => {
     const updateItemsPerPage = () => {
-      if (window.innerWidth <= 991) {
+      if (window.innerWidth <= screenSizes.large) {
         setItemsPerPage(1);
       } else {
         setItemsPerPage(4);
@@ -40,6 +42,14 @@ const PaginatedList = ({ title, data }) => {
 
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
+
+  const displayedData =
+    title !== "Venues"
+      ? data
+      : data.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        );
 
   return (
     <div style={{ padding: "3rem 4rem" }}>
@@ -55,7 +65,7 @@ const PaginatedList = ({ title, data }) => {
       ) : (
         <>
           <div className="row">
-            {currentCards.map((card) => (
+            {displayedData.map((card) => (
               <div className="col-12 col-lg-3" key={card.id}>
                 {card.street ? (
                   <Card
@@ -85,9 +95,9 @@ const PaginatedList = ({ title, data }) => {
               <h6>
                 Showing{" "}
                 <span className="fw-bold">
-                  {Math.min(indexOfLastCard, data.length)}
+                  {Math.min(currentPage * itemsPerPage, totalSize)}
                 </span>{" "}
-                out of <span className="fw-bold">{data.length}</span>
+                out of <span className="fw-bold">{totalSize}</span>
               </h6>
             </div>
             <Pagination className="gap-4 mt-2">

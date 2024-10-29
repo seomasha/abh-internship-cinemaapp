@@ -7,14 +7,14 @@ const movieApiService = apiService(MOVIE_ENDPOINT);
 
 export const movieService = {
   ...movieApiService,
-  getCurrentlyShowingMovies: async (page = 0, size = 5) => {
+  getCurrentlyShowingMovies: async (page = 0, size = 4) => {
     const response = await axios.get(
       BASE_URL + MOVIE_ENDPOINT + "/currently-showing",
       { params: { page, size } }
     );
     return response.data;
   },
-  getUpcomingMovies: async (page = 0, size = 5) => {
+  getUpcomingMovies: async (page = 0, size = 4) => {
     const response = await axios.get(BASE_URL + MOVIE_ENDPOINT + "/upcoming", {
       params: { page, size },
     });

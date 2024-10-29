@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
+import com.abhinternship.CinemaApp.dto.MoviePageResponse;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.model.Venue;
@@ -44,23 +45,31 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public List<Movie> findCurrentlyShowingMovies(final int page, final int size) {
+    public MoviePageResponse findCurrentlyShowingMovies(final int page, final int size) {
         final LocalDate today = LocalDate.now();
         final Pageable pageable = PageRequest.of(page, size);
         final Page<Movie> currentlyShowingMoviesPage = movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfter(today.plusDays(10), today, pageable);
-        return currentlyShowingMoviesPage.getContent();
+
+        final List<Movie> movies = currentlyShowingMoviesPage.getContent();
+        long totalSize = currentlyShowingMoviesPage.getTotalElements();
+
+        return new MoviePageResponse(movies, totalSize);
     }
 
     @Override
-    public List<Movie> findUpcomingMovies(final int page, final int size) {
+    public MoviePageResponse findUpcomingMovies(final int page, final int size) {
         final LocalDate endDate = LocalDate.now().plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
         final Page<Movie> upcomingMoviesPage = movieRepository.findByProjectionStartDateGreaterThanEqual(endDate, pageable);
-        return upcomingMoviesPage.getContent();
+
+        final List<Movie> movies = upcomingMoviesPage.getContent();
+        long totalSize = upcomingMoviesPage.getTotalElements();
+
+        return new MoviePageResponse(movies, totalSize);
     }
 
     @Override
-    public List<Movie> getCurrentlyShowingMoviesByVenue(final Venue venue, final int page, final int size) {
+    public MoviePageResponse getCurrentlyShowingMoviesByVenue(final Venue venue, final int page, final int size) {
         final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
         final List<Projection> projections = projectionPage.getContent();
         final List<Movie> currentlyShowing = new ArrayList<>();
@@ -78,11 +87,13 @@ public class MovieServiceImpl implements MovieService{
             }
         }
 
-        return currentlyShowing;
+        long totalCurrentlyShowingSize = currentlyShowing.size();
+
+        return new MoviePageResponse(currentlyShowing, totalCurrentlyShowingSize);
     }
 
     @Override
-    public List<Movie> getUpcomingMoviesByVenue(final Venue venue, final int page, final int size) {
+    public MoviePageResponse getUpcomingMoviesByVenue(final Venue venue, final int page, final int size) {
         final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
         final List<Projection> projections = projectionPage.getContent();
         final List<Movie> upcoming = new ArrayList<>();
@@ -99,7 +110,8 @@ public class MovieServiceImpl implements MovieService{
             }
         }
 
-        return upcoming;
-    }
+        long upcomingSize = upcoming.size();
 
+        return new MoviePageResponse(upcoming, upcomingSize);
+    }
 }

@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from "react";
-
 import NavBar from "../components/Navbar";
 import Hero from "../components/Hero";
 import VenuesCarousel from "../components/VenuesCarousel";
 import PaginatedList from "../components/PaginatedList";
 import Footer from "../components/Footer";
-
 import { movieService } from "../services/movieService";
 import { venueService } from "../services/venueService";
-import { projectionService } from "../services/projectionService";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
   const [venues, setVenues] = useState([]);
   const [heroMovies, setHeroMovies] = useState([]);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
-  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState({
+    movies: [],
+    totalSize: 0,
+  });
+  const [upcomingMovies, setUpcomingMovies] = useState({
+    movies: [],
+    totalSize: 0,
+  });
+
+  const [currentlyShowingPage, setCurrentlyShowingPage] = useState(0);
+  const [upcomingPage, setUpcomingPage] = useState(0);
+  const [heroMoviesSet, setHeroMoviesSet] = useState(false);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -25,40 +32,69 @@ const Home = () => {
     };
 
     const fetchCurrentlyShowingMovies = async () => {
-      const currentlyShowing = await movieService.getCurrentlyShowingMovies();
-      setCurrentlyShowingMovies(currentlyShowing);
-      setHeroMovies(currentlyShowing);
+      const currentlyShowing = await movieService.getCurrentlyShowingMovies(
+        currentlyShowingPage
+      );
+
+      if (!heroMoviesSet) {
+        setHeroMovies(currentlyShowing.movies);
+        setHeroMoviesSet(true);
+      }
+
+      setCurrentlyShowingMovies({
+        movies: currentlyShowing.movies,
+        totalSize: currentlyShowing.totalSize,
+      });
     };
 
     const fetchUpcomingMovies = async () => {
-      const upcoming = await movieService.getUpcomingMovies();
-      setUpcomingMovies(upcoming);
+      const upcoming = await movieService.getUpcomingMovies(upcomingPage);
+      setUpcomingMovies({
+        movies: upcoming.movies,
+        totalSize: upcoming.totalSize,
+      });
     };
 
     fetchCurrentlyShowingMovies();
     fetchUpcomingMovies();
     fetchVenues();
-  }, []);
+  }, [currentlyShowingPage, upcomingPage, heroMoviesSet]);
 
   useEffect(() => {
     const fetchCurrentlyShowingAndUpcomingMovies = async () => {
       if (selectedVenueId) {
         const currentlyShowing =
           await movieService.getCurrentlyShowingMoviesByVenueId(
-            selectedVenueId
+            selectedVenueId,
+            currentlyShowingPage
           );
 
         const upcomingMovies = await movieService.getUpcomingMoviesByVenueId(
-          selectedVenueId
+          selectedVenueId,
+          upcomingPage
         );
 
-        setCurrentlyShowingMovies(currentlyShowing);
-        setUpcomingMovies(upcomingMovies);
+        setCurrentlyShowingMovies({
+          movies: currentlyShowing.movies,
+          totalSize: currentlyShowing.totalSize,
+        });
+        setUpcomingMovies({
+          movies: upcomingMovies.movies,
+          totalSize: upcomingMovies.totalSize,
+        });
       }
     };
 
     fetchCurrentlyShowingAndUpcomingMovies();
-  }, [selectedVenueId]);
+  }, [selectedVenueId, currentlyShowingPage, upcomingPage]);
+
+  const handleCurrentlyShowingPageChange = (newPage) => {
+    setCurrentlyShowingPage(newPage);
+  };
+
+  const handleUpcomingPageChange = (newPage) => {
+    setUpcomingPage(newPage);
+  };
 
   return (
     <div>
@@ -69,9 +105,21 @@ const Home = () => {
         setMovies={setMovies}
         setSelectedVenueId={setSelectedVenueId}
       />
-      <PaginatedList title="Currently Showing" data={currentlyShowingMovies} />
-      <PaginatedList title="Upcoming Movies" data={upcomingMovies} />
-      <PaginatedList title="Venues" data={venues} />
+      <PaginatedList
+        title="Currently Showing"
+        data={currentlyShowingMovies.movies}
+        totalSize={currentlyShowingMovies.totalSize}
+        page={currentlyShowingPage}
+        onPageChange={handleCurrentlyShowingPageChange}
+      />
+      <PaginatedList
+        title="Upcoming Movies"
+        data={upcomingMovies.movies}
+        totalSize={upcomingMovies.totalSize}
+        page={upcomingPage}
+        onPageChange={handleUpcomingPageChange}
+      />
+      <PaginatedList title="Venues" data={venues} totalSize={venues.length} />
       <Footer />
     </div>
   );

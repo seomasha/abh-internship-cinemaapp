@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
+import com.abhinternship.CinemaApp.dto.MoviePageResponse;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Venue;
 
@@ -12,8 +13,8 @@ public interface MovieService {
     Optional<Movie> findMovieById(Long id);
     void saveMovie(Movie movie);
     void deleteMovie(Long id);
-    List<Movie> findCurrentlyShowingMovies(int page, int size);
-    List<Movie> findUpcomingMovies(int page, int size);
-    List<Movie> getCurrentlyShowingMoviesByVenue(Venue venue, int page, int size);
-    List<Movie> getUpcomingMoviesByVenue(Venue venue, int page, int size);
+    MoviePageResponse findCurrentlyShowingMovies(int page, int size);
+    MoviePageResponse findUpcomingMovies(int page, int size);
+    MoviePageResponse getCurrentlyShowingMoviesByVenue(Venue venue, int page, int size);
+    MoviePageResponse getUpcomingMoviesByVenue(Venue venue, int page, int size);
 }
