@@ -24,16 +24,19 @@ const Home = () => {
       setVenues(venues);
     };
 
-    const fetchMoviesOverview = async () => {
-      const { currentlyShowingMovies, upcomingMovies } =
-        await movieService.getMoviesOverview();
-
-      setHeroMovies(currentlyShowingMovies);
-      setCurrentlyShowingMovies(currentlyShowingMovies);
-      setUpcomingMovies(upcomingMovies);
+    const fetchCurrentlyShowingMovies = async () => {
+      const currentlyShowing = await movieService.getCurrentlyShowingMovies();
+      setCurrentlyShowingMovies(currentlyShowing);
+      setHeroMovies(currentlyShowing);
     };
 
-    fetchMoviesOverview();
+    const fetchUpcomingMovies = async () => {
+      const upcoming = await movieService.getUpcomingMovies();
+      setUpcomingMovies(upcoming);
+    };
+
+    fetchCurrentlyShowingMovies();
+    fetchUpcomingMovies();
     fetchVenues();
   }, []);
 

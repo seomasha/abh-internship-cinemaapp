@@ -13,8 +13,17 @@ export const movieService = {
     );
     return response.data;
   },
-  getMoviesOverview: async () => {
-    const response = await axios.get(BASE_URL + MOVIE_ENDPOINT + "/overview");
-    return await response.data;
-  }
+  getCurrentlyShowingMovies: async (page = 0, size = 5) => {
+    const response = await axios.get(
+      BASE_URL + MOVIE_ENDPOINT + "/currently-showing",
+      { params: { page, size } }
+    );
+    return response.data;
+  },
+  getUpcomingMovies: async (page = 0, size = 5) => {
+    const response = await axios.get(BASE_URL + MOVIE_ENDPOINT + "/upcoming", {
+      params: { page, size },
+    });
+    return response.data;
+  },
 };

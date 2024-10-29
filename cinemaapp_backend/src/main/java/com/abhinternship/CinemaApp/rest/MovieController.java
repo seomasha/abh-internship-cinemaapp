@@ -30,17 +30,16 @@ public class MovieController {
 
     }
 
-    @GetMapping("/overview")
-    public ResponseEntity<Map<String, List<Movie>>> getMoviesOverview(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
-        final Map<String, List<Movie>> moviesOverview = new HashMap<>();
+    @GetMapping("/currently-showing")
+    public ResponseEntity<List<Movie>> getCurrentlyShowingMovies(final @RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
+        List<Movie> currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
+        return ResponseEntity.ok(currentlyShowingMovies);
+    }
 
-        final List<Movie> currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
-        final List<Movie> upcomingMovies = movieService.findUpcomingMovies(page, size);
-
-        moviesOverview.put("currentlyShowingMovies", currentlyShowingMovies);
-        moviesOverview.put("upcomingMovies", upcomingMovies);
-
-        return ResponseEntity.ok(moviesOverview);
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<Movie>> getUpcomingMovies(final @RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
+        List<Movie> upcomingMovies = movieService.findUpcomingMovies(page, size);
+        return ResponseEntity.ok(upcomingMovies);
     }
 
     @PostMapping
