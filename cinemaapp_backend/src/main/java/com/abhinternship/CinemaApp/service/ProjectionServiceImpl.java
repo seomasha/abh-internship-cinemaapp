@@ -5,7 +5,8 @@ import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,21 +39,21 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     @Override
-    public Map<String, List<Movie>> getMoviesByVenue(Venue venue) {
-        List<Projection> projections = projectionRepository.findAllByVenueId(venue);
-        List<Movie> currentlyShowing = new ArrayList<>();
-        List<Movie> upcoming = new ArrayList<>();
+    public Map<String, List<Movie>> getMoviesByVenue(Venue venue, int page, int size) {
+        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
+        final List<Projection> projections = projectionPage.getContent();
+        final List<Movie> currentlyShowing = new ArrayList<>();
+        final List<Movie> upcoming = new ArrayList<>();
 
-        LocalDate today = LocalDate.now();
-        LocalDate endDate = today.plusDays(10);
+        final LocalDate today = LocalDate.now();
+        final LocalDate endDate = today.plusDays(10);
 
-        // Filter projections based on their start and end dates
         for (Projection projection : projections) {
             Movie movie = projection.getMovieId();
 
             // Parse the strings to LocalDate
-            LocalDate projectionStartDate = movie.getProjectionStartDate();
-            LocalDate projectionEndDate = movie.getProjectionEndDate();
+            final LocalDate projectionStartDate = movie.getProjectionStartDate();
+            final LocalDate projectionEndDate = movie.getProjectionEndDate();
 
             if (projectionStartDate.isBefore(endDate) && projectionEndDate.isAfter(today)) {
                 currentlyShowing.add(movie);
@@ -61,7 +62,7 @@ public class ProjectionServiceImpl implements ProjectionService {
             }
         }
 
-        Map<String, List<Movie>> response = new HashMap<>();
+        final Map<String, List<Movie>> response = new HashMap<>();
         response.put("currentlyShowing", currentlyShowing);
         response.put("upcoming", upcoming);
 

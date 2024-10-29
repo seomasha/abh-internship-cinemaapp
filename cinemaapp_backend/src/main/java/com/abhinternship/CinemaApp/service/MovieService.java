@@ -1,9 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.Movie;
-import com.abhinternship.CinemaApp.model.Venue;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,22 +36,19 @@ public class MovieController {
 
     }
 
-    @GetMapping("/hero-movies")
-    public ResponseEntity<List<Movie>> getHeroMovies() {
+    @GetMapping("/overview")
+    public ResponseEntity<Map<String, List<Movie>>> getMoviesOverview() {
+        final Map<String, List<Movie>> moviesOverview = new HashMap<>();
+
         final List<Movie> heroMovies = movieService.findHeroMovies(3);
-        return ResponseEntity.ok(heroMovies);
-    }
-
-    @GetMapping("/currently-showing")
-    public ResponseEntity<List<Movie>> getCurrentlyShowingMovies() {
         final List<Movie> currentlyShowingMovies = movieService.findMoviesByProjectionDateRange();
-        return ResponseEntity.ok(currentlyShowingMovies);
-    }
-
-    @GetMapping("/upcoming")
-    public ResponseEntity<List<Movie>> getUpcomingMovies() {
         final List<Movie> upcomingMovies = movieService.findUpcomingMovies();
-        return ResponseEntity.ok(upcomingMovies);
+
+        moviesOverview.put("heroMovies", heroMovies);
+        moviesOverview.put("currentlyShowingMovies", currentlyShowingMovies);
+        moviesOverview.put("upcomingMovies", upcomingMovies);
+
+        return ResponseEntity.ok(moviesOverview);
     }
 
     @PostMapping
