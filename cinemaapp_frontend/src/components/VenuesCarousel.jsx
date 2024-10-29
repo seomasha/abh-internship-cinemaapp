@@ -3,7 +3,6 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import VenueButton from "./VenueButton";
-import { projectionService } from "../services/projectionService";
 import screenSizes from "../utils/screenSizes";
 import { movieService } from "../services/movieService";
 
@@ -51,11 +50,6 @@ const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
   };
 
   const handleVenueClick = async (venueId) => {
-    const response = await movieService.getMoviesByVenueId(venueId);
-    setMovies({
-      currentlyShowing: response.currentlyShowing,
-      upcoming: response.upcoming,
-    });
     setSelectedVenueId(venueId);
   };
 

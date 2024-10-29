@@ -14,5 +14,6 @@ public interface MovieService {
     void deleteMovie(Long id);
     List<Movie> findCurrentlyShowingMovies(int page, int size);
     List<Movie> findUpcomingMovies(int page, int size);
-    Map<String, List<Movie>> getMoviesByVenue(Venue venue, int page, int size);
+    List<Movie> getCurrentlyShowingMoviesByVenue(Venue venue, int page, int size);
+    List<Movie> getUpcomingMoviesByVenue(Venue venue, int page, int size);
 }
