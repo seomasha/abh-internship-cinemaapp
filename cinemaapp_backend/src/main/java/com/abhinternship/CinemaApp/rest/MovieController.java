@@ -34,11 +34,9 @@ public class MovieController {
     public ResponseEntity<Map<String, List<Movie>>> getMoviesOverview(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
         final Map<String, List<Movie>> moviesOverview = new HashMap<>();
 
-        final List<Movie> heroMovies = movieService.findHeroMovies(3);
         final List<Movie> currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
         final List<Movie> upcomingMovies = movieService.findUpcomingMovies(page, size);
 
-        moviesOverview.put("heroMovies", heroMovies);
         moviesOverview.put("currentlyShowingMovies", currentlyShowingMovies);
         moviesOverview.put("upcomingMovies", upcomingMovies);
 
@@ -46,9 +44,9 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(final @RequestBody Movie movie) {
-        final Movie savedMovie = movieService.saveMovie(movie);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
+    public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) {
+        movieService.saveMovie(movie);
+        return ResponseEntity.status(HttpStatus.CREATED).body(movie.getId());
     }
 
     @DeleteMapping("/{id}")

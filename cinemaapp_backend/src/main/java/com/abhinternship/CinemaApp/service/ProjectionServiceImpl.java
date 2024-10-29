@@ -39,7 +39,7 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     @Override
-    public Map<String, List<Movie>> getMoviesByVenue(Venue venue, int page, int size) {
+    public Map<String, List<Movie>> getMoviesByVenue(final Venue venue, final int page, final int size) {
         final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
         final List<Projection> projections = projectionPage.getContent();
         final List<Movie> currentlyShowing = new ArrayList<>();
@@ -49,9 +49,8 @@ public class ProjectionServiceImpl implements ProjectionService {
         final LocalDate endDate = today.plusDays(10);
 
         for (Projection projection : projections) {
-            Movie movie = projection.getMovieId();
+            final Movie movie = projection.getMovieId();
 
-            // Parse the strings to LocalDate
             final LocalDate projectionStartDate = movie.getProjectionStartDate();
             final LocalDate projectionEndDate = movie.getProjectionEndDate();
 

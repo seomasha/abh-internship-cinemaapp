@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 
 @Service
@@ -32,8 +31,8 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public Movie saveMovie(final Movie movie) {
-        return movieRepository.save(movie);
+    public void saveMovie(final Movie movie) {
+        movieRepository.save(movie);
     }
 
     @Override
@@ -42,33 +41,18 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public List<Movie> findCurrentlyShowingMovies(int page, int size) {
+    public List<Movie> findCurrentlyShowingMovies(final int page, final int size) {
         final LocalDate today = LocalDate.now();
         final Pageable pageable = PageRequest.of(page, size);
-        final Page<Movie> currentlyShowingMoviesPage = movieRepository.findMoviesByProjectionDateRange(today, today.plusDays(10), pageable);
+        final Page<Movie> currentlyShowingMoviesPage = movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfter(today.plusDays(10), today, pageable);
         return currentlyShowingMoviesPage.getContent();
     }
 
     @Override
-    public List<Movie> findUpcomingMovies(int page, int size) {
+    public List<Movie> findUpcomingMovies(final int page, final int size) {
         final LocalDate endDate = LocalDate.now().plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
-        final Page<Movie> upcomingMoviesPage = movieRepository.findUpcomingMovies(endDate, pageable);
+        final Page<Movie> upcomingMoviesPage = movieRepository.findByProjectionStartDateGreaterThanEqual(endDate, pageable);
         return upcomingMoviesPage.getContent();
-    }
-
-    @Override
-    public List<Movie> findHeroMovies(final int count) {
-        final List<Movie> allMovies = movieRepository.findAll();
-        if (allMovies.size() <= count) {
-            return allMovies;
-        }
-
-        final Random random = new Random();
-        return random.ints(0, allMovies.size())
-                .distinct()
-                .limit(count)
-                .mapToObj(allMovies::get)
-                .toList();
     }
 }

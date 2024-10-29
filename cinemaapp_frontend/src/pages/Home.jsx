@@ -25,9 +25,10 @@ const Home = () => {
     };
 
     const fetchMoviesOverview = async () => {
-      const { heroMovies, currentlyShowingMovies, upcomingMovies } = await movieService.getMoviesOverview();
+      const { currentlyShowingMovies, upcomingMovies } =
+        await movieService.getMoviesOverview();
 
-      setHeroMovies(heroMovies);
+      setHeroMovies(currentlyShowingMovies);
       setCurrentlyShowingMovies(currentlyShowingMovies);
       setUpcomingMovies(upcomingMovies);
     };
