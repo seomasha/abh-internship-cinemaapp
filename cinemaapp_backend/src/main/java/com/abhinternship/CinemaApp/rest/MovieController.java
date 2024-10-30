@@ -1,6 +1,6 @@
 package com.abhinternship.CinemaApp.rest;
 
-import com.abhinternship.CinemaApp.dto.MoviePageResponse;
+import com.abhinternship.CinemaApp.dto.MovieDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.service.MovieService;
@@ -10,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/movies")
@@ -35,30 +33,30 @@ public class MovieController {
     }
 
     @GetMapping("/currently-showing")
-    public ResponseEntity<MoviePageResponse> getCurrentlyShowingMovies(@RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
-        final MoviePageResponse currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
+    public ResponseEntity<MovieDTO> getCurrentlyShowingMovies(@RequestParam(defaultValue = "0") int page, final @RequestParam(defaultValue = "5") int size) {
+        final MovieDTO currentlyShowingMovies = movieService.findCurrentlyShowingMovies(page, size);
         return ResponseEntity.ok(currentlyShowingMovies);
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<MoviePageResponse> getUpcomingMovies(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
-        final MoviePageResponse upcomingMovies = movieService.findUpcomingMovies(page, size);
+    public ResponseEntity<MovieDTO> getUpcomingMovies(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+        final MovieDTO upcomingMovies = movieService.findUpcomingMovies(page, size);
         return ResponseEntity.ok(upcomingMovies);
     }
 
     @GetMapping("/venue/{venueId}/currently-showing")
-    public ResponseEntity<MoviePageResponse> getCurrentlyShowingMoviesByVenue(@PathVariable Venue venueId,
-                                                                              @RequestParam(defaultValue = "0") int page,
-                                                                              @RequestParam(defaultValue = "4") int size) {
-        final MoviePageResponse movies = movieService.getCurrentlyShowingMoviesByVenue(venueId, page, size);
+    public ResponseEntity<MovieDTO> getCurrentlyShowingMoviesByVenue(@PathVariable Venue venueId,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "4") int size) {
+        final MovieDTO movies = movieService.getCurrentlyShowingMoviesByVenue(venueId, page, size);
         return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/venue/{venueId}/upcoming")
-    public ResponseEntity<MoviePageResponse> getUpcomingMoviesByVenue(@PathVariable Venue venueId,
-                                                                      @RequestParam(defaultValue = "0") int page,
-                                                                      @RequestParam(defaultValue = "4") int size) {
-        final MoviePageResponse movies = movieService.getUpcomingMoviesByVenue(venueId, page, size);
+    public ResponseEntity<MovieDTO> getUpcomingMoviesByVenue(@PathVariable Venue venueId,
+                                                             @RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "4") int size) {
+        final MovieDTO movies = movieService.getUpcomingMoviesByVenue(venueId, page, size);
         return ResponseEntity.ok(movies);
     }
 

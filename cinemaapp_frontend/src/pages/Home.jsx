@@ -9,7 +9,7 @@ import { venueService } from "../services/venueService";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
-  const [venues, setVenues] = useState([]);
+  const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
   const [heroMovies, setHeroMovies] = useState([]);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
   const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState({
@@ -23,12 +23,13 @@ const Home = () => {
 
   const [currentlyShowingPage, setCurrentlyShowingPage] = useState(0);
   const [upcomingPage, setUpcomingPage] = useState(0);
+  const [venuesPage, setVenuesPage] = useState(0);
   const [heroMoviesSet, setHeroMoviesSet] = useState(false);
 
   useEffect(() => {
     const fetchVenues = async () => {
-      const venues = await venueService.getAll();
-      setVenues(venues);
+      const venueList = await venueService.getAll(venuesPage);
+      setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
     };
 
     const fetchCurrentlyShowingMovies = async () => {
@@ -58,7 +59,7 @@ const Home = () => {
     fetchCurrentlyShowingMovies();
     fetchUpcomingMovies();
     fetchVenues();
-  }, [currentlyShowingPage, upcomingPage, heroMoviesSet]);
+  }, [currentlyShowingPage, upcomingPage, heroMoviesSet, venuesPage]);
 
   useEffect(() => {
     const fetchCurrentlyShowingAndUpcomingMovies = async () => {
@@ -96,12 +97,16 @@ const Home = () => {
     setUpcomingPage(newPage);
   };
 
+  const handleVenuesPageChange = (newPage) => {
+    setVenuesPage(newPage);
+  };
+
   return (
     <div>
       <NavBar />
       <Hero data={heroMovies} />
       <VenuesCarousel
-        data={venues}
+        data={venues.venues}
         setMovies={setMovies}
         setSelectedVenueId={setSelectedVenueId}
       />
@@ -119,7 +124,13 @@ const Home = () => {
         page={upcomingPage}
         onPageChange={handleUpcomingPageChange}
       />
-      <PaginatedList title="Venues" data={venues} totalSize={venues.length} />
+      <PaginatedList
+        title="Venues"
+        data={venues.venues}
+        totalSize={venues.totalSize}
+        page={venuesPage}
+        onPageChange={handleVenuesPageChange}
+      />
       <Footer />
     </div>
   );

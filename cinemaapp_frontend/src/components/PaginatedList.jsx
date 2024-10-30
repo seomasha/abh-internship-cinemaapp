@@ -43,14 +43,6 @@ const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
-  const displayedData =
-    page === null
-      ? data
-      : data.slice(
-          (currentPage - 1) * itemsPerPage,
-          currentPage * itemsPerPage
-        );
-
   return (
     <div style={{ padding: "3rem 4rem" }}>
       <div className="d-flex justify-content-between align-items-center">
@@ -65,7 +57,7 @@ const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
       ) : (
         <>
           <div className="row">
-            {displayedData.map((card) => (
+            {data.map((card) => (
               <div className="col-12 col-lg-3" key={card.id}>
                 {card.street ? (
                   <Card
