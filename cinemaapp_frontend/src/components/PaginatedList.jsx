@@ -44,7 +44,7 @@ const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
   }, []);
 
   const displayedData =
-    title !== "Venues"
+    page === null
       ? data
       : data.slice(
           (currentPage - 1) * itemsPerPage,
