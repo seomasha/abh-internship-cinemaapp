@@ -6,6 +6,8 @@ import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.repository.MovieRepository;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
+import com.abhinternship.CinemaApp.repository.VenueRepository;
+import com.abhinternship.CinemaApp.utils.FilterMovie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,7 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final ProjectionRepository projectionRepository;
+    private final VenueRepository venueRepository;
 
     @Override
     public List<Movie> findAllMovies() {
@@ -57,21 +60,18 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieDTO findUpcomingMovies(final int page, final int size) {
-        final LocalDate endDate = LocalDate.now().plusDays(10);
-        final Pageable pageable = PageRequest.of(page, size);
-        final Page<Movie> upcomingMoviesPage = movieRepository
-                .findByProjectionStartDateGreaterThanEqual(endDate, pageable);
+    public MovieDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size) {
+        if (filterMovie.getVenueId() == null) {
+            return new MovieDTO(new ArrayList<>(), 0);
+        }
 
-        final List<Movie> movies = upcomingMoviesPage.getContent();
-        final long totalSize = upcomingMoviesPage.getTotalElements();
+        Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
 
-        return new MovieDTO(movies, totalSize);
-    }
+        if (!venue.isPresent()) {
+            return new MovieDTO(new ArrayList<>(), 0);
+        }
 
-    @Override
-    public MovieDTO getCurrentlyShowingMoviesByVenue(final Venue venue, final int page, final int size) {
-        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
+        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue.get(), PageRequest.of(page, size));
         final List<Projection> projections = projectionPage.getContent();
         final List<Movie> currentlyShowing = new ArrayList<>();
 
@@ -93,9 +93,33 @@ public class MovieServiceImpl implements MovieService {
         return new MovieDTO(currentlyShowing, totalCurrentlyShowingSize);
     }
 
+
     @Override
-    public MovieDTO getUpcomingMoviesByVenue(final Venue venue, final int page, final int size) {
-        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue, PageRequest.of(page, size));
+    public MovieDTO findUpcomingMovies(final int page, final int size) {
+        final LocalDate endDate = LocalDate.now().plusDays(10);
+        final Pageable pageable = PageRequest.of(page, size);
+        final Page<Movie> upcomingMoviesPage = movieRepository
+                .findByProjectionStartDateGreaterThanEqual(endDate, pageable);
+
+        final List<Movie> movies = upcomingMoviesPage.getContent();
+        final long totalSize = upcomingMoviesPage.getTotalElements();
+
+        return new MovieDTO(movies, totalSize);
+    }
+
+
+    @Override
+    public MovieDTO findUpcomingMovies(FilterMovie filterMovie, final int page, final int size) {
+        if (filterMovie.getVenueId() == null) {
+            return findUpcomingMovies(page, size);
+        }
+
+        Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
+        if (!venue.isPresent()) {
+            return new MovieDTO(new ArrayList<>(), 0); // Return an empty MovieDTO if venue not found
+        }
+
+        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue.get(), PageRequest.of(page, size));
         final List<Projection> projections = projectionPage.getContent();
         final List<Movie> upcoming = new ArrayList<>();
 
@@ -116,3 +140,4 @@ public class MovieServiceImpl implements MovieService {
         return new MovieDTO(upcoming, upcomingSize);
     }
 }
+
