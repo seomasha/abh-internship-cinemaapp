@@ -7,10 +7,12 @@ import java.util.Map;
 public class FilterMovie {
     private Long venueId;
 
-    public FilterMovie() {}
-
     public FilterMovie(Map<String, String> filters) {
         this.venueId = filters.containsKey("venueId") ? Long.valueOf(filters.get("venueId")) : null;
+    }
+
+    public boolean isEmpty() {
+        return venueId == null;
     }
 }
 

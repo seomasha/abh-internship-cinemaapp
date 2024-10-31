@@ -51,7 +51,8 @@ public class MovieServiceImpl implements MovieService {
     public MovieDTO findCurrentlyShowingMovies(final int page, final int size) {
         final LocalDate today = LocalDate.now();
         final Pageable pageable = PageRequest.of(page, size);
-        final Page<Movie> currentlyShowingMoviesPage = movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfter(today.plusDays(10), today, pageable);
+        final Page<Movie> currentlyShowingMoviesPage = movieRepository
+                .findByProjectionStartDateBeforeAndProjectionEndDateAfter(today.plusDays(10), today, pageable);
 
         final List<Movie> movies = currentlyShowingMoviesPage.getContent();
         final long totalSize = currentlyShowingMoviesPage.getTotalElements();
@@ -60,14 +61,14 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size) {
-        if (filterMovie.getVenueId() == null) {
-            return new MovieDTO(new ArrayList<>(), 0);
+    public MovieDTO findCurrentlyShowingMovies(final FilterMovie filterMovie, final int page, final int size) {
+        if (filterMovie.isEmpty()) {
+            return findCurrentlyShowingMovies(page, size);
         }
 
         Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
 
-        if (!venue.isPresent()) {
+        if (venue.isEmpty()) {
             return new MovieDTO(new ArrayList<>(), 0);
         }
 
@@ -109,14 +110,14 @@ public class MovieServiceImpl implements MovieService {
 
 
     @Override
-    public MovieDTO findUpcomingMovies(FilterMovie filterMovie, final int page, final int size) {
-        if (filterMovie.getVenueId() == null) {
+    public MovieDTO findUpcomingMovies(final FilterMovie filterMovie, final int page, final int size) {
+        if (filterMovie.isEmpty()) {
             return findUpcomingMovies(page, size);
         }
 
         Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
-        if (!venue.isPresent()) {
-            return new MovieDTO(new ArrayList<>(), 0); // Return an empty MovieDTO if venue not found
+        if (venue.isEmpty()) {
+            return new MovieDTO(new ArrayList<>(), 0);
         }
 
         final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue.get(), PageRequest.of(page, size));
@@ -140,4 +141,3 @@ public class MovieServiceImpl implements MovieService {
         return new MovieDTO(upcoming, upcomingSize);
     }
 }
-
