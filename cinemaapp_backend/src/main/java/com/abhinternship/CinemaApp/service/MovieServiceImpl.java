@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -72,26 +73,18 @@ public class MovieServiceImpl implements MovieService {
             return new MovieDTO(new ArrayList<>(), 0);
         }
 
-        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue.get(), PageRequest.of(page, size));
-        final List<Projection> projections = projectionPage.getContent();
-        final List<Movie> currentlyShowing = new ArrayList<>();
-
         final LocalDate today = LocalDate.now();
         final LocalDate endDate = today.plusDays(10);
+        final Page<Projection> projectionPage = projectionRepository.findCurrentlyShowingProjectionsByVenueAndMovieDates(
+                venue.get(), today, endDate, PageRequest.of(page, size));
 
-        for (Projection projection : projections) {
-            final Movie movie = projection.getMovieId();
-            final LocalDate projectionStartDate = movie.getProjectionStartDate();
-            final LocalDate projectionEndDate = movie.getProjectionEndDate();
+        final List<Movie> currentlyShowingMovies = projectionPage.stream()
+                .map(Projection::getMovieId)
+                .distinct()
+                .collect(Collectors.toList());
 
-            if (projectionStartDate.isBefore(endDate) && projectionEndDate.isAfter(today)) {
-                currentlyShowing.add(movie);
-            }
-        }
+        return new MovieDTO(currentlyShowingMovies, projectionPage.getTotalElements());
 
-        final long totalCurrentlyShowingSize = currentlyShowing.size();
-
-        return new MovieDTO(currentlyShowing, totalCurrentlyShowingSize);
     }
 
 
@@ -120,24 +113,15 @@ public class MovieServiceImpl implements MovieService {
             return new MovieDTO(new ArrayList<>(), 0);
         }
 
-        final Page<Projection> projectionPage = projectionRepository.findAllByVenueId(venue.get(), PageRequest.of(page, size));
-        final List<Projection> projections = projectionPage.getContent();
-        final List<Movie> upcoming = new ArrayList<>();
+        final LocalDate endDate = LocalDate.now().plusDays(10);
+        final Page<Projection> projectionPage = projectionRepository.findUpcomingProjectionsByVenueAndMovieDates(
+                venue.get(), endDate, PageRequest.of(page, size));
 
-        final LocalDate today = LocalDate.now();
-        final LocalDate endDate = today.plusDays(10);
+        final List<Movie> upcoming = projectionPage.stream()
+                .map(Projection::getMovieId)
+                .distinct()
+                .collect(Collectors.toList());
 
-        for (Projection projection : projections) {
-            final Movie movie = projection.getMovieId();
-            final LocalDate projectionStartDate = movie.getProjectionStartDate();
-
-            if (projectionStartDate.isAfter(endDate)) {
-                upcoming.add(movie);
-            }
-        }
-
-        final long upcomingSize = upcoming.size();
-
-        return new MovieDTO(upcoming, upcomingSize);
+        return new MovieDTO(upcoming, projectionPage.getTotalElements());
     }
 }
