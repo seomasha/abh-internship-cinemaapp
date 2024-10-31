@@ -3,63 +3,66 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import VenueButton from "./VenueButton";
+import screenSizes from "../utils/screenSizes";
 
-const venues = [
-  { id: 1, name: "Cineplex" },
-  { id: 2, name: "Meeting point" },
-  { id: 3, name: "Cinestar" },
-  { id: 4, name: "Kinoteka" },
-  { id: 5, name: "Kino Novi Grad" },
-  { id: 6, name: "Kino Cinema City" },
-  { id: 7, name: "Kino Cinema City" },
-  { id: 8, name: "Kino Cinema City" },
-];
-
-const VenuesCarousel = () => {
+const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
   const settings = {
     infinite: true,
-    speed: 1000,
-    slidesToShow: 6,
-    slidesToScroll: 2,
-    draggable: true,
-    cssEase: "linear",
+    dots: true,
+    speed: 500,
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    centerMode: true,
+    centerPadding: "0px",
+    focusOnSelect: true,
     responsive: [
       {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: 5,
-          slidesToScroll: 2,
-        },
-      },
-      {
-        breakpoint: 992,
+        breakpoint: screenSizes.extraLarge,
         settings: {
           slidesToShow: 4,
           slidesToScroll: 1,
         },
       },
       {
-        breakpoint: 768,
+        breakpoint: screenSizes.large,
         settings: {
           slidesToShow: 3,
           slidesToScroll: 1,
         },
       },
       {
-        breakpoint: 576,
+        breakpoint: screenSizes.medium,
         settings: {
           slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: screenSizes.small,
+        settings: {
+          slidesToShow: 1,
           slidesToScroll: 1,
         },
       },
     ],
   };
 
+  const handleVenueClick = async (venueId) => {
+    setSelectedVenueId(venueId);
+  };
+
   return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
+    <div style={{ padding: "2rem" }}>
       <Slider {...settings}>
-        {venues.map((venue) => (
-          <VenueButton key={venue.id} name={venue.name} />
+        {data.map((venue) => (
+          <div key={venue.id} className="d-flex justify-content-center">
+            <VenueButton
+              id={venue.id}
+              name={venue.name}
+              onClick={() => handleVenueClick(venue.id)}
+            />
+          </div>
         ))}
       </Slider>
     </div>

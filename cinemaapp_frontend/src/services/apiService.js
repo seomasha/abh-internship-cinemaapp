@@ -1,7 +1,9 @@
 import axios from "axios";
 import ErrorHandler from "./errorHandler";
 
-const BASE_URL = "http://localhost:8888";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const apiPath = import.meta.env.VITE_API_PATH;
+export const BASE_URL = `${backendUrl}${apiPath}`;
 
 const request = async (url, options = {}) => {
   try {
@@ -15,7 +17,10 @@ const request = async (url, options = {}) => {
 export const apiService = (endpoint) => {
   return {
     get: () => request(endpoint),
-    getAll: () => request(endpoint),
+    getAll: (page = 0, size = 0) =>
+      request(endpoint, {
+        params: { page, size },
+      }),
     create: (data) =>
       request(endpoint, {
         method: "POST",

@@ -13,8 +13,4 @@ public class Genre {
     private Long id;
 
     private String name;
-
-
-    @ManyToMany(mappedBy = "genres")
-    private Set<Movie> movies;
 }
