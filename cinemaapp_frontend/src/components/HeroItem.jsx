@@ -15,7 +15,7 @@ const HeroItem = ({ imageUrl, title, description, genre }) => {
       <div className="hero-item-content p-3">
         <div className="genres-container mb-3 d-flex flex-wrap">
           {genre.map((genreItem, index) => (
-            <HeroMovieCategory key={index} genre={genreItem} />
+            <HeroMovieCategory key={index} genre={genreItem.name} />
           ))}
         </div>
 

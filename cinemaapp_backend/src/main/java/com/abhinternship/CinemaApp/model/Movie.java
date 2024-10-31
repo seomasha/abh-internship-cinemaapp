@@ -3,6 +3,8 @@ package com.abhinternship.CinemaApp.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,7 +32,9 @@ public class Movie {
 
     private String actors;
 
-    private String status;
+    private LocalDate projectionStartDate;
+
+    private LocalDate projectionEndDate;
 
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
@@ -39,4 +43,7 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     private Set<Genre> genres;
+
+    @OneToMany(mappedBy = "entityId", cascade = CascadeType.ALL)
+    private List<Photo> photos;
 }

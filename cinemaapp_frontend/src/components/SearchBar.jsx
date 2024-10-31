@@ -6,7 +6,11 @@ const SearchBar = () => {
   return (
     <div className="search-container">
       <IoSearchOutline className="search-icon" />
-      <input type="search" className="search-input fw-light" placeholder="Search" />
+      <input
+        type="search"
+        className="search-input fw-light"
+        placeholder="Search"
+      />
     </div>
   );
 };
