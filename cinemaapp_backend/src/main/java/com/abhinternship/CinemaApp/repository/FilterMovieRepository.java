@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface FilterMovieRepository {
-    Page<Movie> findMoviesByFilter(FilterMovie filter, Pageable pageable);
+    Page<Movie> findMoviesByFilter(FilterMovie filter, Pageable pageable, boolean currentlyShowing);
 }

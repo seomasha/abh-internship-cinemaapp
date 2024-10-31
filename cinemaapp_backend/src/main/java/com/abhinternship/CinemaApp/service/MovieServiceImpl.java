@@ -63,14 +63,9 @@ public class MovieServiceImpl implements MovieService {
         }
 
         final Page<Movie> moviePage = filterMovieRepositoryImpl.findMoviesByFilter(
-                filterMovie, pageable);
+                filterMovie, pageable, true);
 
-        final List<Movie> currentlyShowingMovies = moviePage.getContent().stream()
-                .filter(movie -> !movie.getProjectionStartDate().isAfter(endDate)
-                        && !movie.getProjectionEndDate().isBefore(today))
-                .collect(Collectors.toList());
-
-        return new MovieDTO(currentlyShowingMovies, currentlyShowingMovies.size());
+        return new MovieDTO(moviePage);
     }
 
     @Override
@@ -85,12 +80,8 @@ public class MovieServiceImpl implements MovieService {
         }
 
         final Page<Movie> moviePage = filterMovieRepositoryImpl.findMoviesByFilter(
-                filterMovie, pageable);
+                filterMovie, pageable, false);
 
-        final List<Movie> upcomingMovies = moviePage.getContent().stream()
-                .filter(movie -> movie.getProjectionStartDate().isAfter(endDate))
-                .collect(Collectors.toList());
-
-        return new MovieDTO(upcomingMovies, upcomingMovies.size());
+        return new MovieDTO(moviePage);
     }
 }

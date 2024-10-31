@@ -21,11 +21,11 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
     }
 
     @Override
-    public Page<Movie> findMoviesByFilter(final FilterMovie filter, final Pageable pageable) {
+    public Page<Movie> findMoviesByFilter(final FilterMovie filter, final Pageable pageable, final boolean currentlyShowing) {
         final String baseQuery = "SELECT m FROM Movie m JOIN Projection p ON m.id = p.movieId.id";
 
         List<Object> parameters = new ArrayList<>();
-        final String filterQuery = filter.toQueryString(parameters);
+        final String filterQuery = filter.toQueryString(parameters, currentlyShowing);
 
         final String finalQuery = filterQuery.isEmpty() ? baseQuery : baseQuery + " WHERE " + filterQuery;
 
