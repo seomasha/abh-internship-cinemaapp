@@ -67,7 +67,7 @@ public class MovieServiceImpl implements MovieService {
             return findCurrentlyShowingMovies(page, size);
         }
 
-        Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
+        final Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
 
         if (venue.isEmpty()) {
             return new MovieDTO(new ArrayList<>(), 0);
@@ -108,7 +108,7 @@ public class MovieServiceImpl implements MovieService {
             return findUpcomingMovies(page, size);
         }
 
-        Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
+        final Optional<Venue> venue = venueRepository.findById(filterMovie.getVenueId());
         if (venue.isEmpty()) {
             return new MovieDTO(new ArrayList<>(), 0);
         }
