@@ -19,7 +19,7 @@ public class VenueServiceImpl implements VenueService{
     @Override
     public VenueDTO findAllVenues(final int page, final int size) {
         if(size == 0) {
-            List<Venue> allVenues = venueRepository.findAll();
+            final List<Venue> allVenues = venueRepository.findAll();
             return new VenueDTO(allVenues, allVenues.size());
         } else {
             final Page<Venue> venues = venueRepository.findAll(PageRequest.of(page, size));
