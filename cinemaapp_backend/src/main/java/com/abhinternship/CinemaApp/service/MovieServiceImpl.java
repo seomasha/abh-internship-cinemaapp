@@ -55,10 +55,7 @@ public class MovieServiceImpl implements MovieService {
         final Page<Movie> currentlyShowingMoviesPage = movieRepository
                 .findByProjectionStartDateBeforeAndProjectionEndDateAfter(today.plusDays(10), today, pageable);
 
-        final List<Movie> movies = currentlyShowingMoviesPage.getContent();
-        final long totalSize = currentlyShowingMoviesPage.getTotalElements();
-
-        return new MovieDTO(movies, totalSize);
+        return new MovieDTO(currentlyShowingMoviesPage);
     }
 
     @Override
@@ -84,7 +81,6 @@ public class MovieServiceImpl implements MovieService {
                 .collect(Collectors.toList());
 
         return new MovieDTO(currentlyShowingMovies, projectionPage.getTotalElements());
-
     }
 
 
@@ -95,10 +91,7 @@ public class MovieServiceImpl implements MovieService {
         final Page<Movie> upcomingMoviesPage = movieRepository
                 .findByProjectionStartDateGreaterThanEqual(endDate, pageable);
 
-        final List<Movie> movies = upcomingMoviesPage.getContent();
-        final long totalSize = upcomingMoviesPage.getTotalElements();
-
-        return new MovieDTO(movies, totalSize);
+        return new MovieDTO(upcomingMoviesPage);
     }
 
 
