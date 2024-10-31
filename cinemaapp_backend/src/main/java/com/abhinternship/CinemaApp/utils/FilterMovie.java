@@ -14,5 +14,9 @@ public class FilterMovie {
     public boolean isEmpty() {
         return venueId == null;
     }
+
+    public static FilterMovie empty() {
+        return new FilterMovie(Map.of());
+    }
 }
 

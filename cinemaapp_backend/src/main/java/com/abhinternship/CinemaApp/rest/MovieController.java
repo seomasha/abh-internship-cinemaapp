@@ -41,7 +41,7 @@ public class MovieController {
                                                               @RequestParam(required = false) Map<String, String> filters) {
         final MovieDTO currentlyShowingMovies;
 
-        final FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = (filters == null || filters.isEmpty()) ? FilterMovie.empty() : new FilterMovie(filters);
         currentlyShowingMovies = movieService.findCurrentlyShowingMovies(filterMovie, page, size);
 
         return ResponseEntity.ok(currentlyShowingMovies);
@@ -53,7 +53,7 @@ public class MovieController {
                                                       @RequestParam(required = false) Map<String, String> filters) {
         final MovieDTO upcomingMovies;
 
-        final FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = (filters == null || filters.isEmpty()) ? FilterMovie.empty() : new FilterMovie(filters);
         upcomingMovies = movieService.findUpcomingMovies(filterMovie, page, size);
 
         return ResponseEntity.ok(upcomingMovies);
