@@ -7,7 +7,7 @@ import java.util.Map;
 public class FilterMovie {
     private final Long venueId;
 
-    public FilterMovie(Map<String, String> filters) {
+    public FilterMovie(final Map<String, String> filters) {
         this.venueId = filters.containsKey("venueId") ? Long.valueOf(filters.get("venueId")) : null;
     }
 
