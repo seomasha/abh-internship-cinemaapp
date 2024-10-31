@@ -38,6 +38,10 @@ const Home = () => {
       setVenueCarousel(carousel.venues);
     };
 
+    fetchVenues();
+  }, [venuesPage]);
+
+  useEffect(() => {
     const fetchCurrentlyShowingMovies = async () => {
       const currentlyShowing = await movieService.getMovies();
 
@@ -65,26 +69,28 @@ const Home = () => {
 
     fetchCurrentlyShowingMovies();
     fetchUpcomingMovies();
-    fetchVenues();
-  }, [currentlyShowingPage, upcomingPage, heroMoviesSet, venuesPage]);
+  }, [currentlyShowingPage, upcomingPage, heroMoviesSet]);
 
   useEffect(() => {
-    const fetchCurrentlyShowingAndUpcomingMovies = async () => {
+    const fetchAndProcessCurrentlyShowing = async () => {
       if (selectedVenueId) {
         const currentlyShowing = await movieService.getMovies({
           page: currentlyShowingPage,
           venueId: selectedVenueId,
         });
+        setCurrentlyShowingMovies({
+          movies: currentlyShowing.movies,
+          totalSize: currentlyShowing.totalSize,
+        });
+      }
+    };
 
+    const fetchAndProcessUpcomingMovies = async () => {
+      if (selectedVenueId) {
         const upcomingMovies = await movieService.getMovies({
           type: "upcoming",
           page: upcomingPage,
           venueId: selectedVenueId,
-        });
-
-        setCurrentlyShowingMovies({
-          movies: currentlyShowing.movies,
-          totalSize: currentlyShowing.totalSize,
         });
         setUpcomingMovies({
           movies: upcomingMovies.movies,
@@ -93,7 +99,8 @@ const Home = () => {
       }
     };
 
-    fetchCurrentlyShowingAndUpcomingMovies();
+    fetchAndProcessCurrentlyShowing();
+    fetchAndProcessUpcomingMovies();
   }, [selectedVenueId, currentlyShowingPage, upcomingPage]);
 
   const handleCurrentlyShowingPageChange = (newPage) => {
