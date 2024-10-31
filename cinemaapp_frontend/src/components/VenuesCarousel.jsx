@@ -13,7 +13,7 @@ const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
     slidesToShow: 5,
     slidesToScroll: 1,
     swipeToSlide: true,
-    centerMode: false,
+    centerMode: true,
     centerPadding: "0px",
     focusOnSelect: true,
     responsive: [

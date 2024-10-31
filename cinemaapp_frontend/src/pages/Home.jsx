@@ -9,6 +9,7 @@ import { venueService } from "../services/venueService";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
+  const [venueCarousel, setVenueCarousel] = useState([]);
   const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
   const [heroMovies, setHeroMovies] = useState([]);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
@@ -29,7 +30,12 @@ const Home = () => {
   useEffect(() => {
     const fetchVenues = async () => {
       const venueList = await venueService.getAll(venuesPage);
+      const carousel = await venueService.getAll(
+        venuesPage,
+        venueList.totalSize
+      );
       setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
+      setVenueCarousel(carousel.venues);
     };
 
     const fetchCurrentlyShowingMovies = async () => {
@@ -104,10 +110,11 @@ const Home = () => {
 
   return (
     <div>
+      {console.log(venueCarousel)}
       <NavBar />
       <Hero data={heroMovies} />
       <VenuesCarousel
-        data={venues.venues}
+        data={venueCarousel}
         setMovies={setMovies}
         setSelectedVenueId={setSelectedVenueId}
       />
