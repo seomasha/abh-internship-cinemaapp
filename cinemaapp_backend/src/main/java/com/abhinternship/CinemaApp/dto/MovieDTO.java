@@ -14,7 +14,7 @@ public class MovieDTO {
     private final List<Movie> movies;
     private final long totalSize;
 
-    public MovieDTO(Page<Movie> moviePage) {
+    public MovieDTO(final Page<Movie> moviePage) {
         this.movies = moviePage.getContent();
         this.totalSize = moviePage.getTotalElements();
     }

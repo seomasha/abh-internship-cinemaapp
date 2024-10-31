@@ -28,10 +28,6 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
 
         final Query query = entityManager.createQuery(finalQuery, Movie.class);
 
-        if (filter.getVenueId() != null) {
-            query.setParameter("venueId", filter.getVenueId());
-        }
-
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
@@ -41,10 +37,6 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
                 "SELECT COUNT(m) FROM Movie m JOIN Projection p ON m.id = p.movieId.id" +
                         (filterQuery.isEmpty() ? "" : " WHERE " + filterQuery)
         );
-
-        if (filter.getVenueId() != null) {
-            countQuery.setParameter("venueId", filter.getVenueId());
-        }
 
         final long count = (long) countQuery.getSingleResult();
 

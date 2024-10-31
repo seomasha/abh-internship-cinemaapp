@@ -26,7 +26,7 @@ public class FilterMovie {
         final List<String> predicates = new ArrayList<>();
 
         if (venueId != null) {
-            predicates.add("p.venueId.id = :venueId");
+            predicates.add("p.venueId.id = " + getVenueId());
         }
 
         return String.join(" AND ", predicates);

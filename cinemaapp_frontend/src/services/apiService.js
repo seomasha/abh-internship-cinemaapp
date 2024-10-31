@@ -17,7 +17,10 @@ const request = async (url, options = {}) => {
 export const apiService = (endpoint) => {
   return {
     get: () => request(endpoint),
-    getAll: () => request(endpoint),
+    getAll: (page = 0, size = 0) =>
+      request(endpoint, {
+        params: { page, size },
+      }),
     create: (data) =>
       request(endpoint, {
         method: "POST",

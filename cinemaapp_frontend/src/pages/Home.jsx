@@ -29,7 +29,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchVenues = async () => {
-      const venueList = await venueService.getAll(venuesPage);
+      const venueList = await venueService.getAll(venuesPage, 4);
       const carousel = await venueService.getAll(
         venuesPage,
         venueList.totalSize
@@ -73,30 +73,28 @@ const Home = () => {
 
   useEffect(() => {
     const fetchAndProcessCurrentlyShowing = async () => {
-      if (selectedVenueId) {
-        const currentlyShowing = await movieService.getMovies({
-          page: currentlyShowingPage,
-          venueId: selectedVenueId,
-        });
-        setCurrentlyShowingMovies({
-          movies: currentlyShowing.movies,
-          totalSize: currentlyShowing.totalSize,
-        });
-      }
+      if (selectedVenueId) return;
+      const currentlyShowing = await movieService.getMovies({
+        page: currentlyShowingPage,
+        venueId: selectedVenueId,
+      });
+      setCurrentlyShowingMovies({
+        movies: currentlyShowing.movies,
+        totalSize: currentlyShowing.totalSize,
+      });
     };
 
     const fetchAndProcessUpcomingMovies = async () => {
-      if (selectedVenueId) {
-        const upcomingMovies = await movieService.getMovies({
-          type: "upcoming",
-          page: upcomingPage,
-          venueId: selectedVenueId,
-        });
-        setUpcomingMovies({
-          movies: upcomingMovies.movies,
-          totalSize: upcomingMovies.totalSize,
-        });
-      }
+      if (selectedVenueId) return;
+      const upcomingMovies = await movieService.getMovies({
+        type: "upcoming",
+        page: upcomingPage,
+        venueId: selectedVenueId,
+      });
+      setUpcomingMovies({
+        movies: upcomingMovies.movies,
+        totalSize: upcomingMovies.totalSize,
+      });
     };
 
     fetchAndProcessCurrentlyShowing();
@@ -117,7 +115,6 @@ const Home = () => {
 
   return (
     <div>
-      {console.log(venueCarousel)}
       <NavBar />
       <Hero data={heroMovies} />
       <VenuesCarousel
