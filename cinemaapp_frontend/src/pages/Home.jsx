@@ -33,9 +33,7 @@ const Home = () => {
     };
 
     const fetchCurrentlyShowingMovies = async () => {
-      const currentlyShowing = await movieService.getCurrentlyShowingMovies(
-        currentlyShowingPage
-      );
+      const currentlyShowing = await movieService.getMovies();
 
       if (!heroMoviesSet) {
         setHeroMovies(currentlyShowing.movies);
@@ -49,7 +47,10 @@ const Home = () => {
     };
 
     const fetchUpcomingMovies = async () => {
-      const upcoming = await movieService.getUpcomingMovies(upcomingPage);
+      const upcoming = await movieService.getMovies({
+        type: "upcoming",
+        page: upcomingPage,
+      });
       setUpcomingMovies({
         movies: upcoming.movies,
         totalSize: upcoming.totalSize,
@@ -64,16 +65,16 @@ const Home = () => {
   useEffect(() => {
     const fetchCurrentlyShowingAndUpcomingMovies = async () => {
       if (selectedVenueId) {
-        const currentlyShowing =
-          await movieService.getCurrentlyShowingMoviesByVenueId(
-            selectedVenueId,
-            currentlyShowingPage
-          );
+        const currentlyShowing = await movieService.getMovies({
+          page: currentlyShowingPage,
+          venueId: selectedVenueId,
+        });
 
-        const upcomingMovies = await movieService.getUpcomingMoviesByVenueId(
-          selectedVenueId,
-          upcomingPage
-        );
+        const upcomingMovies = await movieService.getMovies({
+          type: "upcoming",
+          page: upcomingPage,
+          venueId: selectedVenueId,
+        });
 
         setCurrentlyShowingMovies({
           movies: currentlyShowing.movies,
