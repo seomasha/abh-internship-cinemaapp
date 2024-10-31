@@ -78,7 +78,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchAndProcessCurrentlyShowing = async () => {
-      if (selectedVenueId) return;
+      if (!selectedVenueId) return;
       const currentlyShowing = await movieService.getMovies({
         page: currentlyShowingPage,
         venueId: selectedVenueId,
@@ -90,7 +90,7 @@ const Home = () => {
     };
 
     const fetchAndProcessUpcomingMovies = async () => {
-      if (selectedVenueId) return;
+      if (!selectedVenueId) return;
       const upcomingMovies = await movieService.getMovies({
         type: "upcoming",
         page: upcomingPage,
