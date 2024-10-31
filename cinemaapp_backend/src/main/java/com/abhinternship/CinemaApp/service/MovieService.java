@@ -13,8 +13,6 @@ public interface MovieService {
     Optional<Movie> findMovieById(Long id);
     void saveMovie(Movie movie);
     void deleteMovie(Long id);
-    MovieDTO findCurrentlyShowingMovies(int page, int size);
     MovieDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size);
-    MovieDTO findUpcomingMovies(int page, int size);
     MovieDTO findUpcomingMovies(FilterMovie filterMovie, int page, int size);
 }

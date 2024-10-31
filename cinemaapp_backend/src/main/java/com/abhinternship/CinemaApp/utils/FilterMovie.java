@@ -1,6 +1,9 @@
 package com.abhinternship.CinemaApp.utils;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -17,6 +20,16 @@ public class FilterMovie {
 
     public static FilterMovie empty() {
         return new FilterMovie(Map.of());
+    }
+
+    public String toQueryString() {
+        final List<String> predicates = new ArrayList<>();
+
+        if (venueId != null) {
+            predicates.add("p.venueId.id = :venueId");
+        }
+
+        return String.join(" AND ", predicates);
     }
 }
 
