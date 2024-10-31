@@ -22,11 +22,12 @@ public class FilterMovie {
         return new FilterMovie(Map.of());
     }
 
-    public String toQueryString() {
+    public String toQueryString(List<Object> parameters) {
         final List<String> predicates = new ArrayList<>();
 
         if (venueId != null) {
-            predicates.add("p.venueId.id = " + getVenueId());
+            predicates.add("p.venueId.id = ?1");
+            parameters.add(getVenueId());
         }
 
         return String.join(" AND ", predicates);

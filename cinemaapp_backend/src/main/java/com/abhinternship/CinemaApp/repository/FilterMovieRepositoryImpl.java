@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -22,11 +23,17 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
     @Override
     public Page<Movie> findMoviesByFilter(final FilterMovie filter, final Pageable pageable) {
         final String baseQuery = "SELECT m FROM Movie m JOIN Projection p ON m.id = p.movieId.id";
-        final String filterQuery = filter.toQueryString();
+
+        List<Object> parameters = new ArrayList<>();
+        final String filterQuery = filter.toQueryString(parameters);
 
         final String finalQuery = filterQuery.isEmpty() ? baseQuery : baseQuery + " WHERE " + filterQuery;
 
         final Query query = entityManager.createQuery(finalQuery, Movie.class);
+
+        for (int i = 0; i < parameters.size(); i++) {
+            query.setParameter(i + 1, parameters.get(i));
+        }
 
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
@@ -37,6 +44,10 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
                 "SELECT COUNT(m) FROM Movie m JOIN Projection p ON m.id = p.movieId.id" +
                         (filterQuery.isEmpty() ? "" : " WHERE " + filterQuery)
         );
+
+        for (int i = 0; i < parameters.size(); i++) {
+            countQuery.setParameter(i + 1, parameters.get(i));
+        }
 
         final long count = (long) countQuery.getSingleResult();
 

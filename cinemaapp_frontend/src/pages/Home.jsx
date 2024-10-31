@@ -30,20 +30,24 @@ const Home = () => {
   useEffect(() => {
     const fetchVenues = async () => {
       const venueList = await venueService.getAll(venuesPage, 4);
-      const carousel = await venueService.getAll(
-        venuesPage,
-        venueList.totalSize
-      );
       setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
+    };
+
+    const fetchVenueCarousel = async () => {
+      const carousel = await venueService.getAll(venuesPage, 0);
       setVenueCarousel(carousel.venues);
     };
 
     fetchVenues();
+    fetchVenueCarousel();
   }, [venuesPage]);
 
   useEffect(() => {
     const fetchCurrentlyShowingMovies = async () => {
-      const currentlyShowing = await movieService.getMovies();
+      const currentlyShowing = await movieService.getMovies({
+        page: currentlyShowingPage,
+        venueId: selectedVenueId,
+      });
 
       if (!heroMoviesSet) {
         setHeroMovies(currentlyShowing.movies);
@@ -60,6 +64,7 @@ const Home = () => {
       const upcoming = await movieService.getMovies({
         type: "upcoming",
         page: upcomingPage,
+        venueId: selectedVenueId,
       });
       setUpcomingMovies({
         movies: upcoming.movies,
@@ -69,7 +74,7 @@ const Home = () => {
 
     fetchCurrentlyShowingMovies();
     fetchUpcomingMovies();
-  }, [currentlyShowingPage, upcomingPage, heroMoviesSet]);
+  }, [currentlyShowingPage, upcomingPage, heroMoviesSet, selectedVenueId]);
 
   useEffect(() => {
     const fetchAndProcessCurrentlyShowing = async () => {
