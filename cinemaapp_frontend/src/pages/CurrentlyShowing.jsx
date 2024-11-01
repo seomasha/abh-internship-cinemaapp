@@ -163,6 +163,7 @@ const CurrentlyShowing = () => {
                   movie.photos.find((photo) => photo.entityType === "movie")
                     ?.url
                 }
+                projectionTimes={movie.projectionTimes}
               />
             );
           })}

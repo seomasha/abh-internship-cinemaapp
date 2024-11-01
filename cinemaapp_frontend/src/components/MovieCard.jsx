@@ -8,6 +8,7 @@ const MovieCard = ({
   movieDuration,
   genres,
   projectionEndDate,
+  projectionTimes,
   photo,
 }) => {
   const formattedEndDate = new Intl.DateTimeFormat("en-GB", {
@@ -45,10 +46,11 @@ const MovieCard = ({
       <div className="mt-3 mt-md-0">
         <h5 className="primary-red fw-bold">Showtimes</h5>
         <div className="d-flex flex-wrap gap-2 gap-md-4 mt-2">
-          <p className="fw-bold rounded border py-2 px-3">12:00</p>
-          <p className="fw-bold rounded border py-2 px-3">15:00</p>
-          <p className="fw-bold rounded border py-2 px-3">18:00</p>
-          <p className="fw-bold rounded border py-2 px-3">21:00</p>
+          {projectionTimes.map((time, index) => (
+            <p key={index} className="fw-bold rounded border py-2 px-3">
+              {time.slice(0, 5)}
+            </p>
+          ))}
         </div>
       </div>
     </div>

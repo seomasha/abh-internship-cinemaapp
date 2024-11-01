@@ -58,13 +58,13 @@ public class MovieServiceImpl implements MovieService {
         if (filterMovie.isEmpty()) {
             final Page<Movie> currentlyShowingMoviesPage = movieRepository
                     .findByProjectionStartDateBeforeAndProjectionEndDateAfter(endDate, today, pageable);
-            return new MovieDTO(currentlyShowingMoviesPage);
+            return MovieDTO.fromMoviePage(currentlyShowingMoviesPage, projectionRepository);
         }
 
         final Page<Movie> moviePage = filterMovieRepositoryImpl.findMoviesByFilter(
                 filterMovie, pageable, true);
 
-        return new MovieDTO(moviePage);
+        return MovieDTO.fromMoviePage(moviePage, projectionRepository);
     }
 
     @Override
@@ -75,12 +75,12 @@ public class MovieServiceImpl implements MovieService {
         if (filterMovie.isEmpty()) {
             final Page<Movie> upcomingMoviesPage = movieRepository
                     .findByProjectionStartDateGreaterThanEqual(endDate, pageable);
-            return new MovieDTO(upcomingMoviesPage);
+            return MovieDTO.fromMoviePage(upcomingMoviesPage, projectionRepository);
         }
 
         final Page<Movie> moviePage = filterMovieRepositoryImpl.findMoviesByFilter(
                 filterMovie, pageable, false);
 
-        return new MovieDTO(moviePage);
+        return MovieDTO.fromMoviePage(moviePage, projectionRepository);
     }
 }
