@@ -31,9 +31,11 @@ const MovieCard = ({
             <span className="primary-red">|</span> {movieDuration}min
           </p>
           <div className="d-flex flex-wrap gap-2 gap-md-4">
-            {genres.map((genre) => {
-              <p className="movie-card-category p-2 rounded">{genre.name}</p>;
-            })}
+            {genres.map((genre) => (
+              <p key={genre.id} className="movie-card-category p-2 rounded">
+                {genre.name}
+              </p>
+            ))}
           </div>
         </div>
         <p className="fw-light mt-3 mt-md-0">

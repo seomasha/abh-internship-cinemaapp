@@ -8,6 +8,9 @@ import DayPicker from "../components/DayPicker";
 import MovieCard from "../components/MovieCard";
 import { Carousel } from "react-bootstrap";
 import { movieService } from "../services/movieService";
+import { venueService } from "../services/venueService";
+import { genreService } from "../services/genreService";
+import { projectionService } from "../services/projectionService";
 
 import "../styles/CurrentlyShowing.css";
 
@@ -18,6 +21,10 @@ const CurrentlyShowing = () => {
     movies: [],
     totalSize: 0,
   });
+  const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
+  const [cities, setCities] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [projectionTimes, setProjectionTimes] = useState([]);
   const [page, setPage] = useState(0);
 
   const dayPickers = [];
@@ -50,7 +57,6 @@ const CurrentlyShowing = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       const currentlyShowing = await movieService.getMovies({ page: page });
-      console.log(page);
       setCurrentlyShowingMovies((prevState) => ({
         movies:
           page > 0
@@ -63,10 +69,38 @@ const CurrentlyShowing = () => {
     fetchMovies();
   }, [page]);
 
+  useEffect(() => {
+    const fetchVenues = async () => {
+      const venueList = await venueService.getAll();
+      setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
+    };
+
+    const fetchCities = async () => {
+      const cityList = await venueService.getAllCities();
+      setCities(cityList);
+    };
+
+    const fetchGenres = async () => {
+      const genreList = await genreService.getAll();
+      setGenres(genreList);
+    };
+
+    const fetchProjectionTimes = async () => {
+      const projectionTimesList =
+        await projectionService.getAllDistinctProjectionTimes();
+      setProjectionTimes(projectionTimesList);
+    };
+
+    fetchVenues();
+    fetchCities();
+    fetchGenres();
+    fetchProjectionTimes();
+  }, []);
+
   return (
     <div>
+      {console.log(currentlyShowingMovies.movies)}
       <NavBar />
-
       <div className="p-5">
         <h2 className="fw-bold">
           Currently showing ({currentlyShowingMovies.totalSize})
@@ -75,31 +109,27 @@ const CurrentlyShowing = () => {
         <SearchBar />
         <div className="row gx-4">
           <div className="col-12 col-md-3">
-            <Dropdown
-              icon={CiLocationOn}
-              title="All Cities"
-              options={["Option 1", "Option 2"]}
-            />
+            <Dropdown icon={CiLocationOn} title="All Cities" options={cities} />
           </div>
           <div className="col-12 col-md-3">
             <Dropdown
               icon={CiLocationOn}
               title="All Cinemas"
-              options={["Option 1", "Option 2"]}
+              options={venues.venues.map((venue) => venue.name)}
             />
           </div>
           <div className="col-12 col-md-3">
             <Dropdown
               icon={CiLocationOn}
               title="All Genres"
-              options={["Option 1", "Option 2"]}
+              options={genres.map((genre) => genre.name)}
             />
           </div>
           <div className="col-12 col-md-3">
             <Dropdown
               icon={CiClock1}
               title="All Projection Times"
-              options={["Option 1", "Option 2"]}
+              options={projectionTimes.map((time) => time.slice(0, 5))}
             />
           </div>
         </div>

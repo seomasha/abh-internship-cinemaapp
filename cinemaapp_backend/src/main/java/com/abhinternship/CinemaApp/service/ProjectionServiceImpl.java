@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -35,5 +36,10 @@ public class ProjectionServiceImpl implements ProjectionService {
     @Override
     public void deleteProjection(final Long id) {
         projectionRepository.deleteById(id);
+    }
+
+    @Override
+    public List<LocalTime> findAllDistinctProjectionTimes() {
+        return projectionRepository.findAllDistinctProjectionTimes();
     }
 }

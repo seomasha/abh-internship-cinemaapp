@@ -27,7 +27,6 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final ProjectionRepository projectionRepository;
-    private final VenueRepository venueRepository;
     private final FilterMovieRepositoryImpl filterMovieRepositoryImpl;
 
     @Override
