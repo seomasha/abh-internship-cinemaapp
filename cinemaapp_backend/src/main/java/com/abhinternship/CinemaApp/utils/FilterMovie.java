@@ -35,11 +35,11 @@ public class FilterMovie {
         }
 
         if (currentlyShowing) {
-            predicates.add("m.projectionStartDate <= ?2 AND m.projectionEndDate >= ?3");
+            predicates.add("m.projectionStartDate < ?2 AND m.projectionEndDate >= ?3");
             parameters.add(projectionEndDate);
             parameters.add(projectionStartDate);
         } else {
-            predicates.add("m.projectionStartDate > ?2");
+            predicates.add("m.projectionStartDate >= ?2");
             parameters.add(projectionEndDate);
         }
 

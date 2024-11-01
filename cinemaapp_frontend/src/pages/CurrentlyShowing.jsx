@@ -7,13 +7,18 @@ import { CiLocationOn, CiClock1 } from "react-icons/ci";
 import DayPicker from "../components/DayPicker";
 import MovieCard from "../components/MovieCard";
 import { Carousel } from "react-bootstrap";
+import { movieService } from "../services/movieService";
 
 import "../styles/CurrentlyShowing.css";
 
 const CurrentlyShowing = () => {
   const today = new Date();
   const [selectedDay, setSelectedDay] = useState(null);
-  const [moviesToShow, setMoviesToShow] = useState(5);
+  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState({
+    movies: [],
+    totalSize: 0,
+  });
+  const [page, setPage] = useState(0);
 
   const dayPickers = [];
 
@@ -38,18 +43,34 @@ const CurrentlyShowing = () => {
     );
   }
 
-  const movieCards = Array(15).fill(<MovieCard />);
-
   const loadMoreMovies = () => {
-    setMoviesToShow((prevMoviesToShow) => prevMoviesToShow + 5);
+    setPage((prevState) => prevState + 1);
   };
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      const currentlyShowing = await movieService.getMovies({ page: page });
+      console.log(page);
+      setCurrentlyShowingMovies((prevState) => ({
+        movies:
+          page > 0
+            ? [...prevState.movies, ...currentlyShowing.movies]
+            : currentlyShowing.movies,
+        totalSize: currentlyShowing.totalSize,
+      }));
+    };
+
+    fetchMovies();
+  }, [page]);
 
   return (
     <div>
       <NavBar />
 
       <div className="p-5">
-        <h2 className="fw-bold">Currently showing (15)</h2>
+        <h2 className="fw-bold">
+          Currently showing ({currentlyShowingMovies.totalSize})
+        </h2>
 
         <SearchBar />
         <div className="row gx-4">
@@ -98,9 +119,26 @@ const CurrentlyShowing = () => {
         </div>
 
         <div className="mt-4">
-          {movieCards.slice(0, moviesToShow)}
+          {currentlyShowingMovies.movies.map((movie) => {
+            return (
+              <MovieCard
+                key={movie.id}
+                title={movie.name}
+                pgRating={movie.pgRating}
+                language={movie.language}
+                movieDuration={movie.movieDuration}
+                genres={movie.genres}
+                projectionEndDate={movie.projectionEndDate}
+                photo={
+                  movie.photos.find((photo) => photo.entityType === "movie")
+                    ?.url
+                }
+              />
+            );
+          })}
 
-          {moviesToShow < movieCards.length && (
+          {currentlyShowingMovies.movies.length <
+            currentlyShowingMovies.totalSize && (
             <div className="text-center">
               <button
                 className="btn primary-red text-decoration-underline fw-bold mt-4"
