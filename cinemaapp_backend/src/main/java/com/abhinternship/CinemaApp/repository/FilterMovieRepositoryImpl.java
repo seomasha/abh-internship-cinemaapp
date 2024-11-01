@@ -10,7 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class FilterMovieRepositoryImpl implements FilterMovieRepository {
@@ -24,16 +26,14 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
     public Page<Movie> findMoviesByFilter(final FilterMovie filter, final Pageable pageable, final boolean currentlyShowing) {
         final String baseQuery = "SELECT m FROM Movie m JOIN Projection p ON m.id = p.movieId.id";
 
-        List<Object> parameters = new ArrayList<>();
+        Map<String, Object> parameters = new HashMap<>();
         final String filterQuery = filter.toQueryString(parameters, currentlyShowing);
 
         final String finalQuery = filterQuery.isEmpty() ? baseQuery : baseQuery + " WHERE " + filterQuery;
 
         final Query query = entityManager.createQuery(finalQuery, Movie.class);
 
-        for (int i = 0; i < parameters.size(); i++) {
-            query.setParameter(i + 1, parameters.get(i));
-        }
+        parameters.forEach(query::setParameter);
 
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
@@ -45,9 +45,7 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
                         (filterQuery.isEmpty() ? "" : " WHERE " + filterQuery)
         );
 
-        for (int i = 0; i < parameters.size(); i++) {
-            countQuery.setParameter(i + 1, parameters.get(i));
-        }
+        parameters.forEach(countQuery::setParameter);
 
         final long count = (long) countQuery.getSingleResult();
 

@@ -26,6 +26,7 @@ const CurrentlyShowing = () => {
   const [genres, setGenres] = useState([]);
   const [projectionTimes, setProjectionTimes] = useState([]);
   const [page, setPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const dayPickers = [];
 
@@ -50,13 +51,26 @@ const CurrentlyShowing = () => {
     );
   }
 
+  useEffect(() => {
+    if (searchQuery) {
+      setPage(0);
+    }
+  }, [searchQuery]);
+
   const loadMoreMovies = () => {
     setPage((prevState) => prevState + 1);
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
   useEffect(() => {
     const fetchMovies = async () => {
-      const currentlyShowing = await movieService.getMovies({ page: page });
+      const currentlyShowing = await movieService.getMovies({
+        page: page,
+        ...(searchQuery && { name: searchQuery }),
+      });
       setCurrentlyShowingMovies((prevState) => ({
         movies:
           page > 0
@@ -67,7 +81,7 @@ const CurrentlyShowing = () => {
     };
 
     fetchMovies();
-  }, [page]);
+  }, [page, searchQuery]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -106,7 +120,7 @@ const CurrentlyShowing = () => {
           Currently showing ({currentlyShowingMovies.totalSize})
         </h2>
 
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
         <div className="row gx-4">
           <div className="col-12 col-md-3">
             <Dropdown icon={CiLocationOn} title="All Cities" options={cities} />
