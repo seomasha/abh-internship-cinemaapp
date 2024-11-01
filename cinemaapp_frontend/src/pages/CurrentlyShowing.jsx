@@ -28,6 +28,7 @@ const CurrentlyShowing = () => {
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProjectionTimes, setSelectedProjectionTimes] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
 
   const dayPickers = [];
 
@@ -74,6 +75,9 @@ const CurrentlyShowing = () => {
         ...(selectedProjectionTimes.length > 0 && {
           projectionTimes: selectedProjectionTimes.join(","),
         }),
+        ...(selectedGenres.length > 0 && {
+          genres: selectedGenres.join(","),
+        }),
       });
       setCurrentlyShowingMovies((prevState) => ({
         movies:
@@ -85,7 +89,7 @@ const CurrentlyShowing = () => {
     };
 
     fetchMovies();
-  }, [page, searchQuery, selectedProjectionTimes]);
+  }, [page, searchQuery, selectedProjectionTimes, selectedGenres]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -140,6 +144,7 @@ const CurrentlyShowing = () => {
               icon={CiLocationOn}
               title="All Genres"
               options={genres.map((genre) => genre.name)}
+              onChange={setSelectedGenres}
             />
           </div>
           <div className="col-12 col-md-3">

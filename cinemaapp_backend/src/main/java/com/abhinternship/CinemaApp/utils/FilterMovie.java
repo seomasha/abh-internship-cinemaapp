@@ -15,12 +15,16 @@ public class FilterMovie {
     private final LocalDate projectionEndDate;
     private final String name;
     private final List<String> projectionTimes;
+    private final List<String> genres;
 
     public FilterMovie(final Map<String, String> filters) {
         this.venueId = filters.containsKey("venueId") ? Long.valueOf(filters.get("venueId")) : null;
         this.projectionStartDate = LocalDate.now();
         this.projectionEndDate = LocalDate.now().plusDays(10);
         this.name = filters.getOrDefault("name", null);
+        this.genres = filters.containsKey("genres")
+                ? Arrays.asList(filters.get("genres").split(","))
+                : new ArrayList<>();
 
         if (filters.containsKey("projectionTimes")) {
             this.projectionTimes = Arrays.stream(filters.get("projectionTimes").split(","))
@@ -32,7 +36,7 @@ public class FilterMovie {
     }
 
     public boolean isEmpty() {
-        return venueId == null && name == null && projectionTimes.isEmpty();
+        return venueId == null && name == null && projectionTimes.isEmpty() && genres.isEmpty();
     }
 
     public static FilterMovie empty() {
@@ -70,6 +74,17 @@ public class FilterMovie {
 
             projectionTimes.forEach(time -> {
                 parameters.put("time" + time.replace(":", ""), time);
+            });
+        }
+
+        if (!genres.isEmpty()) {
+            List<String> genreConditions = genres.stream()
+                    .map(genre -> "LOWER(g.name) = :genre" + genre.replace(" ", ""))
+                    .collect(Collectors.toList());
+            predicates.add("(" + String.join(" OR ", genreConditions) + ")");
+
+            genres.forEach(genre -> {
+                parameters.put("genre" + genre.replace(" ", ""), genre.toLowerCase());
             });
         }
 
