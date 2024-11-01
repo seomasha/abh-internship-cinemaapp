@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Repository
 public interface ProjectionRepository extends JpaRepository<Projection, Long> {
-    @Query("SELECT DISTINCT p.projectionTime FROM Projection p")
+    @Query("SELECT DISTINCT p.projectionTime FROM Projection p ORDER BY p.projectionTime")
     List<LocalTime> findAllDistinctProjectionTimes();
     Set<Projection> findByMovieIdIdOrderByProjectionTime(Long movieId);
 }

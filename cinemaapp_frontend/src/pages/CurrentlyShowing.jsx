@@ -113,7 +113,6 @@ const CurrentlyShowing = () => {
 
   return (
     <div>
-      {console.log(currentlyShowingMovies.movies)}
       <NavBar />
       <div className="p-5">
         <h2 className="fw-bold">

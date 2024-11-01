@@ -2,6 +2,7 @@ package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.Projection;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
