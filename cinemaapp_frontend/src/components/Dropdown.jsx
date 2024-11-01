@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import "../styles/Dropdown.css";
 
-const Dropdown = ({ icon: Icon, title, options }) => {
+const Dropdown = ({ icon: Icon, title, options, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [dropdownWidth, setDropdownWidth] = useState("auto");
@@ -13,10 +13,16 @@ const Dropdown = ({ icon: Icon, title, options }) => {
   };
 
   const handleCheckboxChange = (option) => {
-    setCheckedItems((prev) => ({
-      ...prev,
-      [option]: !prev[option],
-    }));
+    const updatedCheckedItems = {
+      ...checkedItems,
+      [option]: !checkedItems[option],
+    };
+    setCheckedItems(updatedCheckedItems);
+    onChange(
+      Object.keys(updatedCheckedItems).filter(
+        (item) => updatedCheckedItems[item]
+      )
+    );
   };
 
   useEffect(() => {

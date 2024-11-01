@@ -3,8 +3,10 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class FilterMovie {
@@ -12,16 +14,25 @@ public class FilterMovie {
     private final LocalDate projectionStartDate;
     private final LocalDate projectionEndDate;
     private final String name;
+    private final List<String> projectionTimes;
 
     public FilterMovie(final Map<String, String> filters) {
         this.venueId = filters.containsKey("venueId") ? Long.valueOf(filters.get("venueId")) : null;
         this.projectionStartDate = LocalDate.now();
         this.projectionEndDate = LocalDate.now().plusDays(10);
         this.name = filters.getOrDefault("name", null);
+
+        if (filters.containsKey("projectionTimes")) {
+            this.projectionTimes = Arrays.stream(filters.get("projectionTimes").split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
+        } else {
+            this.projectionTimes = new ArrayList<>();
+        }
     }
 
     public boolean isEmpty() {
-        return venueId == null && name == null;
+        return venueId == null && name == null && projectionTimes.isEmpty();
     }
 
     public static FilterMovie empty() {
@@ -48,6 +59,18 @@ public class FilterMovie {
         if (name != null && !name.isBlank()) {
             predicates.add("LOWER(m.name) LIKE :name");
             parameters.put("name", "%" + name.toLowerCase() + "%");
+        }
+
+        if (!projectionTimes.isEmpty()) {
+            List<String> timeConditions = projectionTimes.stream()
+                    .map(time -> "FUNCTION('TO_CHAR', p.projectionTime, 'HH24:MI') = :time" + time.replace(":", ""))
+                    .collect(Collectors.toList());
+
+            predicates.add("(" + String.join(" OR ", timeConditions) + ")");
+
+            projectionTimes.forEach(time -> {
+                parameters.put("time" + time.replace(":", ""), time);
+            });
         }
 
         return String.join(" AND ", predicates);

@@ -27,6 +27,7 @@ const CurrentlyShowing = () => {
   const [projectionTimes, setProjectionTimes] = useState([]);
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProjectionTimes, setSelectedProjectionTimes] = useState([]);
 
   const dayPickers = [];
 
@@ -70,6 +71,9 @@ const CurrentlyShowing = () => {
       const currentlyShowing = await movieService.getMovies({
         page: page,
         ...(searchQuery && { name: searchQuery }),
+        ...(selectedProjectionTimes.length > 0 && {
+          projectionTimes: selectedProjectionTimes.join(","),
+        }),
       });
       setCurrentlyShowingMovies((prevState) => ({
         movies:
@@ -81,7 +85,7 @@ const CurrentlyShowing = () => {
     };
 
     fetchMovies();
-  }, [page, searchQuery]);
+  }, [page, searchQuery, selectedProjectionTimes]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -143,6 +147,7 @@ const CurrentlyShowing = () => {
               icon={CiClock1}
               title="All Projection Times"
               options={projectionTimes.map((time) => time.slice(0, 5))}
+              onChange={setSelectedProjectionTimes}
             />
           </div>
         </div>
