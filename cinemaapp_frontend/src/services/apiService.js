@@ -5,7 +5,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const apiPath = import.meta.env.VITE_API_PATH;
 export const BASE_URL = `${backendUrl}${apiPath}`;
 
-const request = async (url, options = {}) => {
+export const request = async (url, options = {}) => {
   try {
     const response = await axios({ url: `${BASE_URL}${url}`, ...options });
     return response.data;

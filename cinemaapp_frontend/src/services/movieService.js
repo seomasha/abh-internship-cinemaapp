@@ -1,5 +1,4 @@
-import axios from "axios";
-import { apiService, BASE_URL } from "./apiService";
+import { apiService, request } from "./apiService";
 
 const MOVIE_ENDPOINT = "/movies";
 
@@ -13,11 +12,11 @@ export const movieService = {
     size = 4,
     ...filters
   } = {}) => {
-    let endpoint = `${BASE_URL + MOVIE_ENDPOINT}/${type}`;
+    let endpoint = `${MOVIE_ENDPOINT}/${type}`;
 
     const params = { page, size, ...filters };
 
-    const response = await axios.get(endpoint, { params });
-    return response.data;
+    const response = await request(endpoint, { params });
+    return response;
   },
 };

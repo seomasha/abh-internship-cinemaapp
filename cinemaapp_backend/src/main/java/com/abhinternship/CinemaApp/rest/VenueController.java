@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +30,12 @@ public class VenueController {
         return venueService.findVenueById(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + id));
+    }
+
+    @GetMapping("/cities")
+    public ResponseEntity<List<String>> getAllCities() {
+        final List<String> cities = venueService.findAllCities();
+        return ResponseEntity.of(Optional.ofNullable(cities));
     }
 
     @PostMapping

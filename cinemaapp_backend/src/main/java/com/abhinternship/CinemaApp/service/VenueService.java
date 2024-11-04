@@ -12,4 +12,5 @@ public interface VenueService {
     Optional<Venue> findVenueById(Long id);
     Venue saveVenue(Venue venue);
     void deleteVenue(Long id);
+    List<String> findAllCities();
 }

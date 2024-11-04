@@ -1,0 +1,21 @@
+.movie-card {
+  width: 100%;
+}
+
+.movie-card img {
+  max-width: 300px;
+  height: 350px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.movie-card-category {
+  background-color: #e4e7ec;
+}
+
+.selected-time {
+  background-color: #b22222;
+  color: #ffffff;
+  border-color: #b22222;
+}

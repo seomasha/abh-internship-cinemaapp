@@ -1,8 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
-import com.abhinternship.CinemaApp.dto.MovieDTO;
+import com.abhinternship.CinemaApp.dto.MovieListDTO;
 import com.abhinternship.CinemaApp.model.Movie;
-import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
 
 import java.util.List;
@@ -13,6 +12,6 @@ public interface MovieService {
     Optional<Movie> findMovieById(Long id);
     void saveMovie(Movie movie);
     void deleteMovie(Long id);
-    MovieDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size);
-    MovieDTO findUpcomingMovies(FilterMovie filterMovie, int page, int size);
+    MovieListDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size);
+    MovieListDTO findUpcomingMovies(FilterMovie filterMovie, int page, int size);
 }
