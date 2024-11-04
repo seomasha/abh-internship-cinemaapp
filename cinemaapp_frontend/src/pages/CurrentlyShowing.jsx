@@ -36,12 +36,12 @@ const CurrentlyShowing = () => {
 
   const dayPickers = [];
 
+  const dateOptions = { month: "short", day: "numeric" };
+  const dayOptions = { weekday: "short" };
+
   for (let i = 0; i < 10; i++) {
     const nextDate = new Date(today);
     nextDate.setDate(today.getDate() + i);
-
-    const dateOptions = { month: "short", day: "numeric" };
-    const dayOptions = { weekday: "short" };
 
     const date = nextDate.toLocaleDateString("en-US", dateOptions);
     const day = nextDate.toLocaleDateString("en-US", dayOptions);

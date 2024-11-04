@@ -28,23 +28,10 @@ public class FilterMovie {
                 ? LocalDate.parse(filters.get("selectedDate"))
                 : null;
         this.name = filters.getOrDefault("name", null);
-        this.cities = filters.containsKey("cities")
-                ? Arrays.stream(filters.get("cities").split(",")).map(String::trim).collect(Collectors.toList())
-                : new ArrayList<>();
-        this.venues = filters.containsKey("venues")
-                ? Arrays.stream(filters.get("venues").split(",")).map(String::trim).collect(Collectors.toList())
-                : new ArrayList<>();
-        this.genres = filters.containsKey("genres")
-                ? Arrays.asList(filters.get("genres").split(","))
-                : new ArrayList<>();
-
-        if (filters.containsKey("projectionTimes")) {
-            this.projectionTimes = Arrays.stream(filters.get("projectionTimes").split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
-        } else {
-            this.projectionTimes = new ArrayList<>();
-        }
+        this.cities = parseCommaSeparatedList(filters, "cities");
+        this.venues = parseCommaSeparatedList(filters, "venues");
+        this.genres = parseCommaSeparatedList(filters, "genres");
+        this.projectionTimes = parseCommaSeparatedList(filters, "projectionTimes");
     }
 
     public boolean isEmpty() {
@@ -122,5 +109,13 @@ public class FilterMovie {
         }
 
         return String.join(" AND ", predicates);
+    }
+
+    private static List<String> parseCommaSeparatedList(final Map<String, String> filters, final String key) {
+        return filters.containsKey(key)
+                ? Arrays.stream(filters.get(key).split(","))
+                .map(String::trim)
+                .collect(Collectors.toList())
+                : new ArrayList<>();
     }
 }

@@ -5,6 +5,12 @@ import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
 
 const NavBar = () => {
+  const navTabs = [
+    { id: 1, path: "/currently-showing", label: "Currently showing" },
+    { id: 2, path: "/upcoming", label: "Upcoming movies" },
+    { id: 3, path: "/venues", label: "Venues" },
+  ];
+
   return (
     <Navbar expand="lg" className="p-4 main-font navbar-background">
       <NavLink
@@ -35,38 +41,21 @@ const NavBar = () => {
         className="justify-content-end"
       >
         <Nav>
-          <NavLink
-            to="/currently-showing"
-            className={({ isActive }) =>
-              isActive
-                ? "text-light mx-4 nav-link fw-bold text-decoration-underline"
-                : "text-light mx-4 nav-link"
-            }
-          >
-            Currently showing
-          </NavLink>
-
-          <NavLink
-            to="/upcoming-movies"
-            className={({ isActive }) =>
-              isActive
-                ? "text-light mx-4 nav-link fw-bold text-decoration-underline"
-                : "text-light mx-4 nav-link"
-            }
-          >
-            Upcoming movies
-          </NavLink>
-
-          <NavLink
-            to="/venues"
-            className={({ isActive }) =>
-              isActive
-                ? "text-light mx-4 nav-link fw-bold text-decoration-underline"
-                : "text-light mx-4 nav-link"
-            }
-          >
-            Venues
-          </NavLink>
+          {navTabs.map((tab) => {
+            return (
+              <NavLink
+                key={tab.id}
+                to={tab.path}
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-light mx-4 nav-link fw-bold text-decoration-underline"
+                    : "text-light mx-4 nav-link"
+                }
+              >
+                {tab.label}
+              </NavLink>
+            );
+          })}
         </Nav>
       </Navbar.Collapse>
 

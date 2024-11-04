@@ -33,7 +33,7 @@ public class MovieWithProjectionsDTO {
     private Set<Genre> genres;
     private Set<LocalTime> projectionTimes;
 
-    public static MovieWithProjectionsDTO fromMovie(Movie movie, Set<Projection> projections) {
+    public static MovieWithProjectionsDTO fromMovie(final Movie movie, final Set<Projection> projections) {
         return new MovieWithProjectionsDTO(
                 movie.getId(),
                 movie.getName(),

@@ -1,13 +1,12 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.MovieDTO;
+import com.abhinternship.CinemaApp.dto.MovieWithProjectionsDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
-import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.repository.FilterMovieRepositoryImpl;
 import com.abhinternship.CinemaApp.repository.MovieRepository;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
-import com.abhinternship.CinemaApp.repository.VenueRepository;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,16 +54,18 @@ public class MovieServiceImpl implements MovieService {
         final LocalDate endDate = today.plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
 
-        if (filterMovie.isEmpty()) {
-            final Page<Movie> currentlyShowingMoviesPage = movieRepository
-                    .findByProjectionStartDateBeforeAndProjectionEndDateAfter(endDate, today, pageable);
-            return MovieDTO.fromMoviePage(currentlyShowingMoviesPage, projectionRepository);
-        }
+        final Page<Movie> moviePage = filterMovie.isEmpty()
+                ? movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfter(endDate, today, pageable)
+                : filterMovieRepositoryImpl.findMoviesByFilter(filterMovie, pageable, true);
 
-        final Page<Movie> moviePage = filterMovieRepositoryImpl.findMoviesByFilter(
-                filterMovie, pageable, true);
+        final List<MovieWithProjectionsDTO> moviesWithProjections = moviePage.getContent().stream()
+                .map(movie -> {
+                    final Set<Projection> projections = projectionRepository.findByMovieIdOrderByProjectionTime(movie);
+                    return MovieWithProjectionsDTO.fromMovie(movie, projections);
+                })
+                .collect(Collectors.toList());
 
-        return MovieDTO.fromMoviePage(moviePage, projectionRepository);
+        return MovieDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
     }
 
     @Override
@@ -72,15 +73,17 @@ public class MovieServiceImpl implements MovieService {
         final LocalDate endDate = LocalDate.now().plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
 
-        if (filterMovie.isEmpty()) {
-            final Page<Movie> upcomingMoviesPage = movieRepository
-                    .findByProjectionStartDateGreaterThanEqual(endDate, pageable);
-            return MovieDTO.fromMoviePage(upcomingMoviesPage, projectionRepository);
-        }
+        final Page<Movie> moviePage = filterMovie.isEmpty()
+                ? movieRepository.findByProjectionStartDateGreaterThanEqual(endDate, pageable)
+                : filterMovieRepositoryImpl.findMoviesByFilter(filterMovie, pageable, false);
 
-        final Page<Movie> moviePage = filterMovieRepositoryImpl.findMoviesByFilter(
-                filterMovie, pageable, false);
+        final List<MovieWithProjectionsDTO> moviesWithProjections = moviePage.getContent().stream()
+                .map(movie -> {
+                    final Set<Projection> projections = projectionRepository.findByMovieIdOrderByProjectionTime(movie);
+                    return MovieWithProjectionsDTO.fromMovie(movie, projections);
+                })
+                .collect(Collectors.toList());
 
-        return MovieDTO.fromMoviePage(moviePage, projectionRepository);
+        return MovieDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
     }
 }

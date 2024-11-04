@@ -4,6 +4,7 @@ import com.abhinternship.CinemaApp.dto.MovieDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
