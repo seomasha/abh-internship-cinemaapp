@@ -5,11 +5,11 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class MovieDTO {
+public class MovieListDTO {
     private final List<MovieWithProjectionsDTO> movies;
     private final long totalSize;
 
-    public static MovieDTO fromMoviesWithProjections(final List<MovieWithProjectionsDTO> movies, final long totalSize) {
-        return new MovieDTO(movies, totalSize);
+    public static MovieListDTO fromMoviesWithProjections(final List<MovieWithProjectionsDTO> movies, final long totalSize) {
+        return new MovieListDTO(movies, totalSize);
     }
 }

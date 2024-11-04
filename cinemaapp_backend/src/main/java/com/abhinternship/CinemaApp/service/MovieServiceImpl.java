@@ -1,6 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
-import com.abhinternship.CinemaApp.dto.MovieDTO;
+import com.abhinternship.CinemaApp.dto.MovieListDTO;
 import com.abhinternship.CinemaApp.dto.MovieWithProjectionsDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
@@ -49,7 +49,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieDTO findCurrentlyShowingMovies(final FilterMovie filterMovie, final int page, final int size) {
+    public MovieListDTO findCurrentlyShowingMovies(final FilterMovie filterMovie, final int page, final int size) {
         final LocalDate today = LocalDate.now();
         final LocalDate endDate = today.plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
@@ -65,11 +65,11 @@ public class MovieServiceImpl implements MovieService {
                 })
                 .collect(Collectors.toList());
 
-        return MovieDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
+        return MovieListDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
     }
 
     @Override
-    public MovieDTO findUpcomingMovies(final FilterMovie filterMovie, final int page, final int size) {
+    public MovieListDTO findUpcomingMovies(final FilterMovie filterMovie, final int page, final int size) {
         final LocalDate endDate = LocalDate.now().plusDays(10);
         final Pageable pageable = PageRequest.of(page, size);
 
@@ -84,6 +84,6 @@ public class MovieServiceImpl implements MovieService {
                 })
                 .collect(Collectors.toList());
 
-        return MovieDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
+        return MovieListDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
     }
 }
