@@ -65,9 +65,13 @@ const CurrentlyShowing = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      setPage(0);
+      resetPage();
     }
   }, [searchQuery]);
+
+  const resetPage = () => {
+    setPage(0);
+  };
 
   const loadMoreMovies = () => {
     setPage((prevState) => prevState + 1);
@@ -75,6 +79,26 @@ const CurrentlyShowing = () => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+  };
+
+  const handleCityChange = (selectedCities) => {
+    setSelectedCities(selectedCities);
+    resetPage();
+  };
+
+  const handleVenueChange = (selectedVenues) => {
+    setSelectedVenues(selectedVenues);
+    resetPage();
+  };
+
+  const handleGenreChange = (selectedGenres) => {
+    setSelectedGenres(selectedGenres);
+    resetPage();
+  };
+
+  const handleProjectionTimeChange = (selectedProjectionTimes) => {
+    setSelectedProjectionTimes(selectedProjectionTimes);
+    resetPage();
   };
 
   useEffect(() => {
@@ -163,7 +187,7 @@ const CurrentlyShowing = () => {
               icon={CiLocationOn}
               title="All Cities"
               options={cities}
-              onChange={setSelectedCities}
+              onChange={handleCityChange}
             />
           </div>
           <div className="col-12 col-md-3">
@@ -171,7 +195,7 @@ const CurrentlyShowing = () => {
               icon={CiLocationOn}
               title="All Cinemas"
               options={venues.venues.map((venue) => venue.name)}
-              onChange={setSelectedVenues}
+              onChange={handleVenueChange}
             />
           </div>
           <div className="col-12 col-md-3">
@@ -179,7 +203,7 @@ const CurrentlyShowing = () => {
               icon={CiLocationOn}
               title="All Genres"
               options={genres.map((genre) => genre.name)}
-              onChange={setSelectedGenres}
+              onChange={handleGenreChange}
             />
           </div>
           <div className="col-12 col-md-3">
@@ -187,7 +211,7 @@ const CurrentlyShowing = () => {
               icon={CiClock1}
               title="All Projection Times"
               options={projectionTimes.map((time) => time.slice(0, 5))}
-              onChange={setSelectedProjectionTimes}
+              onChange={handleProjectionTimeChange}
             />
           </div>
         </div>
@@ -242,28 +266,15 @@ const CurrentlyShowing = () => {
             </>
           ) : (
             <div className="text-center border rounded-5 padding">
-              <TbMovie size={128} />
-              <h6 className="mt-4 fw-bold">No movies to preview for filters</h6>
-              <p className="fw-light mt-4">
-                We are working on updating our schedule for upcoming movies.
-                Stay tuned for amazing movie
-                <br /> experience or explore our other exciting cinema features
-                in the meantime!
-              </p>
-              <Link
-                to="/tickets"
-                className="text-decoration-none"
-                aria-label="Tickets"
-              >
-                <h6 className="fw-bold primary-red text-decoration-underline">
-                  Explore Upcoming Movies
-                </h6>
+              <TbMovie size={80} />
+              <h2 className="mt-4">No currently showing movies</h2>
+              <Link to="/" className="btn btn-primary mt-2">
+                Back to Home
               </Link>
             </div>
           )}
         </div>
       </div>
-
       <Footer />
     </div>
   );
