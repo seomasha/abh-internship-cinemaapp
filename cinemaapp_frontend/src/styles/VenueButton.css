@@ -4,10 +4,10 @@
 
 .venue-button h5 {
   width: fit-content;
-  border: 1px solid #E4E7EC;
+  border: 1px solid #e4e7ec;
   padding: 0.5rem 1rem;
   border-radius: 5px;
-  color: #98A2B3;
+  color: #98a2b3;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -15,4 +15,10 @@
 .venue-button h5:hover {
   background-color: #f0f0f0;
   color: #333333;
+}
+
+.venue-button.selected h5 {
+  background-color: #b22222;
+  color: #ffffff;
+  border-color: #b22222;
 }
