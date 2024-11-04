@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
@@ -11,6 +12,7 @@ import { movieService } from "../services/movieService";
 import { venueService } from "../services/venueService";
 import { genreService } from "../services/genreService";
 import { projectionService } from "../services/projectionService";
+import { TbMovie } from "react-icons/tb";
 
 import "../styles/CurrentlyShowing.css";
 
@@ -29,6 +31,8 @@ const CurrentlyShowing = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProjectionTimes, setSelectedProjectionTimes] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [selectedVenues, setSelectedVenues] = useState([]);
+  const [selectedCities, setSelectedCities] = useState([]);
 
   const dayPickers = [];
 
@@ -78,6 +82,17 @@ const CurrentlyShowing = () => {
         ...(selectedGenres.length > 0 && {
           genres: selectedGenres.join(","),
         }),
+        ...(selectedCities.length > 0 && {
+          cities: selectedCities.join(","),
+        }),
+        ...(selectedVenues.length > 0 && {
+          venues: selectedVenues.join(","),
+        }),
+        ...(selectedDay !== null && {
+          selectedDay: new Date(today.setDate(today.getDate() + selectedDay))
+            .toISOString()
+            .split("T")[0],
+        }),
       });
       setCurrentlyShowingMovies((prevState) => ({
         movies:
@@ -89,7 +104,15 @@ const CurrentlyShowing = () => {
     };
 
     fetchMovies();
-  }, [page, searchQuery, selectedProjectionTimes, selectedGenres]);
+  }, [
+    page,
+    searchQuery,
+    selectedProjectionTimes,
+    selectedGenres,
+    selectedCities,
+    selectedVenues,
+    selectedDay,
+  ]);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -130,13 +153,19 @@ const CurrentlyShowing = () => {
         <SearchBar onSearch={handleSearch} />
         <div className="row gx-4">
           <div className="col-12 col-md-3">
-            <Dropdown icon={CiLocationOn} title="All Cities" options={cities} />
+            <Dropdown
+              icon={CiLocationOn}
+              title="All Cities"
+              options={cities}
+              onChange={setSelectedCities}
+            />
           </div>
           <div className="col-12 col-md-3">
             <Dropdown
               icon={CiLocationOn}
               title="All Cinemas"
               options={venues.venues.map((venue) => venue.name)}
+              onChange={setSelectedVenues}
             />
           </div>
           <div className="col-12 col-md-3">
@@ -172,34 +201,58 @@ const CurrentlyShowing = () => {
         </div>
 
         <div className="mt-4">
-          {currentlyShowingMovies.movies.map((movie) => {
-            return (
-              <MovieCard
-                key={movie.id}
-                title={movie.name}
-                pgRating={movie.pgRating}
-                language={movie.language}
-                movieDuration={movie.movieDuration}
-                genres={movie.genres}
-                projectionEndDate={movie.projectionEndDate}
-                photo={
-                  movie.photos.find((photo) => photo.entityType === "movie")
-                    ?.url
-                }
-                projectionTimes={movie.projectionTimes}
-              />
-            );
-          })}
+          {currentlyShowingMovies.movies.length > 0 ? (
+            <>
+              {currentlyShowingMovies.movies.map((movie) => {
+                return (
+                  <MovieCard
+                    key={movie.id}
+                    title={movie.name}
+                    pgRating={movie.pgRating}
+                    language={movie.language}
+                    movieDuration={movie.movieDuration}
+                    genres={movie.genres}
+                    projectionEndDate={movie.projectionEndDate}
+                    photo={
+                      movie.photos.find((photo) => photo.entityType === "movie")
+                        ?.url
+                    }
+                    projectionTimes={movie.projectionTimes}
+                  />
+                );
+              })}
 
-          {currentlyShowingMovies.movies.length <
-            currentlyShowingMovies.totalSize && (
-            <div className="text-center">
-              <button
-                className="btn primary-red text-decoration-underline fw-bold mt-4"
-                onClick={loadMoreMovies}
+              {currentlyShowingMovies.movies.length <
+                currentlyShowingMovies.totalSize && (
+                <div className="text-center">
+                  <button
+                    className="btn primary-red text-decoration-underline fw-bold mt-4"
+                    onClick={loadMoreMovies}
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center border rounded-5 padding">
+              <TbMovie size={128} />
+              <h6 className="mt-4 fw-bold">No movies to preview for filters</h6>
+              <p className="fw-light mt-4">
+                We are working on updating our schedule for upcoming movies.
+                Stay tuned for amazing movie
+                <br /> experience or explore our other exciting cinema features
+                in the meantime!
+              </p>
+              <Link
+                to="/tickets"
+                className="text-decoration-none"
+                aria-label="Tickets"
               >
-                Load More
-              </button>
+                <h6 className="fw-bold primary-red text-decoration-underline">
+                  Explore Upcoming Movies
+                </h6>
+              </Link>
             </div>
           )}
         </div>

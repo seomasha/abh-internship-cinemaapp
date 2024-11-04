@@ -13,3 +13,7 @@
 .carousel-control-next:hover {
   background-color: rgba(0, 0, 0, 0.7);
 }
+
+.padding {
+  padding: 8rem 0;
+}
