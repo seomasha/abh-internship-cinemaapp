@@ -7,5 +7,14 @@
 }
 
 .card-container {
-  max-width: 500px;
+  max-width: 400px;
+}
+
+.card-container-upcoming {
+  max-width: 360px;
+}
+
+.upcoming-label {
+  font-size: 0.9rem;
+  z-index: 1;
 }
