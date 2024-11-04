@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/MovieCard.css";
 
 const MovieCard = ({
@@ -11,6 +11,12 @@ const MovieCard = ({
   projectionTimes,
   photo,
 }) => {
+  const [selectedTime, setSelectedTime] = useState(null);
+
+  const handleTimeClick = (time) => {
+    setSelectedTime((prevTime) => (prevTime === time ? null : time));
+  };
+
   const formattedEndDate = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "2-digit",
@@ -47,7 +53,14 @@ const MovieCard = ({
         <h5 className="primary-red fw-bold">Showtimes</h5>
         <div className="d-flex flex-wrap gap-2 gap-md-4 mt-2">
           {projectionTimes.map((time, index) => (
-            <p key={index} className="fw-bold rounded border py-2 px-3">
+            <p
+              key={index}
+              onClick={() => handleTimeClick(time)}
+              className={`fw-bold rounded border py-2 px-3 ${
+                selectedTime === time ? "selected-time" : ""
+              }`}
+              style={{ cursor: "pointer" }}
+            >
               {time.slice(0, 5)}
             </p>
           ))}

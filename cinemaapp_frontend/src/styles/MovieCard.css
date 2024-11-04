@@ -13,3 +13,9 @@
 .movie-card-category {
   background-color: #e4e7ec;
 }
+
+.selected-time {
+  background-color: #b22222;
+  color: #ffffff;
+  border-color: #b22222;
+}

@@ -26,7 +26,7 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
     public Page<Movie> findMoviesByFilter(final FilterMovie filter, final Pageable pageable, final boolean currentlyShowing) {
         final String baseQuery = "SELECT DISTINCT(m) FROM Movie m JOIN Projection p ON m.id = p.movieId.id JOIN m.genres g";
 
-        Map<String, Object> parameters = new HashMap<>();
+        final Map<String, Object> parameters = new HashMap<>();
         final String filterQuery = filter.toQueryString(parameters, currentlyShowing);
 
         final String finalQuery = filterQuery.isEmpty() ? baseQuery : baseQuery + " WHERE " + filterQuery;

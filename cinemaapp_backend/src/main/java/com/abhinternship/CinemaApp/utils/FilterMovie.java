@@ -53,7 +53,8 @@ public class FilterMovie {
                 projectionTimes.isEmpty() &&
                 genres.isEmpty() &&
                 venues.isEmpty() &&
-                cities.isEmpty();
+                cities.isEmpty() &&
+                selectedDate == null;
     }
 
     public static FilterMovie empty() {
@@ -98,7 +99,7 @@ public class FilterMovie {
         }
 
         if (!projectionTimes.isEmpty()) {
-            List<String> timeConditions = projectionTimes.stream()
+            final List<String> timeConditions = projectionTimes.stream()
                     .map(time -> "FUNCTION('TO_CHAR', p.projectionTime, 'HH24:MI') = :time" + time.replace(":", ""))
                     .collect(Collectors.toList());
 
@@ -110,7 +111,7 @@ public class FilterMovie {
         }
 
         if (!genres.isEmpty()) {
-            List<String> genreConditions = genres.stream()
+            final List<String> genreConditions = genres.stream()
                     .map(genre -> "LOWER(g.name) = :genre" + genre.replace(" ", ""))
                     .collect(Collectors.toList());
             predicates.add("(" + String.join(" OR ", genreConditions) + ")");
@@ -123,4 +124,3 @@ public class FilterMovie {
         return String.join(" AND ", predicates);
     }
 }
-

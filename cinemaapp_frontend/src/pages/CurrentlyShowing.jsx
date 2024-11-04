@@ -55,8 +55,10 @@ const CurrentlyShowing = () => {
         onSelect={() => {
           if (selectedDay === i) {
             setSelectedDay(null);
+            resetPage();
           } else {
             setSelectedDay(i);
+            resetPage();
           }
         }}
       />
@@ -119,7 +121,7 @@ const CurrentlyShowing = () => {
           venues: selectedVenues.join(","),
         }),
         ...(selectedDay !== null && {
-          selectedDay: new Date(today.setDate(today.getDate() + selectedDay))
+          selectedDate: new Date(today.setDate(today.getDate() + selectedDay))
             .toISOString()
             .split("T")[0],
         }),
@@ -217,7 +219,12 @@ const CurrentlyShowing = () => {
         </div>
 
         <div className="mt-4 d-lg-none">
-          <Carousel prevLabel="" nextLabel="" interval={null}>
+          <Carousel
+            prevLabel=""
+            nextLabel=""
+            interval={null}
+            indicators={false}
+          >
             {dayPickers.map((picker, index) => (
               <Carousel.Item key={index}>
                 <div className="d-flex justify-content-center">{picker}</div>
@@ -267,9 +274,21 @@ const CurrentlyShowing = () => {
           ) : (
             <div className="text-center border rounded-5 padding">
               <TbMovie size={80} />
-              <h2 className="mt-4">No currently showing movies</h2>
-              <Link to="/" className="btn btn-primary mt-2">
-                Back to Home
+              <h6 className="mt-4 fw-bold">No currently showing movies</h6>
+              <p className="fw-light mt-4">
+                We are working on updating our schedule for upcoming movies.
+                Stay tuned for amazing movie
+                <br /> experience or explore our other exciting cinema features
+                in the meantime!
+              </p>
+              <Link
+                to="/tickets"
+                className="text-decoration-none"
+                aria-label="Tickets"
+              >
+                <h6 className="fw-bold primary-red text-decoration-underline">
+                  Explore Upcoming Movies
+                </h6>
               </Link>
             </div>
           )}
