@@ -41,7 +41,7 @@ public class FilterMovieRepositoryImpl implements FilterMovieRepository {
         final List<Movie> movies = query.getResultList();
 
         final Query countQuery = entityManager.createQuery(
-                "SELECT COUNT(m) FROM Movie m JOIN Projection p ON m.id = p.movieId.id JOIN m.genres g" +
+                "SELECT COUNT(DISTINCT(m)) FROM Movie m JOIN Projection p ON m.id = p.movieId.id JOIN m.genres g" +
                         (filterQuery.isEmpty() ? "" : " WHERE " + filterQuery)
         );
 

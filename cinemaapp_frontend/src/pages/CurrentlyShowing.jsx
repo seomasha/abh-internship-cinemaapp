@@ -52,7 +52,13 @@ const CurrentlyShowing = () => {
         date={date}
         day={day}
         isSelected={selectedDay === i}
-        onSelect={() => setSelectedDay(i)}
+        onSelect={() => {
+          if (selectedDay === i) {
+            setSelectedDay(null);
+          } else {
+            setSelectedDay(i);
+          }
+        }}
       />
     );
   }
