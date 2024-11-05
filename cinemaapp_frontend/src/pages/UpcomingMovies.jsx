@@ -9,12 +9,12 @@ import Card from "../components/Card";
 import { movieService } from "../services/movieService";
 import { venueService } from "../services/venueService";
 import { genreService } from "../services/genreService";
-import { projectionService } from "../services/projectionService";
 import { TbMovie } from "react-icons/tb";
 import { FaBuilding, FaCalendarAlt } from "react-icons/fa";
 import { BiCameraMovie } from "react-icons/bi";
 
 import "../styles/CurrentlyShowing.css";
+import DatePickerDropdown from "../components/DatePickerDropdown";
 
 const UpcomingMovies = () => {
   const [upcomingMovies, setupcomingMovies] = useState({
@@ -24,13 +24,15 @@ const UpcomingMovies = () => {
   const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
   const [cities, setCities] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [projectionTimes, setProjectionTimes] = useState([]);
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProjectionTimes, setSelectedProjectionTimes] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null,
+  });
 
   useEffect(() => {
     if (searchQuery) {
@@ -65,8 +67,8 @@ const UpcomingMovies = () => {
     resetPage();
   };
 
-  const handleProjectionTimeChange = (selectedProjectionTimes) => {
-    setSelectedProjectionTimes(selectedProjectionTimes);
+  const handleDateChange = ({ startDate, endDate }) => {
+    setDateRange({ startDate, endDate });
     resetPage();
   };
 
@@ -76,9 +78,6 @@ const UpcomingMovies = () => {
         type: "upcoming",
         page: page,
         ...(searchQuery && { name: searchQuery }),
-        ...(selectedProjectionTimes.length > 0 && {
-          projectionTimes: selectedProjectionTimes.join(","),
-        }),
         ...(selectedGenres.length > 0 && {
           genres: selectedGenres.join(","),
         }),
@@ -88,6 +87,11 @@ const UpcomingMovies = () => {
         ...(selectedVenues.length > 0 && {
           venues: selectedVenues.join(","),
         }),
+        ...(dateRange.startDate &&
+          dateRange.endDate && {
+            upcomingStartDate: dateRange.startDate.toISOString().split("T")[0],
+            upcomingEndDate: dateRange.endDate.toISOString().split("T")[0],
+          }),
       });
       setupcomingMovies((prevState) => ({
         movies:
@@ -102,10 +106,10 @@ const UpcomingMovies = () => {
   }, [
     page,
     searchQuery,
-    selectedProjectionTimes,
     selectedGenres,
     selectedCities,
     selectedVenues,
+    dateRange,
   ]);
 
   useEffect(() => {
@@ -124,16 +128,9 @@ const UpcomingMovies = () => {
       setGenres(genreList);
     };
 
-    const fetchProjectionTimes = async () => {
-      const projectionTimesList =
-        await projectionService.getAllDistinctProjectionTimes();
-      setProjectionTimes(projectionTimesList);
-    };
-
     fetchVenues();
     fetchCities();
     fetchGenres();
-    fetchProjectionTimes();
   }, []);
 
   return (
@@ -171,11 +168,10 @@ const UpcomingMovies = () => {
             />
           </div>
           <div className="col-12 col-md-3">
-            <Dropdown
+            <DatePickerDropdown
+              title="Date range"
               icon={FaCalendarAlt}
-              title="All Projection Times"
-              options={projectionTimes.map((time) => time.slice(0, 5))}
-              onChange={handleProjectionTimeChange}
+              onChange={handleDateChange}
             />
           </div>
         </div>
