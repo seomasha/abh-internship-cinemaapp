@@ -16,6 +16,7 @@ The following dependencies have been installed for the frontend part of the Cine
 - **React Router:** A library for routing in React applications, allowing navigation between different components and views.
 - **React icons:**: A library containing various types of icons.
 - **React Toastify:** Library for showing toast notifications.
+- **rsuite:** Library with Date pickers.
 
 ## Backend Dependencies Used
 
