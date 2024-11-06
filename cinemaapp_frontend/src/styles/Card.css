@@ -12,9 +12,40 @@
 
 .card-container-upcoming {
   max-width: 360px;
+  gap: 1rem;
 }
 
 .upcoming-label {
   font-size: 0.9rem;
   z-index: 1;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-container,
+.card-container-upcoming {
+  width: 100%;
 }

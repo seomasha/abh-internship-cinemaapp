@@ -176,24 +176,27 @@ const UpcomingMovies = () => {
           </div>
         </div>
 
-        <div className="mt-4 d-flex flex-wrap justify-content-start gap-3 row">
+        <div className="mt-4">
           {upcomingMovies.movies.length > 0 ? (
             <>
-              {upcomingMovies.movies.map((movie) => {
-                return (
-                  <Card
-                    key={movie.id}
-                    title={movie.name}
-                    subtitle={movie.movieDuration}
-                    genre={movie.genres.map((genre) => genre.name).join(", ")}
-                    imageUrl={
-                      movie.photos.find((photo) => photo.entityType === "movie")
-                        ?.url
-                    }
-                    upcoming={movie.projectionStartDate}
-                  />
-                );
-              })}
+              <div className="card-grid">
+                {upcomingMovies.movies.map((movie) => {
+                  return (
+                    <Card
+                      key={movie.id}
+                      title={movie.name}
+                      subtitle={movie.movieDuration}
+                      genre={movie.genres.map((genre) => genre.name).join(", ")}
+                      imageUrl={
+                        movie.photos.find(
+                          (photo) => photo.entityType === "movie"
+                        )?.url
+                      }
+                      upcoming={movie.projectionStartDate}
+                    />
+                  );
+                })}
+              </div>
 
               {upcomingMovies.movies.length < upcomingMovies.totalSize && (
                 <div className="text-center">

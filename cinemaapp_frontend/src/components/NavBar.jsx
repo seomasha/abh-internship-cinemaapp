@@ -48,8 +48,8 @@ const NavBar = () => {
                 to={tab.path}
                 className={({ isActive }) =>
                   isActive
-                    ? "text-light mx-4 nav-link fw-bold text-decoration-underline"
-                    : "text-light mx-4 nav-link"
+                    ? "text-light mx-4 nav-link fw-bold fs-6 text-decoration-underline"
+                    : "text-light mx-4 nav-link fw-bold fs-6"
                 }
               >
                 {tab.label}
