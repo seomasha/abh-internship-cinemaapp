@@ -76,10 +76,13 @@ const DatePickerDropdown = ({ icon: Icon, title, onChange }) => {
           />
         </div>
         <div className="d-flex justify-content-end gap-3">
-          <button className="btn secondary" onClick={() => setIsOpen(false)}>
+          <button
+            className="btn button-secondary"
+            onClick={() => setIsOpen(false)}
+          >
             Cancel
           </button>
-          <button className="btn primary" onClick={handleApply}>
+          <button className="btn button-primary" onClick={handleApply}>
             Apply
           </button>
         </div>

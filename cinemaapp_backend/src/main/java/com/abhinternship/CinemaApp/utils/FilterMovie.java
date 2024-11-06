@@ -131,7 +131,7 @@ public class FilterMovie {
                 : new ArrayList<>();
     }
 
-    private LocalDate parseLocalDate(String dateString) {
+    private LocalDate parseLocalDate(final String dateString) {
         return dateString != null && !dateString.isEmpty() ? LocalDate.parse(dateString) : null;
     }
 }

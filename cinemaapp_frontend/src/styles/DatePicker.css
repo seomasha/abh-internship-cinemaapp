@@ -71,18 +71,18 @@
   }
 }
 
-.secondary {
+.button-secondary {
   color: #b22222;
   border: 1px solid #b22222;
 }
 
-.secondary:hover {
+.button-secondary:hover {
   background-color: #b22222;
   color: white;
 }
 
-.primary,
-.primary:hover {
+.button-primary,
+.button-primary:hover {
   background-color: #b22222;
   color: white;
 }
