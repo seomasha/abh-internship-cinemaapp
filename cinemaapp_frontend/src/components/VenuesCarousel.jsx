@@ -5,7 +5,12 @@ import "slick-carousel/slick/slick-theme.css";
 import VenueButton from "./VenueButton";
 import screenSizes from "../utils/screenSizes";
 
-const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
+const VenuesCarousel = ({
+  data,
+  setMovies,
+  setSelectedVenueId,
+  selectedVenueId,
+}) => {
   const settings = {
     infinite: true,
     dots: true,
@@ -48,10 +53,11 @@ const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
     ],
   };
 
-  const handleVenueClick = async (venueId) => {
-    setSelectedVenueId(venueId);
+  const handleVenueClick = (venueId) => {
+    setSelectedVenueId((prevSelectedId) =>
+      prevSelectedId === venueId ? null : venueId
+    );
   };
-
   return (
     <div style={{ padding: "2rem" }}>
       <Slider {...settings}>
@@ -61,6 +67,7 @@ const VenuesCarousel = ({ data, setMovies, setSelectedVenueId }) => {
               id={venue.id}
               name={venue.name}
               onClick={() => handleVenueClick(venue.id)}
+              isSelected={selectedVenueId === venue.id}
             />
           </div>
         ))}

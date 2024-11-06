@@ -126,6 +126,7 @@ const Home = () => {
         data={venueCarousel}
         setMovies={setMovies}
         setSelectedVenueId={setSelectedVenueId}
+        selectedVenueId={selectedVenueId}
       />
       <PaginatedList
         title="Currently Showing"
@@ -133,6 +134,7 @@ const Home = () => {
         totalSize={currentlyShowingMovies.totalSize}
         page={currentlyShowingPage}
         onPageChange={handleCurrentlyShowingPageChange}
+        route="/currently-showing"
       />
       <PaginatedList
         title="Upcoming Movies"
@@ -140,6 +142,7 @@ const Home = () => {
         totalSize={upcomingMovies.totalSize}
         page={upcomingPage}
         onPageChange={handleUpcomingPageChange}
+        route="/upcoming"
       />
       <PaginatedList
         title="Venues"
@@ -147,6 +150,7 @@ const Home = () => {
         totalSize={venues.totalSize}
         page={venuesPage}
         onPageChange={handleVenuesPageChange}
+        route="/venues"
       />
       <Footer />
     </div>

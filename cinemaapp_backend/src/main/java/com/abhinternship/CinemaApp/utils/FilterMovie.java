@@ -1,6 +1,8 @@
 package com.abhinternship.CinemaApp.utils;
+
 import lombok.Data;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,8 @@ public class FilterMovie {
     private final Long venueId;
     private final LocalDate projectionStartDate;
     private final LocalDate projectionEndDate;
+    private final LocalDate upcomingStartDate;
+    private final LocalDate upcomingEndDate;
     private final LocalDate selectedDate;
     private final String name;
     private final List<String> projectionTimes;
@@ -24,9 +28,9 @@ public class FilterMovie {
         this.venueId = filters.containsKey("venueId") ? Long.valueOf(filters.get("venueId")) : null;
         this.projectionStartDate = LocalDate.now();
         this.projectionEndDate = LocalDate.now().plusDays(10);
-        this.selectedDate = filters.containsKey("selectedDate")
-                ? LocalDate.parse(filters.get("selectedDate"))
-                : null;
+        this.upcomingStartDate = parseLocalDate(filters.get("upcomingStartDate"));
+        this.upcomingEndDate = parseLocalDate(filters.get("upcomingEndDate"));
+        this.selectedDate = parseLocalDate(filters.get("selectedDate"));
         this.name = filters.getOrDefault("name", null);
         this.cities = parseCommaSeparatedList(filters, "cities");
         this.venues = parseCommaSeparatedList(filters, "venues");
@@ -41,7 +45,9 @@ public class FilterMovie {
                 genres.isEmpty() &&
                 venues.isEmpty() &&
                 cities.isEmpty() &&
-                selectedDate == null;
+                selectedDate == null &&
+                upcomingEndDate == null &&
+                upcomingStartDate == null;
     }
 
     public static FilterMovie empty() {
@@ -54,6 +60,12 @@ public class FilterMovie {
         if (venueId != null) {
             predicates.add("p.venueId.id = :venueId");
             parameters.put("venueId", venueId);
+        }
+
+        if(upcomingStartDate != null && upcomingEndDate != null) {
+            predicates.add("m.projectionStartDate BETWEEN :upcomingStartDate AND :upcomingEndDate");
+            parameters.put("upcomingStartDate", upcomingStartDate);
+            parameters.put("upcomingEndDate", upcomingEndDate);
         }
 
         if (currentlyShowing) {
@@ -117,5 +129,9 @@ public class FilterMovie {
                 .map(String::trim)
                 .collect(Collectors.toList())
                 : new ArrayList<>();
+    }
+
+    private LocalDate parseLocalDate(final String dateString) {
+        return dateString != null && !dateString.isEmpty() ? LocalDate.parse(dateString) : null;
     }
 }

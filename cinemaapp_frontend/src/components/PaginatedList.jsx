@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Card from "./Card";
 import { Pagination } from "react-bootstrap";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import SmallButton from "./SmallButton";
 import screenSizes from "../utils/screenSizes";
 
-const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
+const PaginatedList = ({
+  title,
+  data,
+  totalSize,
+  page,
+  onPageChange,
+  route,
+}) => {
   const [itemsPerPage, setItemsPerPage] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -47,7 +55,9 @@ const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
     <div style={{ padding: "3rem 4rem" }}>
       <div className="d-flex justify-content-between align-items-center">
         <h3 className="mb-4 fw-bold">{title}</h3>
-        <h6 className="fw-bold primary-red">See all</h6>
+        <Link to={route} className="text-decoration-none">
+          <h6 className="fw-bold primary-red">See all</h6>
+        </Link>
       </div>
 
       {data.length === 0 ? (
@@ -58,7 +68,7 @@ const PaginatedList = ({ title, data, totalSize, page, onPageChange }) => {
         <>
           <div className="row">
             {data.map((card) => (
-              <div className="col-12 col-lg-3" key={card.id}>
+              <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={card.id}>
                 {card.street ? (
                   <Card
                     title={card.name}

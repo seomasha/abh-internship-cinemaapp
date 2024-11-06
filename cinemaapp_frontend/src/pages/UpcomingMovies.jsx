@@ -4,66 +4,35 @@ import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
 import Dropdown from "../components/Dropdown";
-import { CiLocationOn, CiClock1 } from "react-icons/ci";
-import DayPicker from "../components/DayPicker";
-import MovieCard from "../components/MovieCard";
-import { Carousel } from "react-bootstrap";
+import { CiLocationOn } from "react-icons/ci";
+import Card from "../components/Card";
 import { movieService } from "../services/movieService";
 import { venueService } from "../services/venueService";
 import { genreService } from "../services/genreService";
-import { projectionService } from "../services/projectionService";
 import { TbMovie } from "react-icons/tb";
+import { FaBuilding, FaCalendarAlt } from "react-icons/fa";
+import { BiCameraMovie } from "react-icons/bi";
 
 import "../styles/CurrentlyShowing.css";
+import DatePickerDropdown from "../components/DatePickerDropdown";
 
-const CurrentlyShowing = () => {
-  const today = new Date();
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState({
+const UpcomingMovies = () => {
+  const [upcomingMovies, setupcomingMovies] = useState({
     movies: [],
     totalSize: 0,
   });
   const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
   const [cities, setCities] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [projectionTimes, setProjectionTimes] = useState([]);
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProjectionTimes, setSelectedProjectionTimes] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
-
-  const dayPickers = [];
-
-  const dateOptions = { month: "short", day: "numeric" };
-  const dayOptions = { weekday: "short" };
-
-  for (let i = 0; i < 10; i++) {
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + i);
-
-    const date = nextDate.toLocaleDateString("en-US", dateOptions);
-    const day = nextDate.toLocaleDateString("en-US", dayOptions);
-
-    dayPickers.push(
-      <DayPicker
-        key={i}
-        date={date}
-        day={day}
-        isSelected={selectedDay === i}
-        onSelect={() => {
-          if (selectedDay === i) {
-            setSelectedDay(null);
-            resetPage();
-          } else {
-            setSelectedDay(i);
-            resetPage();
-          }
-        }}
-      />
-    );
-  }
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null,
+  });
 
   useEffect(() => {
     if (searchQuery) {
@@ -98,19 +67,17 @@ const CurrentlyShowing = () => {
     resetPage();
   };
 
-  const handleProjectionTimeChange = (selectedProjectionTimes) => {
-    setSelectedProjectionTimes(selectedProjectionTimes);
+  const handleDateChange = ({ startDate, endDate }) => {
+    setDateRange({ startDate, endDate });
     resetPage();
   };
 
   useEffect(() => {
     const fetchMovies = async () => {
       const currentlyShowing = await movieService.getMovies({
+        type: "upcoming",
         page: page,
         ...(searchQuery && { name: searchQuery }),
-        ...(selectedProjectionTimes.length > 0 && {
-          projectionTimes: selectedProjectionTimes.join(","),
-        }),
         ...(selectedGenres.length > 0 && {
           genres: selectedGenres.join(","),
         }),
@@ -120,13 +87,13 @@ const CurrentlyShowing = () => {
         ...(selectedVenues.length > 0 && {
           venues: selectedVenues.join(","),
         }),
-        ...(selectedDay !== null && {
-          selectedDate: new Date(today.setDate(today.getDate() + selectedDay))
-            .toISOString()
-            .split("T")[0],
-        }),
+        ...(dateRange.startDate &&
+          dateRange.endDate && {
+            upcomingStartDate: dateRange.startDate.toISOString().split("T")[0],
+            upcomingEndDate: dateRange.endDate.toISOString().split("T")[0],
+          }),
       });
-      setCurrentlyShowingMovies((prevState) => ({
+      setupcomingMovies((prevState) => ({
         movies:
           page > 0
             ? [...prevState.movies, ...currentlyShowing.movies]
@@ -139,11 +106,10 @@ const CurrentlyShowing = () => {
   }, [
     page,
     searchQuery,
-    selectedProjectionTimes,
     selectedGenres,
     selectedCities,
     selectedVenues,
-    selectedDay,
+    dateRange,
   ]);
 
   useEffect(() => {
@@ -162,16 +128,9 @@ const CurrentlyShowing = () => {
       setGenres(genreList);
     };
 
-    const fetchProjectionTimes = async () => {
-      const projectionTimesList =
-        await projectionService.getAllDistinctProjectionTimes();
-      setProjectionTimes(projectionTimesList);
-    };
-
     fetchVenues();
     fetchCities();
     fetchGenres();
-    fetchProjectionTimes();
   }, []);
 
   return (
@@ -179,7 +138,7 @@ const CurrentlyShowing = () => {
       <NavBar />
       <div className="p-5">
         <h2 className="fw-bold">
-          Currently showing ({currentlyShowingMovies.totalSize})
+          Upcoming movies ({upcomingMovies.totalSize})
         </h2>
 
         <SearchBar onSearch={handleSearch} />
@@ -194,7 +153,7 @@ const CurrentlyShowing = () => {
           </div>
           <div className="col-12 col-md-3">
             <Dropdown
-              icon={CiLocationOn}
+              icon={FaBuilding}
               title="All Cinemas"
               options={venues.venues.map((venue) => venue.name)}
               onChange={handleVenueChange}
@@ -202,65 +161,44 @@ const CurrentlyShowing = () => {
           </div>
           <div className="col-12 col-md-3">
             <Dropdown
-              icon={CiLocationOn}
+              icon={BiCameraMovie}
               title="All Genres"
               options={genres.map((genre) => genre.name)}
               onChange={handleGenreChange}
             />
           </div>
           <div className="col-12 col-md-3">
-            <Dropdown
-              icon={CiClock1}
-              title="All Projection Times"
-              options={projectionTimes.map((time) => time.slice(0, 5))}
-              onChange={handleProjectionTimeChange}
+            <DatePickerDropdown
+              title="Date range"
+              icon={FaCalendarAlt}
+              onChange={handleDateChange}
             />
           </div>
         </div>
 
-        <div className="mt-4 d-lg-none">
-          <Carousel
-            prevLabel=""
-            nextLabel=""
-            interval={null}
-            indicators={false}
-          >
-            {dayPickers.map((picker, index) => (
-              <Carousel.Item key={index}>
-                <div className="d-flex justify-content-center">{picker}</div>
-              </Carousel.Item>
-            ))}
-          </Carousel>
-        </div>
-
-        <div className="d-none flex-wrap d-lg-flex justify-content-start justify-content-xl-between mt-4 gap-1">
-          {dayPickers}
-        </div>
-
         <div className="mt-4">
-          {currentlyShowingMovies.movies.length > 0 ? (
+          {upcomingMovies.movies.length > 0 ? (
             <>
-              {currentlyShowingMovies.movies.map((movie) => {
-                return (
-                  <MovieCard
-                    key={movie.id}
-                    title={movie.name}
-                    pgRating={movie.pgRating}
-                    language={movie.language}
-                    movieDuration={movie.movieDuration}
-                    genres={movie.genres}
-                    projectionEndDate={movie.projectionEndDate}
-                    photo={
-                      movie.photos.find((photo) => photo.entityType === "movie")
-                        ?.url
-                    }
-                    projectionTimes={movie.projectionTimes}
-                  />
-                );
-              })}
+              <div className="card-grid">
+                {upcomingMovies.movies.map((movie) => {
+                  return (
+                    <Card
+                      key={movie.id}
+                      title={movie.name}
+                      subtitle={movie.movieDuration}
+                      genre={movie.genres.map((genre) => genre.name).join(", ")}
+                      imageUrl={
+                        movie.photos.find(
+                          (photo) => photo.entityType === "movie"
+                        )?.url
+                      }
+                      upcoming={movie.projectionStartDate}
+                    />
+                  );
+                })}
+              </div>
 
-              {currentlyShowingMovies.movies.length <
-                currentlyShowingMovies.totalSize && (
+              {upcomingMovies.movies.length < upcomingMovies.totalSize && (
                 <div className="text-center">
                   <button
                     className="btn primary-red text-decoration-underline fw-bold mt-4"
@@ -274,7 +212,7 @@ const CurrentlyShowing = () => {
           ) : (
             <div className="text-center border rounded-5 padding">
               <TbMovie size={80} />
-              <h6 className="mt-4 fw-bold">No currently showing movies</h6>
+              <h6 className="mt-4 fw-bold">No upcoming movies</h6>
               <p className="fw-light mt-4">
                 We are working on updating our schedule for upcoming movies.
                 Stay tuned for amazing movie
@@ -282,12 +220,12 @@ const CurrentlyShowing = () => {
                 in the meantime!
               </p>
               <Link
-                to="/upcoming"
+                to="/currently-showing"
                 className="text-decoration-none"
                 aria-label="Tickets"
               >
                 <h6 className="fw-bold primary-red text-decoration-underline">
-                  Explore Upcoming Movies
+                  Explore Currently Showing Movies
                 </h6>
               </Link>
             </div>
@@ -299,4 +237,4 @@ const CurrentlyShowing = () => {
   );
 };
 
-export default CurrentlyShowing;
+export default UpcomingMovies;

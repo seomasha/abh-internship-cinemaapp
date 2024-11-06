@@ -21,7 +21,7 @@ const Hero = ({ data }) => {
 
   return (
     <div>
-      <Carousel controls={false}>
+      <Carousel controls={false} interval={2000}>
         {displayedItems.map((item) => (
           <Carousel.Item key={item.id}>
             <HeroItem
