@@ -73,26 +73,33 @@ const PaginatedList = ({
             {data.map((card) => (
               <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={card.id}>
                 {route ? (
-                  card.street ? (
-                    <Card
-                      title={card.name}
-                      subtitle={`${card.street} ${
-                        card.streetNo === 0 ? "bb" : card.streetNo
-                      }, ${card.city}`}
-                      imageUrl={card.photoImageId.url}
-                    />
-                  ) : (
-                    <Card
-                      title={card.name}
-                      subtitle={`${card.movieDuration} mins`}
-                      genre={card.genres.map((genre) => genre.name).join(", ")}
-                      imageUrl={
-                        card.photos.find(
-                          (photo) => photo.entityType === "movie"
-                        )?.url
-                      }
-                    />
-                  )
+                  <Link
+                    to={`/movie-details/${card.id}`}
+                    className="text-decoration-none"
+                  >
+                    {card.street ? (
+                      <Card
+                        title={card.name}
+                        subtitle={`${card.street} ${
+                          card.streetNo === 0 ? "bb" : card.streetNo
+                        }, ${card.city}`}
+                        imageUrl={card.photoImageId.url}
+                      />
+                    ) : (
+                      <Card
+                        title={card.name}
+                        subtitle={`${card.movieDuration} mins`}
+                        genre={card.genres
+                          .map((genre) => genre.name)
+                          .join(", ")}
+                        imageUrl={
+                          card.photos.find(
+                            (photo) => photo.entityType === "movie"
+                          )?.url
+                        }
+                      />
+                    )}
+                  </Link>
                 ) : (
                   <SmallCard
                     imgUrl={

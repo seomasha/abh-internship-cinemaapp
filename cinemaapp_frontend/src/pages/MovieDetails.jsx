@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
@@ -19,10 +20,17 @@ import {
 import { CiLocationOn } from "react-icons/ci";
 
 import "../styles/MovieDetails.css";
+import axios from "axios";
+import { venueService } from "../services/venueService";
 
 const MovieDetails = () => {
   const dayPickerContainerRef = useRef(null);
+  const { id } = useParams();
   const [movies, setMovies] = useState({ movies: [], totalSize: 0 });
+  const [movie, setMovie] = useState([]);
+  const [ratings, setRatings] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
 
   const scrollLeft = () => {
     dayPickerContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -38,12 +46,42 @@ const MovieDetails = () => {
       setMovies({ movies: movieList.movies, totalSize: movieList.totalSize });
     };
 
+    const fetchCities = async () => {
+      const cityList = await venueService.getAllCities();
+      setCities(cityList);
+    };
+
+    const fetchVenues = async () => {
+      const venueList = await venueService.getAll();
+      setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
+    };
+
+    fetchCities();
     fetchMovies();
+    fetchVenues();
   }, []);
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      const movieData = await movieService.get(id);
+      setMovie(movieData);
+    };
+
+    const fetchRatings = async () => {
+      const ratings = await axios.get(
+        `https://www.omdbapi.com/?apikey=${
+          import.meta.env.VITE_OMDB_API_KEY
+        }&t=${movie.name.replace(" ", "+")}`
+      );
+      setRatings(ratings.data);
+    };
+
+    fetchMovie();
+    fetchRatings();
+  }, [id, movie.name]);
 
   return (
     <div>
-      {console.log(movies)}
       <NavBar />
       <h3 className="px-5 py-4">Movie Details</h3>
 
@@ -52,7 +90,11 @@ const MovieDetails = () => {
           <iframe
             width="100%"
             height="560"
-            src="https://www.youtube.com/embed/mG4tfdYytEk"
+            src={
+              movie.trailerLink
+                ? movie.trailerLink.replace("watch?v=", "embed/")
+                : ""
+            }
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -61,64 +103,53 @@ const MovieDetails = () => {
         </div>
 
         <div className="image-grid">
-          <img
-            src="http://10.10.11.72:9002/images/it.jpg"
-            alt="Image 1"
-            className="grid-image"
-          />
-          <img
-            src="http://10.10.11.72:9002/images/it.jpg"
-            alt="Image 2"
-            className="grid-image rounded-top-right"
-          />
-          <img
-            src="http://10.10.11.72:9002/images/it.jpg"
-            alt="Image 3"
-            className="grid-image"
-          />
-          <img
-            src="http://10.10.11.72:9002/images/it.jpg"
-            alt="Image 4"
-            className="grid-image rounded-bottom-right"
-          />
+          {movie.photos?.map(
+            (photo, index) =>
+              photo.entityType === "movie" && (
+                <img
+                  key={photo.id}
+                  src={photo.url}
+                  alt={`Image ${index + 1}`}
+                  className={`grid-image ${
+                    index === 2 ? "rounded-top-right" : ""
+                  } ${index === 4 ? "rounded-bottom-right" : ""}`}
+                />
+              )
+          )}
         </div>
       </div>
 
-      <div className="px-5 d-flex">
+      <div className="px-5 d-flex justify-content-between">
         <div>
-          <h3>Avatar: The way of the water</h3>
+          <h3>{movie.name}</h3>
           <h6 className="fw-light gap-3 py-2">
-            PG 13 <span className="primary-red px-2">|</span>
-            English <span className="primary-red px-2">|</span>
-            117 Min <span className="primary-red px-2">|</span>
-            Projection date: 2023/07/04 - 2023/07/10
+            {movie.pgRating} <span className="primary-red px-2">|</span>
+            {movie.language} <span className="primary-red px-2">|</span>
+            {movie.movieDuration} Min{" "}
+            <span className="primary-red px-2">|</span>
+            Projection date: {movie.projectionStartDate} -{" "}
+            {movie.projectionEndDate}
           </h6>
           <div className="d-flex gap-3 py-2">
-            <HeroMovieCategory genre="Fantasy" />
-            <HeroMovieCategory genre="Action" />
-            <HeroMovieCategory genre="Adventure" />
+            {movie.genres?.map((genre) => (
+              <HeroMovieCategory key={genre.id} genre={genre.name} />
+            ))}
           </div>
-          <p className="w-full fs-6 py-2">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut
-            quisquam officia repudiandae qui rerum eveniet dolorum atque, sequi
-            unde consectetur maxime facilis nostrum eos non. Alias similique
-            provident dolores modi!
-          </p>
+          <p className="w-full fs-6 py-2">{movie.synopsis}</p>
           <div className="fw-light py-4">
-            <h6>Director: James Cameron</h6>
-            <h6 className="mt-4">Writers: James Cameron, Rick Jaffa</h6>
+            <h6>Director: {movie.director}</h6>
+            <h6 className="mt-4">Writers: {movie.writers}</h6>
           </div>
           <div className="d-flex align-items-center mb-4">
             <div className="vertical-line"></div>
             <h4>Cast</h4>
           </div>
           <div className="cast-grid">
-            <span className="fw-bold fs-6">Sam Worthington</span>
-            <span className="fw-bold fs-6">Milos Bikovic</span>
-            <span className="fw-bold fs-6">Text 3</span>
-            <span className="fw-bold fs-6">Text 4</span>
-            <span className="fw-bold fs-6">Text 5</span>
-            <span className="fw-bold fs-6">Text 6</span>
+            {movie.actors?.split(",").map((actor) => (
+              <span key={actor} className="fw-bold fs-6">
+                {actor}
+              </span>
+            ))}
           </div>
         </div>
         <div className="border rounded-4 w-50 shadow">
@@ -127,7 +158,7 @@ const MovieDetails = () => {
               <Dropdown
                 icon={CiLocationOn}
                 title="Choose City"
-                options={["cities"]}
+                options={cities}
                 onChange={() => console.log("test")}
               />
             </div>
@@ -135,7 +166,7 @@ const MovieDetails = () => {
               <Dropdown
                 icon={FaRegBuilding}
                 title="Choose Cinema"
-                options={["cities"]}
+                options={venues.venues.map((venue) => venue.name)}
                 onChange={() => console.log("test")}
               />
             </div>
@@ -159,30 +190,15 @@ const MovieDetails = () => {
             </div>
             <h5 className="mt-5 px-4">Standard</h5>
             <div className="d-flex px-4 py-2 gap-3">
-              <p
-                className={`fw-bold rounded border py-2 px-3 fs-6`}
-                style={{ cursor: "pointer", margin: 0 }}
-              >
-                12:00
-              </p>
-              <p
-                className="fw-bold rounded border py-2 px-3 fs-6"
-                style={{ cursor: "pointer", margin: 0 }}
-              >
-                12:00
-              </p>
-              <p
-                className="fw-bold rounded border py-2 px-3 fs-6"
-                style={{ cursor: "pointer", margin: 0 }}
-              >
-                12:00
-              </p>
-              <p
-                className="fw-bold rounded border py-2 px-3 fs-6"
-                style={{ cursor: "pointer", margin: 0 }}
-              >
-                12:00
-              </p>
+              {movie.projectionTimes?.map((time) => (
+                <p
+                  key={time}
+                  className={`fw-bold rounded border py-2 px-3 fs-6`}
+                  style={{ cursor: "pointer", margin: 0 }}
+                >
+                  {time.slice(0, 5)}
+                </p>
+              ))}
             </div>
             <hr></hr>
             <div className="d-flex px-4 mb-4 gap-3">
@@ -202,20 +218,22 @@ const MovieDetails = () => {
           <h4>Rating</h4>
         </div>
         <div className="d-flex gap-3 mb-4">
-          <div className="d-flex align-items-center gap-2 border rounded p-3">
-            <FaRegStar size={20} className="primary-red" />
-            <div>
-              <h6>9.7</h6>
-              <p>IMDB Rating</p>
-            </div>
-          </div>
-          <div className="d-flex align-items-center gap-2 border rounded p-3">
-            <FaRegStar size={20} className="primary-red" />
-            <div>
-              <h6>9.7</h6>
-              <p>Rotten Tomatoes</p>
-            </div>
-          </div>
+          {ratings.Ratings && ratings.Ratings.length > 0 ? (
+            ratings.Ratings.map((rating) => (
+              <div
+                key={rating.source}
+                className="d-flex align-items-center gap-2 border rounded p-3"
+              >
+                <FaRegStar size={20} className="primary-red" />
+                <div>
+                  <h6>{rating.Value}</h6>
+                  <p>{rating.Source}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No ratings available</p>
+          )}
         </div>
       </div>
       <PaginatedList

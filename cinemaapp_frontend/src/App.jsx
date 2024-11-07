@@ -30,7 +30,7 @@ function App() {
           <Route path="/tickets" element={<Tickets />} />
           <Route path="/currently-showing" element={<CurrentlyShowing />} />
           <Route path="/upcoming" element={<UpcomingMovies />} />
-          <Route path="/movie-details" element={<MovieDetails />} />
+          <Route path="/movie-details/:id" element={<MovieDetails />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

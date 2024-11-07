@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.MovieListDTO;
+import com.abhinternship.CinemaApp.dto.MovieWithProjectionsDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
 
@@ -14,4 +15,5 @@ public interface MovieService {
     void deleteMovie(Long id);
     MovieListDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size);
     MovieListDTO findUpcomingMovies(FilterMovie filterMovie, int page, int size);
+    Optional<MovieWithProjectionsDTO> findMovieWithProjectionsById(Long id);
 }

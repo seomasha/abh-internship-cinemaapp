@@ -16,7 +16,7 @@ export const request = async (url, options = {}) => {
 
 export const apiService = (endpoint) => {
   return {
-    get: () => request(endpoint),
+    get: (id) => request(`${endpoint}/${id}`),
     getAll: (page = 0, size = 0) =>
       request(endpoint, {
         params: { page, size },
