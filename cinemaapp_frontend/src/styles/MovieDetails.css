@@ -1,0 +1,89 @@
+.video-container {
+  flex: 1;
+  max-width: 50%;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  flex: 1;
+  max-width: 50%;
+}
+
+.grid-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.rounded-top-right {
+  border-top-right-radius: 15px;
+}
+
+.rounded-bottom-right {
+  border-bottom-right-radius: 15px;
+}
+
+.rounded-left-corners {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.vertical-line {
+  width: 2px;
+  height: 20px;
+  background-color: #b22222;
+  margin-right: 4px;
+}
+
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px;
+  width: 50%;
+}
+
+.dropdown-full-width {
+  flex: 1;
+}
+
+.dropdown-full-width .dropdown {
+  width: 100%;
+}
+
+.day-picker-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem 0;
+  width: 100%;
+  scrollbar-width: none;
+}
+
+.day-picker-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-arrow {
+  background: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.button-secondary {
+  color: #b22222;
+  border: 1px solid #b22222;
+}
+
+.button-secondary:hover {
+  background-color: #b22222;
+  color: white;
+}
+
+.button-primary,
+.button-primary:hover {
+  background-color: #b22222;
+  color: white;
+}

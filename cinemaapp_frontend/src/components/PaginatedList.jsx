@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Card from "./Card";
+import SmallCard from "./SmallCard";
 import { Pagination } from "react-bootstrap";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import SmallButton from "./SmallButton";
@@ -55,9 +56,11 @@ const PaginatedList = ({
     <div style={{ padding: "3rem 4rem" }}>
       <div className="d-flex justify-content-between align-items-center">
         <h3 className="mb-4 fw-bold">{title}</h3>
-        <Link to={route} className="text-decoration-none">
-          <h6 className="fw-bold primary-red">See all</h6>
-        </Link>
+        {route && (
+          <Link to={route} className="text-decoration-none">
+            <h6 className="fw-bold primary-red">See all</h6>
+          </Link>
+        )}
       </div>
 
       {data.length === 0 ? (
@@ -69,23 +72,34 @@ const PaginatedList = ({
           <div className="row">
             {data.map((card) => (
               <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={card.id}>
-                {card.street ? (
-                  <Card
-                    title={card.name}
-                    subtitle={`${card.street} ${
-                      card.streetNo === 0 ? "bb" : card.streetNo
-                    }, ${card.city}`}
-                    imageUrl={card.photoImageId.url}
-                  />
+                {route ? (
+                  card.street ? (
+                    <Card
+                      title={card.name}
+                      subtitle={`${card.street} ${
+                        card.streetNo === 0 ? "bb" : card.streetNo
+                      }, ${card.city}`}
+                      imageUrl={card.photoImageId.url}
+                    />
+                  ) : (
+                    <Card
+                      title={card.name}
+                      subtitle={`${card.movieDuration} mins`}
+                      genre={card.genres.map((genre) => genre.name).join(", ")}
+                      imageUrl={
+                        card.photos.find(
+                          (photo) => photo.entityType === "movie"
+                        )?.url
+                      }
+                    />
+                  )
                 ) : (
-                  <Card
-                    title={card.name}
-                    subtitle={`${card.movieDuration} mins`}
-                    genre={card.genres.map((genre) => genre.name).join(", ")}
-                    imageUrl={
+                  <SmallCard
+                    imgUrl={
                       card.photos.find((photo) => photo.entityType === "movie")
                         ?.url
                     }
+                    title={card.name}
                   />
                 )}
               </div>
