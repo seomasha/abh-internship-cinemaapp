@@ -16,6 +16,7 @@ import {
   FaRegBuilding,
   FaArrowLeft,
   FaArrowRight,
+  FaRegBell,
 } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
 
@@ -31,6 +32,14 @@ const MovieDetails = () => {
   const [ratings, setRatings] = useState([]);
   const [cities, setCities] = useState([]);
   const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  const today = new Date();
+
+  const dateOptions = { month: "short", day: "numeric" };
+  const dayOptions = { weekday: "short" };
 
   const scrollLeft = () => {
     dayPickerContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -39,6 +48,43 @@ const MovieDetails = () => {
   const scrollRight = () => {
     dayPickerContainerRef.current.scrollBy({ left: 200, behavior: "smooth" });
   };
+
+  const handleTimeClick = (time) => {
+    setSelectedTime((prevTime) => (prevTime === time ? null : time));
+  };
+
+  const handleButtonClick = () => {
+    setShowSuccessMessage(true);
+
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 5000);
+  };
+
+  const dayPickers = [];
+  for (let i = 0; i < 10; i++) {
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + i);
+    const date = nextDate.toLocaleDateString("en-US", dateOptions);
+    const day = nextDate.toLocaleDateString("en-US", dayOptions);
+
+    dayPickers.push(
+      <DayPicker
+        key={i}
+        date={date}
+        day={day}
+        isSelected={selectedDay === i}
+        onSelect={() => {
+          if (i === selectedDay) {
+            setSelectedDay(null);
+          } else {
+            setSelectedDay(i);
+          }
+        }}
+        small={true}
+      />
+    );
+  }
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -153,63 +199,80 @@ const MovieDetails = () => {
           </div>
         </div>
         <div className="border rounded-4 w-50 shadow">
-          <div className="d-flex justify-content-between p-4 gap-3">
-            <div className="dropdown-full-width">
-              <Dropdown
-                icon={CiLocationOn}
-                title="Choose City"
-                options={cities}
-                onChange={() => console.log("test")}
-              />
+          {showSuccessMessage ? (
+            <div className="p-3 text-center">
+              <h5>{movie.name}</h5>
+              <p>Get notified when the movie is part of the schedule</p>
+              <FaRegBell />
             </div>
-            <div className="dropdown-full-width">
-              <Dropdown
-                icon={FaRegBuilding}
-                title="Choose Cinema"
-                options={venues.venues.map((venue) => venue.name)}
-                onChange={() => console.log("test")}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="d-flex flex-column align-items-center px-4">
-              <div className="day-picker-container" ref={dayPickerContainerRef}>
-                {Array.from({ length: 10 }, (_, index) => (
-                  <DayPicker
-                    key={index}
-                    date={`Dec ${22 + index}`}
-                    day={index === 0 ? "Today" : `Day ${index + 1}`}
-                    small={true}
+          ) : (
+            <div>
+              <div className="d-flex justify-content-between p-4 gap-3">
+                <div className="dropdown-full-width">
+                  <Dropdown
+                    icon={CiLocationOn}
+                    title="Choose City"
+                    options={cities}
+                    onChange={() => console.log("test")}
                   />
-                ))}
+                </div>
+                <div className="dropdown-full-width">
+                  <Dropdown
+                    icon={FaRegBuilding}
+                    title="Choose Cinema"
+                    options={venues.venues.map((venue) => venue.name)}
+                    onChange={() => console.log("test")}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="d-flex flex-column align-items-center px-4">
+                  <div
+                    className="day-picker-container"
+                    ref={dayPickerContainerRef}
+                  >
+                    {dayPickers}
+                  </div>
+                </div>
+                <div className="d-flex justify-content-end mt-2 gap-3 px-4">
+                  <SmallButton onClick={scrollLeft} icon={<FaArrowLeft />} />
+                  <SmallButton onClick={scrollRight} icon={<FaArrowRight />} />
+                </div>
+                <h5 className="mt-5 px-4">Standard</h5>
+                <div className="d-flex px-4 py-2 gap-3">
+                  {movie.projectionTimes?.map((time, index) => (
+                    <p
+                      key={index}
+                      onClick={() => handleTimeClick(time)}
+                      className={`fw-bold rounded border py-2 px-3 ${
+                        selectedTime === time ? "selected-time" : ""
+                      }`}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {time.slice(0, 5)}
+                    </p>
+                  ))}
+                </div>
+                <hr />
+                <div className="d-flex px-4 mb-4 gap-3">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={handleButtonClick}
+                    disabled={selectedDay === null || selectedTime === null}
+                  >
+                    Reserve Ticket
+                  </button>
+                  <button
+                    className="btn flex-grow-1 button-primary"
+                    onClick={handleButtonClick}
+                    disabled={selectedDay === null || selectedTime === null}
+                  >
+                    Buy Ticket
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="d-flex justify-content-end mt-2 gap-3 px-4">
-              <SmallButton onClick={scrollLeft} icon={<FaArrowLeft />} />
-              <SmallButton onClick={scrollRight} icon={<FaArrowRight />} />
-            </div>
-            <h5 className="mt-5 px-4">Standard</h5>
-            <div className="d-flex px-4 py-2 gap-3">
-              {movie.projectionTimes?.map((time) => (
-                <p
-                  key={time}
-                  className={`fw-bold rounded border py-2 px-3 fs-6`}
-                  style={{ cursor: "pointer", margin: 0 }}
-                >
-                  {time.slice(0, 5)}
-                </p>
-              ))}
-            </div>
-            <hr></hr>
-            <div className="d-flex px-4 mb-4 gap-3">
-              <button className="btn flex-grow-1 button-secondary">
-                Reserve Ticket
-              </button>
-              <button className="btn flex-grow-1 button-primary">
-                Buy Ticket
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
       <div className="px-5 mt-4">

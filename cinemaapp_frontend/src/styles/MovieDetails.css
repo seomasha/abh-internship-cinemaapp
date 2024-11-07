@@ -52,6 +52,12 @@
   width: 100%;
 }
 
+.selected-time {
+  background-color: #b22222;
+  color: #ffffff;
+  border-color: #b22222;
+}
+
 .day-picker-container {
   display: flex;
   overflow-x: auto;
@@ -85,4 +91,9 @@
 .button-primary:hover {
   background-color: #b22222;
   color: white;
+}
+
+button:disabled {
+  background-color: darkgray;
+  cursor: not-allowed;
 }
