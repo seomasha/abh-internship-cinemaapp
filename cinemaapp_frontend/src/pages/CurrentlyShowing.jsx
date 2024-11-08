@@ -135,6 +135,7 @@ const CurrentlyShowing = () => {
             : currentlyShowing.movies,
         totalSize: currentlyShowing.totalSize,
       }));
+      setLoading(false);
     };
 
     fetchMovies();
@@ -175,17 +176,6 @@ const CurrentlyShowing = () => {
     fetchGenres();
     fetchProjectionTimes();
   }, []);
-
-  useEffect(() => {
-    if (
-      venues.venues.length > 0 &&
-      cities.length > 0 &&
-      currentlyShowingMovies.movies.length > 0 &&
-      projectionTimes.length > 0
-    ) {
-      setLoading(false);
-    }
-  }, [venues, projectionTimes, currentlyShowingMovies, cities]);
 
   if (loading) {
     return (

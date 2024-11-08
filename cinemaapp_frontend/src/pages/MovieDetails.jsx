@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import movieRatingApiService from "../services/movieRatingApiService";
 
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
@@ -23,7 +24,6 @@ import {
 import { CiLocationOn } from "react-icons/ci";
 
 import "../styles/MovieDetails.css";
-import axios from "axios";
 import { venueService } from "../services/venueService";
 import Rating from "../components/Rating";
 
@@ -41,11 +41,14 @@ const MovieDetails = () => {
   const [loading, setLoading] = useState(true);
   const [recommendedMoviesPage, setRecommendedMoviesPage] = useState(0);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const itemsPerPage = 6;
 
   const today = new Date();
-
   const dateOptions = { month: "short", day: "numeric" };
   const dayOptions = { weekday: "short" };
+  const nextDate = new Date(today);
+  const date = nextDate.toLocaleDateString("en-US", dateOptions);
+  const day = nextDate.toLocaleDateString("en-US", dayOptions);
 
   const scrollLeft = () => {
     dayPickerContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -69,10 +72,7 @@ const MovieDetails = () => {
 
   const dayPickers = [];
   for (let i = 0; i < 10; i++) {
-    const nextDate = new Date(today);
     nextDate.setDate(today.getDate() + i);
-    const date = nextDate.toLocaleDateString("en-US", dateOptions);
-    const day = nextDate.toLocaleDateString("en-US", dayOptions);
 
     dayPickers.push(
       <DayPicker
@@ -122,7 +122,7 @@ const MovieDetails = () => {
     const fetchMovies = async () => {
       const movieList = await movieService.getMovies({
         page: recommendedMoviesPage,
-        size: 6,
+        size: itemsPerPage,
       });
       setMovies({ movies: movieList.movies, totalSize: movieList.totalSize });
     };
@@ -138,17 +138,17 @@ const MovieDetails = () => {
     };
 
     const fetchRatings = async () => {
-      const ratings = await axios.get(
-        `https://www.omdbapi.com/?apikey=${
-          import.meta.env.VITE_OMDB_API_KEY
-        }&t=${movie.name.replace(" ", "+")}`
-      );
-      setRatings(ratings.data);
+      if (movie?.name) {
+        const ratingData = await movieRatingApiService.getMovieRatings(
+          movie?.name
+        );
+        setRatings(ratingData.Ratings);
+      }
     };
 
     fetchMovie();
     fetchRatings();
-  }, [id, movie.name]);
+  }, [id, movie?.name]);
 
   const handleRecommendedMoviesPage = (newPage) => {
     setRecommendedMoviesPage(newPage);
@@ -338,8 +338,8 @@ const MovieDetails = () => {
           <h4>Rating</h4>
         </div>
         <div className="d-flex gap-3 mb-4">
-          {ratings.Ratings && ratings.Ratings.length > 0 ? (
-            ratings.Ratings.map((rating) => (
+          {ratings && ratings.length > 0 ? (
+            ratings.map((rating) => (
               <Rating
                 key={rating.Source}
                 source={rating.Source}

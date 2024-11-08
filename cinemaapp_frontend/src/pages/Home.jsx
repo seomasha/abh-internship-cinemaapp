@@ -110,14 +110,12 @@ const Home = () => {
 
   useEffect(() => {
     if (
-      venues.venues.length > 0 &&
-      venueCarousel.length > 0 &&
       currentlyShowingMovies.movies.length > 0 &&
       upcomingMovies.movies.length > 0
     ) {
       setLoading(false);
     }
-  }, [venues, venueCarousel, currentlyShowingMovies, upcomingMovies]);
+  }, [currentlyShowingMovies, upcomingMovies]);
 
   const handleCurrentlyShowingPageChange = (newPage) => {
     setCurrentlyShowingPage(newPage);

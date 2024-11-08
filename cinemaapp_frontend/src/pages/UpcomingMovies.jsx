@@ -102,6 +102,7 @@ const UpcomingMovies = () => {
             : currentlyShowing.movies,
         totalSize: currentlyShowing.totalSize,
       }));
+      setLoading(false);
     };
 
     fetchMovies();
@@ -134,16 +135,6 @@ const UpcomingMovies = () => {
     fetchCities();
     fetchGenres();
   }, []);
-
-  useEffect(() => {
-    if (
-      venues.venues.length > 0 &&
-      cities.length > 0 &&
-      upcomingMovies.movies.length > 0
-    ) {
-      setLoading(false);
-    }
-  }, [venues, cities, upcomingMovies]);
 
   if (loading) {
     return (

@@ -28,9 +28,8 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MovieWithProjectionsDTO> getMovieById(@PathVariable Long id) throws ResourceNotFoundException {
-        return movieService.findMovieWithProjectionsById(id)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+        MovieWithProjectionsDTO movieWithProjections = movieService.findMovieWithProjectionsById(id);
+        return ResponseEntity.ok(movieWithProjections);
     }
 
     @GetMapping("/currently-showing")
