@@ -14,14 +14,16 @@ const PaginatedList = ({
   page,
   onPageChange,
   route,
+  perPage = 4,
 }) => {
-  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [itemsPerPage, setItemsPerPage] = useState(perPage);
   const [currentPage, setCurrentPage] = useState(1);
 
   const indexOfLastCard = currentPage * itemsPerPage;
   const indexOfFirstCard = indexOfLastCard - itemsPerPage;
 
-  const totalPages = Math.ceil(totalSize / itemsPerPage);
+  const totalPages =
+    perPage === totalSize ? 1 : Math.ceil(totalSize / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -71,7 +73,12 @@ const PaginatedList = ({
         <>
           <div className="row">
             {data.map((card) => (
-              <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={card.id}>
+              <div
+                className={`col-12 col-sm-6 col-md-4 col-lg-${
+                  route ? "3" : "2"
+                }`}
+                key={card.id}
+              >
                 {route ? (
                   <Link
                     to={`/movie-details/${card.id}`}
@@ -124,7 +131,12 @@ const PaginatedList = ({
               <h6>
                 Showing{" "}
                 <span className="fw-bold">
-                  {Math.min(currentPage * itemsPerPage, totalSize)}
+                  {Math.min(
+                    perPage === totalSize
+                      ? totalSize
+                      : currentPage * itemsPerPage,
+                    totalSize
+                  )}
                 </span>{" "}
                 out of <span className="fw-bold">{totalSize}</span>
               </h6>

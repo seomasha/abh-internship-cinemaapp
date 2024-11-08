@@ -38,6 +38,7 @@ const MovieDetails = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [recommendedMoviesPage, setRecommendedMoviesPage] = useState(0);
 
   const today = new Date();
 
@@ -90,11 +91,6 @@ const MovieDetails = () => {
   }
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      const movieList = await movieService.getMovies({ size: 6 });
-      setMovies({ movies: movieList.movies, totalSize: movieList.totalSize });
-    };
-
     const fetchCities = async () => {
       const cityList = await venueService.getAllCities();
       setCities(cityList);
@@ -106,9 +102,20 @@ const MovieDetails = () => {
     };
 
     fetchCities();
-    fetchMovies();
     fetchVenues();
   }, []);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      const movieList = await movieService.getMovies({
+        page: recommendedMoviesPage,
+        size: 6,
+      });
+      setMovies({ movies: movieList.movies, totalSize: movieList.totalSize });
+    };
+
+    fetchMovies();
+  }, [recommendedMoviesPage]);
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -129,6 +136,10 @@ const MovieDetails = () => {
     fetchMovie();
     fetchRatings();
   }, [id, movie.name]);
+
+  const handleRecommendedMoviesPage = (newPage) => {
+    setRecommendedMoviesPage(newPage);
+  };
 
   if (loading) {
     return (
@@ -324,6 +335,9 @@ const MovieDetails = () => {
         title="See Also"
         data={movies.movies}
         totalSize={movies.totalSize}
+        page={recommendedMoviesPage}
+        onPageChange={handleRecommendedMoviesPage}
+        perPage={6}
       />
       <Footer />
     </div>
