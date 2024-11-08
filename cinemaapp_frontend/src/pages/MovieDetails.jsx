@@ -9,6 +9,7 @@ import SmallButton from "../components/SmallButton";
 import PaginatedList from "../components/PaginatedList";
 import HeroMovieCategory from "../components/HeroMovieCategory";
 import ProjectionTimes from "../components/ProjectionTimes";
+import { Spinner } from "react-bootstrap";
 
 import { movieService } from "../services/movieService";
 
@@ -36,6 +37,7 @@ const MovieDetails = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const today = new Date();
 
@@ -112,6 +114,7 @@ const MovieDetails = () => {
     const fetchMovie = async () => {
       const movieData = await movieService.get(id);
       setMovie(movieData);
+      setLoading(false);
     };
 
     const fetchRatings = async () => {
@@ -126,6 +129,14 @@ const MovieDetails = () => {
     fetchMovie();
     fetchRatings();
   }, [id, movie.name]);
+
+  if (loading) {
+    return (
+      <div className="spinner-container">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div>

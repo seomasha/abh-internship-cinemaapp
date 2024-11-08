@@ -101,13 +101,19 @@ const PaginatedList = ({
                     )}
                   </Link>
                 ) : (
-                  <SmallCard
-                    imgUrl={
-                      card.photos.find((photo) => photo.entityType === "movie")
-                        ?.url
-                    }
-                    title={card.name}
-                  />
+                  <Link
+                    to={`/movie-details/${card.id}`}
+                    className="text-decoration-none"
+                  >
+                    <SmallCard
+                      imgUrl={
+                        card.photos.find(
+                          (photo) => photo.entityType === "movie"
+                        )?.url
+                      }
+                      title={card.name}
+                    />
+                  </Link>
                 )}
               </div>
             ))}
