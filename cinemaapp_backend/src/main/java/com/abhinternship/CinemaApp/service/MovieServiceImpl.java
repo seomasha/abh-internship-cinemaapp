@@ -39,9 +39,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Optional<MovieWithProjectionsDTO> findMovieWithProjectionsById(Long id) {
+    public Optional<MovieWithProjectionsDTO> findMovieWithProjectionsById(final Long id) {
         return movieRepository.findById(id).map(movie -> {
-            Set<Projection> projections = projectionRepository.findByMovieIdOrderByProjectionTime(movie);
+            final Set<Projection> projections = projectionRepository.findByMovieIdOrderByProjectionTime(movie);
             return MovieWithProjectionsDTO.fromMovie(movie, projections);
         });
     }

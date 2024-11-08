@@ -97,3 +97,68 @@ button:disabled {
   background-color: darkgray;
   cursor: not-allowed;
 }
+
+@keyframes bellRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(15deg);
+  }
+  20% {
+    transform: rotate(-10deg);
+  }
+  30% {
+    transform: rotate(5deg);
+  }
+  40% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+  60% {
+    transform: rotate(-3deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+  90% {
+    transform: rotate(1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.icon-container {
+  background-color: #f0f0f0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes popUp {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-message {
+  animation: popUp 0.5s ease-out;
+}
+
+.bell-animation {
+  animation: bellRing 1s ease infinite;
+}

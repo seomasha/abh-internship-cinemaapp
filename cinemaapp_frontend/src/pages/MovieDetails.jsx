@@ -8,6 +8,7 @@ import DayPicker from "../components/DayPicker";
 import SmallButton from "../components/SmallButton";
 import PaginatedList from "../components/PaginatedList";
 import HeroMovieCategory from "../components/HeroMovieCategory";
+import ProjectionTimes from "../components/ProjectionTimes";
 
 import { movieService } from "../services/movieService";
 
@@ -132,7 +133,7 @@ const MovieDetails = () => {
       <h3 className="px-5 py-4">Movie Details</h3>
 
       <div className="px-5 pb-3 d-flex align-items-center">
-        <div className="video-container me-5">
+        <div className="video-container me-5 col-6">
           <iframe
             width="100%"
             height="560"
@@ -148,7 +149,7 @@ const MovieDetails = () => {
           ></iframe>
         </div>
 
-        <div className="image-grid">
+        <div className="image-grid col-6">
           {movie.photos?.map(
             (photo, index) =>
               photo.entityType === "movie" && (
@@ -166,7 +167,7 @@ const MovieDetails = () => {
       </div>
 
       <div className="px-5 d-flex justify-content-between">
-        <div>
+        <div className="col-6">
           <h3>{movie.name}</h3>
           <h6 className="fw-light gap-3 py-2">
             {movie.pgRating} <span className="primary-red px-2">|</span>
@@ -198,12 +199,28 @@ const MovieDetails = () => {
             ))}
           </div>
         </div>
-        <div className="border rounded-4 w-50 shadow">
+        <div className="border rounded-4 col-6 shadow">
           {showSuccessMessage ? (
-            <div className="p-3 text-center">
-              <h5>{movie.name}</h5>
-              <p>Get notified when the movie is part of the schedule</p>
-              <FaRegBell />
+            <div className="d-flex flex-column p-3 text-center success-message">
+              <h4 className="fw-bold">{movie.name} is coming in April!</h4>
+              <p className="mt-3">
+                Get notified when the movie is part of the schedule
+              </p>
+              <div className="mt-5 p-5 mx-auto">
+                <div className="icon-container p-5 rounded-circle bell-animation">
+                  <FaRegBell size={48} className="bell" />
+                </div>
+              </div>
+              <hr />
+              <button className="btn flex-grow-1 button-primary">
+                Notify me
+              </button>
+              <p className="mt-3">
+                Only signed-up users can be notified.{" "}
+                <span className="text-decoration-underline fw-bold">
+                  Sign up.
+                </span>
+              </p>
             </div>
           ) : (
             <div>
@@ -240,18 +257,11 @@ const MovieDetails = () => {
                 </div>
                 <h5 className="mt-5 px-4">Standard</h5>
                 <div className="d-flex px-4 py-2 gap-3">
-                  {movie.projectionTimes?.map((time, index) => (
-                    <p
-                      key={index}
-                      onClick={() => handleTimeClick(time)}
-                      className={`fw-bold rounded border py-2 px-3 ${
-                        selectedTime === time ? "selected-time" : ""
-                      }`}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {time.slice(0, 5)}
-                    </p>
-                  ))}
+                  <ProjectionTimes
+                    projectionTimes={movie.projectionTimes}
+                    selectedTime={selectedTime}
+                    onTimeClick={handleTimeClick}
+                  />
                 </div>
                 <hr />
                 <div className="d-flex px-4 mb-4 gap-3">
