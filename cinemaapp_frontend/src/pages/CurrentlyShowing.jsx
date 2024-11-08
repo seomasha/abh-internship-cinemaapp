@@ -13,6 +13,7 @@ import { venueService } from "../services/venueService";
 import { genreService } from "../services/genreService";
 import { projectionService } from "../services/projectionService";
 import { TbMovie } from "react-icons/tb";
+import { Spinner } from "react-bootstrap";
 
 import "../styles/CurrentlyShowing.css";
 
@@ -33,6 +34,7 @@ const CurrentlyShowing = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const dayPickers = [];
 
@@ -173,6 +175,25 @@ const CurrentlyShowing = () => {
     fetchGenres();
     fetchProjectionTimes();
   }, []);
+
+  useEffect(() => {
+    if (
+      venues.venues.length > 0 &&
+      cities.length > 0 &&
+      currentlyShowingMovies.movies.length > 0 &&
+      projectionTimes.length > 0
+    ) {
+      setLoading(false);
+    }
+  }, [venues, projectionTimes, currentlyShowingMovies, cities]);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div>

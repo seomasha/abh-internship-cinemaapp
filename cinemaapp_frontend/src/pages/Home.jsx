@@ -6,6 +6,7 @@ import PaginatedList from "../components/PaginatedList";
 import Footer from "../components/Footer";
 import { movieService } from "../services/movieService";
 import { venueService } from "../services/venueService";
+import { Spinner } from "react-bootstrap";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
@@ -26,6 +27,7 @@ const Home = () => {
   const [upcomingPage, setUpcomingPage] = useState(0);
   const [venuesPage, setVenuesPage] = useState(0);
   const [heroMoviesSet, setHeroMoviesSet] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -106,6 +108,17 @@ const Home = () => {
     fetchAndProcessUpcomingMovies();
   }, [selectedVenueId, currentlyShowingPage, upcomingPage]);
 
+  useEffect(() => {
+    if (
+      venues.venues.length > 0 &&
+      venueCarousel.length > 0 &&
+      currentlyShowingMovies.movies.length > 0 &&
+      upcomingMovies.movies.length > 0
+    ) {
+      setLoading(false);
+    }
+  }, [venues, venueCarousel, currentlyShowingMovies, upcomingMovies]);
+
   const handleCurrentlyShowingPageChange = (newPage) => {
     setCurrentlyShowingPage(newPage);
   };
@@ -117,6 +130,14 @@ const Home = () => {
   const handleVenuesPageChange = (newPage) => {
     setVenuesPage(newPage);
   };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div>

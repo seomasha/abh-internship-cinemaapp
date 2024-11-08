@@ -12,6 +12,7 @@ import { genreService } from "../services/genreService";
 import { TbMovie } from "react-icons/tb";
 import { FaBuilding, FaCalendarAlt } from "react-icons/fa";
 import { BiCameraMovie } from "react-icons/bi";
+import { Spinner } from "react-bootstrap";
 
 import "../styles/CurrentlyShowing.css";
 import DatePickerDropdown from "../components/DatePickerDropdown";
@@ -33,6 +34,7 @@ const UpcomingMovies = () => {
     startDate: null,
     endDate: null,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (searchQuery) {
@@ -132,6 +134,24 @@ const UpcomingMovies = () => {
     fetchCities();
     fetchGenres();
   }, []);
+
+  useEffect(() => {
+    if (
+      venues.venues.length > 0 &&
+      cities.length > 0 &&
+      upcomingMovies.movies.length > 0
+    ) {
+      setLoading(false);
+    }
+  }, [venues, cities, upcomingMovies]);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div>

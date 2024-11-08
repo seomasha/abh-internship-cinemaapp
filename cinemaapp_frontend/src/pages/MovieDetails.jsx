@@ -199,8 +199,10 @@ const MovieDetails = () => {
                   src={photo.url}
                   alt={`Image ${index + 1}`}
                   className={`grid-image ${
-                    index === 2 ? "rounded-top-right" : ""
-                  } ${index === 4 ? "rounded-bottom-right" : ""}`}
+                    index === 2 && !isSmallScreen ? "rounded-top-right" : ""
+                  } ${
+                    index === 4 && !isSmallScreen ? "rounded-bottom-right" : ""
+                  }`}
                 />
               )
           )}
