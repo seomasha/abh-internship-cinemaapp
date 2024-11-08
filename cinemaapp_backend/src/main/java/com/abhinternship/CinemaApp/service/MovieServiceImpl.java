@@ -8,6 +8,7 @@ import com.abhinternship.CinemaApp.repository.FilterMovieRepositoryImpl;
 import com.abhinternship.CinemaApp.repository.MovieRepository;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
+import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,16 @@ public class MovieServiceImpl implements MovieService {
     public Optional<Movie> findMovieById(final Long id) {
         return movieRepository.findById(id);
     }
+
+    @Override
+    public MovieWithProjectionsDTO findMovieWithProjectionsById(final Long id) throws ResourceNotFoundException {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+
+        final Set<Projection> projections = projectionRepository.findByMovieIdOrderByProjectionTime(movie);
+        return MovieWithProjectionsDTO.fromMovie(movie, projections);
+    }
+
 
     @Override
     public void saveMovie(final Movie movie) {

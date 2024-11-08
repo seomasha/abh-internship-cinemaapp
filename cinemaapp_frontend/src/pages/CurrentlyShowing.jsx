@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import NavBar from "../components/Navbar";
+import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
 import Dropdown from "../components/Dropdown";
@@ -13,6 +13,7 @@ import { venueService } from "../services/venueService";
 import { genreService } from "../services/genreService";
 import { projectionService } from "../services/projectionService";
 import { TbMovie } from "react-icons/tb";
+import { Spinner } from "react-bootstrap";
 
 import "../styles/CurrentlyShowing.css";
 
@@ -33,6 +34,7 @@ const CurrentlyShowing = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const dayPickers = [];
 
@@ -133,6 +135,7 @@ const CurrentlyShowing = () => {
             : currentlyShowing.movies,
         totalSize: currentlyShowing.totalSize,
       }));
+      setLoading(false);
     };
 
     fetchMovies();
@@ -173,6 +176,14 @@ const CurrentlyShowing = () => {
     fetchGenres();
     fetchProjectionTimes();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import ScrollToTop from "./utils/ScrollToTop";
 import CurrentlyShowing from "./pages/CurrentlyShowing";
 import UpcomingMovies from "./pages/UpcomingMovies";
+import MovieDetails from "./pages/MovieDetails";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/tickets" element={<Tickets />} />
           <Route path="/currently-showing" element={<CurrentlyShowing />} />
           <Route path="/upcoming" element={<UpcomingMovies />} />
+          <Route path="/movie-details/:id" element={<MovieDetails />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

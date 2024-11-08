@@ -1,0 +1,164 @@
+.video-container {
+  flex: 1;
+  max-width: 100%;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  flex: 1;
+  max-width: 100%;
+}
+
+.grid-image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+.rounded-top-right {
+  border-top-right-radius: 15px;
+}
+
+.rounded-bottom-right {
+  border-bottom-right-radius: 15px;
+}
+
+.rounded-left-corners {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.vertical-line {
+  width: 2px;
+  height: 20px;
+  background-color: #b22222;
+  margin-right: 4px;
+}
+
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.dropdown-full-width {
+  flex: 1;
+}
+
+.dropdown-full-width .dropdown {
+  width: 100%;
+}
+
+.selected-time {
+  background-color: #b22222;
+  color: #ffffff;
+  border-color: #b22222;
+}
+
+.day-picker-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem 0;
+  width: 100%;
+  scrollbar-width: none;
+}
+
+.day-picker-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-arrow {
+  background: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.button-secondary {
+  color: #b22222;
+  border: 1px solid #b22222;
+}
+
+.button-secondary:hover {
+  background-color: #b22222;
+  color: white;
+}
+
+.button-primary,
+.button-primary:hover {
+  background-color: #b22222;
+  color: white;
+}
+
+button:disabled {
+  background-color: darkgray;
+  cursor: not-allowed;
+}
+
+@keyframes bellRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(15deg);
+  }
+  20% {
+    transform: rotate(-10deg);
+  }
+  30% {
+    transform: rotate(5deg);
+  }
+  40% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+  60% {
+    transform: rotate(-3deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+  90% {
+    transform: rotate(1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.icon-container {
+  background-color: #f0f0f0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes popUp {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-message {
+  animation: popUp 0.5s ease-out;
+}
+
+.bell-animation {
+  animation: bellRing 1s ease infinite;
+}

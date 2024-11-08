@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Card from "./Card";
+import SmallCard from "./SmallCard";
 import { Pagination } from "react-bootstrap";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import SmallButton from "./SmallButton";
@@ -13,14 +14,16 @@ const PaginatedList = ({
   page,
   onPageChange,
   route,
+  perPage = 4,
 }) => {
-  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [itemsPerPage, setItemsPerPage] = useState(perPage);
   const [currentPage, setCurrentPage] = useState(1);
 
   const indexOfLastCard = currentPage * itemsPerPage;
   const indexOfFirstCard = indexOfLastCard - itemsPerPage;
 
-  const totalPages = Math.ceil(totalSize / itemsPerPage);
+  const totalPages =
+    perPage === totalSize ? 1 : Math.ceil(totalSize / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -55,9 +58,11 @@ const PaginatedList = ({
     <div style={{ padding: "3rem 4rem" }}>
       <div className="d-flex justify-content-between align-items-center">
         <h3 className="mb-4 fw-bold">{title}</h3>
-        <Link to={route} className="text-decoration-none">
-          <h6 className="fw-bold primary-red">See all</h6>
-        </Link>
+        {route && (
+          <Link to={route} className="text-decoration-none">
+            <h6 className="fw-bold primary-red">See all</h6>
+          </Link>
+        )}
       </div>
 
       {data.length === 0 ? (
@@ -68,25 +73,54 @@ const PaginatedList = ({
         <>
           <div className="row">
             {data.map((card) => (
-              <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={card.id}>
-                {card.street ? (
-                  <Card
-                    title={card.name}
-                    subtitle={`${card.street} ${
-                      card.streetNo === 0 ? "bb" : card.streetNo
-                    }, ${card.city}`}
-                    imageUrl={card.photoImageId.url}
-                  />
+              <div
+                className={`col-12 col-sm-6 col-md-4 col-lg-${
+                  route ? "3" : "2"
+                }`}
+                key={card.id}
+              >
+                {route ? (
+                  <Link
+                    to={`/movie-details/${card.id}`}
+                    className="text-decoration-none"
+                  >
+                    {card.street ? (
+                      <Card
+                        title={card.name}
+                        subtitle={`${card.street} ${
+                          card.streetNo === 0 ? "bb" : card.streetNo
+                        }, ${card.city}`}
+                        imageUrl={card.photoImageId.url}
+                      />
+                    ) : (
+                      <Card
+                        title={card.name}
+                        subtitle={`${card.movieDuration} mins`}
+                        genre={card.genres
+                          .map((genre) => genre.name)
+                          .join(", ")}
+                        imageUrl={
+                          card.photos.find(
+                            (photo) => photo.entityType === "movie"
+                          )?.url
+                        }
+                      />
+                    )}
+                  </Link>
                 ) : (
-                  <Card
-                    title={card.name}
-                    subtitle={`${card.movieDuration} mins`}
-                    genre={card.genres.map((genre) => genre.name).join(", ")}
-                    imageUrl={
-                      card.photos.find((photo) => photo.entityType === "movie")
-                        ?.url
-                    }
-                  />
+                  <Link
+                    to={`/movie-details/${card.id}`}
+                    className="text-decoration-none"
+                  >
+                    <SmallCard
+                      imgUrl={
+                        card.photos.find(
+                          (photo) => photo.entityType === "movie"
+                        )?.url
+                      }
+                      title={card.name}
+                    />
+                  </Link>
                 )}
               </div>
             ))}
@@ -97,7 +131,12 @@ const PaginatedList = ({
               <h6>
                 Showing{" "}
                 <span className="fw-bold">
-                  {Math.min(currentPage * itemsPerPage, totalSize)}
+                  {Math.min(
+                    perPage === totalSize
+                      ? totalSize
+                      : currentPage * itemsPerPage,
+                    totalSize
+                  )}
                 </span>{" "}
                 out of <span className="fw-bold">{totalSize}</span>
               </h6>

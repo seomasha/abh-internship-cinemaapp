@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.rest;
 
 import com.abhinternship.CinemaApp.dto.MovieListDTO;
+import com.abhinternship.CinemaApp.dto.MovieWithProjectionsDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.service.MovieService;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
@@ -26,11 +27,9 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getMovieById(@PathVariable Long id) throws ResourceNotFoundException {
-        return movieService.findMovieById(id).
-                map(ResponseEntity::ok).
-                orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
-
+    public ResponseEntity<MovieWithProjectionsDTO> getMovieById(@PathVariable Long id) throws ResourceNotFoundException {
+        MovieWithProjectionsDTO movieWithProjections = movieService.findMovieWithProjectionsById(id);
+        return ResponseEntity.ok(movieWithProjections);
     }
 
     @GetMapping("/currently-showing")
