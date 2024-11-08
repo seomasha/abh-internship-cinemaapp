@@ -10,11 +10,11 @@ import PaginatedList from "../components/PaginatedList";
 import HeroMovieCategory from "../components/HeroMovieCategory";
 import ProjectionTimes from "../components/ProjectionTimes";
 import { Spinner } from "react-bootstrap";
+import screenSizes from "../utils/screenSizes";
 
 import { movieService } from "../services/movieService";
 
 import {
-  FaRegStar,
   FaRegBuilding,
   FaArrowLeft,
   FaArrowRight,
@@ -25,6 +25,7 @@ import { CiLocationOn } from "react-icons/ci";
 import "../styles/MovieDetails.css";
 import axios from "axios";
 import { venueService } from "../services/venueService";
+import Rating from "../components/Rating";
 
 const MovieDetails = () => {
   const dayPickerContainerRef = useRef(null);
@@ -39,6 +40,7 @@ const MovieDetails = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recommendedMoviesPage, setRecommendedMoviesPage] = useState(0);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   const today = new Date();
 
@@ -89,6 +91,17 @@ const MovieDetails = () => {
       />
     );
   }
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= screenSizes.medium);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -143,7 +156,7 @@ const MovieDetails = () => {
 
   if (loading) {
     return (
-      <div className="spinner-container">
+      <div className="d-flex justify-content-center align-items-center vh-100">
         <Spinner />
       </div>
     );
@@ -154,8 +167,8 @@ const MovieDetails = () => {
       <NavBar />
       <h3 className="px-5 py-4">Movie Details</h3>
 
-      <div className="px-5 pb-3 d-flex align-items-center">
-        <div className="video-container me-5 col-6">
+      <div className="px-5 pb-3 d-flex flex-column flex-lg-row  align-items-center">
+        <div className="video-container me-5 container d-flex justify-content-center">
           <iframe
             width="100%"
             height="560"
@@ -167,11 +180,17 @@ const MovieDetails = () => {
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="rounded-left-corners"
+            className={`rounded${isSmallScreen ? "" : "-left-corners"}`}
+            style={{
+              minWidth: "250px",
+              maxWidth: "100%",
+              minHeight: "250px",
+              height: "560px",
+            }}
           ></iframe>
         </div>
 
-        <div className="image-grid col-6">
+        <div className="image-grid">
           {movie.photos?.map(
             (photo, index) =>
               photo.entityType === "movie" && (
@@ -188,8 +207,8 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      <div className="px-5 d-flex justify-content-between">
-        <div className="col-6">
+      <div className="px-3 px-md-5 d-flex flex-column flex-md-row justify-content-between">
+        <div className="col-12 col-md-6">
           <h3>{movie.name}</h3>
           <h6 className="fw-light gap-3 py-2">
             {movie.pgRating} <span className="primary-red px-2">|</span>
@@ -199,7 +218,7 @@ const MovieDetails = () => {
             Projection date: {movie.projectionStartDate} -{" "}
             {movie.projectionEndDate}
           </h6>
-          <div className="d-flex gap-3 py-2">
+          <div className="d-flex gap-3 py-2 flex-wrap">
             {movie.genres?.map((genre) => (
               <HeroMovieCategory key={genre.id} genre={genre.name} />
             ))}
@@ -221,7 +240,7 @@ const MovieDetails = () => {
             ))}
           </div>
         </div>
-        <div className="border rounded-4 col-6 shadow">
+        <div className="border rounded-4 col-12 col-md-6 shadow mt-4 mt-md-0">
           {showSuccessMessage ? (
             <div className="d-flex flex-column p-3 text-center success-message">
               <h4 className="fw-bold">{movie.name} is coming in April!</h4>
@@ -246,8 +265,8 @@ const MovieDetails = () => {
             </div>
           ) : (
             <div>
-              <div className="d-flex justify-content-between p-4 gap-3">
-                <div className="dropdown-full-width">
+              <div className="d-flex flex-column flex-md-row justify-content-between p-4 gap-3 container">
+                <div className="dropdown-full-width col-12 col-md-6">
                   <Dropdown
                     icon={CiLocationOn}
                     title="Choose City"
@@ -255,7 +274,7 @@ const MovieDetails = () => {
                     onChange={() => console.log("test")}
                   />
                 </div>
-                <div className="dropdown-full-width">
+                <div className="dropdown-full-width col-12 col-md-6">
                   <Dropdown
                     icon={FaRegBuilding}
                     title="Choose Cinema"
@@ -264,49 +283,53 @@ const MovieDetails = () => {
                   />
                 </div>
               </div>
-              <div>
-                <div className="d-flex flex-column align-items-center px-4">
-                  <div
-                    className="day-picker-container"
-                    ref={dayPickerContainerRef}
-                  >
-                    {dayPickers}
-                  </div>
+
+              <div className="d-flex flex-column align-items-center px-4">
+                <div
+                  className="day-picker-container"
+                  ref={dayPickerContainerRef}
+                >
+                  {dayPickers}
                 </div>
-                <div className="d-flex justify-content-end mt-2 gap-3 px-4">
-                  <SmallButton onClick={scrollLeft} icon={<FaArrowLeft />} />
-                  <SmallButton onClick={scrollRight} icon={<FaArrowRight />} />
-                </div>
-                <h5 className="mt-5 px-4">Standard</h5>
-                <div className="d-flex px-4 py-2 gap-3">
-                  <ProjectionTimes
-                    projectionTimes={movie.projectionTimes}
-                    selectedTime={selectedTime}
-                    onTimeClick={handleTimeClick}
-                  />
-                </div>
-                <hr />
-                <div className="d-flex px-4 mb-4 gap-3">
-                  <button
-                    className="btn flex-grow-1 button-secondary"
-                    onClick={handleButtonClick}
-                    disabled={selectedDay === null || selectedTime === null}
-                  >
-                    Reserve Ticket
-                  </button>
-                  <button
-                    className="btn flex-grow-1 button-primary"
-                    onClick={handleButtonClick}
-                    disabled={selectedDay === null || selectedTime === null}
-                  >
-                    Buy Ticket
-                  </button>
-                </div>
+              </div>
+
+              <div className="d-flex justify-content-end mt-2 gap-3 px-4">
+                <SmallButton onClick={scrollLeft} icon={<FaArrowLeft />} />
+                <SmallButton onClick={scrollRight} icon={<FaArrowRight />} />
+              </div>
+
+              <h5 className="mt-5 px-4">Standard</h5>
+              <div className="d-flex flex-column flex-md-row px-4 py-2 gap-3">
+                <ProjectionTimes
+                  projectionTimes={movie.projectionTimes}
+                  selectedTime={selectedTime}
+                  onTimeClick={handleTimeClick}
+                />
+              </div>
+
+              <hr />
+
+              <div className="d-flex flex-column flex-md-row px-4 mb-4 gap-3">
+                <button
+                  className="btn flex-grow-1 button-secondary"
+                  onClick={handleButtonClick}
+                  disabled={selectedDay === null || selectedTime === null}
+                >
+                  Reserve Ticket
+                </button>
+                <button
+                  className="btn flex-grow-1 button-primary"
+                  onClick={handleButtonClick}
+                  disabled={selectedDay === null || selectedTime === null}
+                >
+                  Buy Ticket
+                </button>
               </div>
             </div>
           )}
         </div>
       </div>
+
       <div className="px-5 mt-4">
         <div className="d-flex align-items-center mb-4">
           <div className="vertical-line"></div>
@@ -315,16 +338,11 @@ const MovieDetails = () => {
         <div className="d-flex gap-3 mb-4">
           {ratings.Ratings && ratings.Ratings.length > 0 ? (
             ratings.Ratings.map((rating) => (
-              <div
-                key={rating.source}
-                className="d-flex align-items-center gap-2 border rounded p-3"
-              >
-                <FaRegStar size={20} className="primary-red" />
-                <div>
-                  <h6>{rating.Value}</h6>
-                  <p>{rating.Source}</p>
-                </div>
-              </div>
+              <Rating
+                key={rating.Source}
+                source={rating.Source}
+                value={rating.Value}
+              />
             ))
           ) : (
             <p>No ratings available</p>
