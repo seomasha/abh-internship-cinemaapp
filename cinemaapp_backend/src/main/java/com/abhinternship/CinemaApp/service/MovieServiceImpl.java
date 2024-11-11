@@ -41,7 +41,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieWithProjectionsDTO findMovieWithProjectionsById(final Long id) throws ResourceNotFoundException {
-        Movie movie = movieRepository.findById(id)
+        final Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
         final Set<Projection> projections = projectionRepository.findByMovieIdOrderByProjectionTime(movie);
