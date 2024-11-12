@@ -67,13 +67,13 @@ Ensure you have the following installed on your system:
 
    The backend should now be running on `http://localhost:8080`.
 
-3. ** Mock application.properties**:
-   	spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
-   	spring.datasource.username=username
-	spring.datasource.password=password
+# Mock application.properties
+- spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+- spring.datasource.username=username
+- spring.datasource.password=password
+- server.servlet.context-path=/api/v1
+- frontend.url=http://localhost:5173/
 
-	server.servlet.context-path=/api/v1
-	frontend.url=http://localhost:5173/
 
 ### Frontend (React)
 
