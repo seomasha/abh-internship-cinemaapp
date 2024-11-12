@@ -67,6 +67,14 @@ Ensure you have the following installed on your system:
 
    The backend should now be running on `http://localhost:8080`.
 
+3. ** Mock application.properties**:
+   	spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+   	spring.datasource.username=username
+	spring.datasource.password=password
+
+	server.servlet.context-path=/api/v1
+	frontend.url=http://localhost:5173/
+
 ### Frontend (React)
 
 1. **Install Dependencies**:
@@ -106,7 +114,7 @@ To fetch mock movie data while developing the application, you can set up a JSON
    npm install -g json-server
 2. Run the following command to start the JSON server on port **8888**:
    ```bash
-   json-server --watch data/mock-movie.json --port 888
+   json-server --watch data/mock-movie.json --port 8888
 
 ### Running the Application Together
 
