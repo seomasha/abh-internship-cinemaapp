@@ -134,7 +134,7 @@ const PaginatedList = ({
                   {Math.min(
                     perPage === totalSize
                       ? totalSize
-                      : currentPage * itemsPerPage,
+                      : data.length + perPage * page,
                     totalSize
                   )}
                 </span>{" "}

@@ -77,4 +77,6 @@ class VenueServiceTest {
         assertEquals(venuesList, result.getVenues());
         verify(venueRepository, times(1)).findAll(PageRequest.of(PAGE_NUMBER, PAGE_SIZE));
     }
+
+    // cleanup
 }

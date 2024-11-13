@@ -27,7 +27,7 @@ public class VenueServiceImpl implements VenueService{
 
             return new VenueDTO(venues.getContent(), totalSize);
         }
-    }
+    } // da li se metoda pozvala i koja
 
     @Override
     public Optional<Venue> findVenueById(final Long id) {
