@@ -40,7 +40,7 @@ const MovieCard = ({
           </p>
           <div className="d-flex flex-wrap gap-2 gap-md-4">
             {genres.map((genre) => (
-              <p key={genre.id} className="movie-card-category p-2 rounded">
+              <p key={genre.id} className="movie-card-category p-2 rounded m-0 mt-4">
                 {genre.name}
               </p>
             ))}
