@@ -6,18 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
 class ProjectionServiceTest {
 
     @Mock
@@ -26,10 +22,6 @@ class ProjectionServiceTest {
     @InjectMocks
     private ProjectionServiceImpl projectionService;
 
-    private static final LocalTime MORNING_SHOW = LocalTime.of(10, 0);
-    private static final LocalTime AFTERNOON_SHOW = LocalTime.of(12, 30);
-    private static final LocalTime EVENING_SHOW = LocalTime.of(15, 0);
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -37,30 +29,25 @@ class ProjectionServiceTest {
 
     @Test
     void testFindAllDistinctProjectionTimes() {
-        final List<LocalTime> projectionTimesWithDuplicates = Arrays.asList(
-                MORNING_SHOW,
-                AFTERNOON_SHOW,
-                EVENING_SHOW,
-                MORNING_SHOW,
-                EVENING_SHOW
+        final List<LocalTime> distinctTimes = Arrays.asList(
+                LocalTime.of(10, 0),
+                LocalTime.of(14, 0),
+                LocalTime.of(18, 0)
         );
+        when(projectionRepository.findAllDistinctProjectionTimes()).thenReturn(distinctTimes);
 
-        when(projectionRepository.findAllDistinctProjectionTimes()).thenReturn(projectionTimesWithDuplicates);
+        final List<LocalTime> result = projectionService.findAllDistinctProjectionTimes();
 
-        final List<LocalTime> actualProjectionTimes = projectionService.findAllDistinctProjectionTimes();
+        assertEquals(distinctTimes.size(), result.size());
+        assertEquals(distinctTimes, result);
+    }
 
-        final Set<LocalTime> actualProjectionTimesSet = new HashSet<>(actualProjectionTimes);
+    @Test
+    void testFindAllDistinctProjectionTimesWithEmptyList() {
+        when(projectionRepository.findAllDistinctProjectionTimes()).thenReturn(List.of());
 
-        final List<LocalTime> expectedProjectionTimes = Arrays.asList(
-                MORNING_SHOW,
-                AFTERNOON_SHOW,
-                EVENING_SHOW
-        );
+        final List<LocalTime> result = projectionService.findAllDistinctProjectionTimes();
 
-        assertNotNull(actualProjectionTimes);
-        assertEquals(expectedProjectionTimes.size(), actualProjectionTimesSet.size());
-        assertTrue(actualProjectionTimesSet.containsAll(expectedProjectionTimes));
-
-        verify(projectionRepository, times(1)).findAllDistinctProjectionTimes();
+        assertEquals(0, result.size());
     }
 }
