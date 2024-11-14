@@ -25,9 +25,9 @@ class FilterMovieTest {
     @Test
     void testToQueryStringWithVenueId() {
         filters.put("venueId", "1");
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, true);
+        final String queryString = filterMovie.toQueryString(parameters, true);
 
         assertEquals("p.venueId.id = :venueId AND m.projectionStartDate < :endDate AND m.projectionEndDate >= :startDate", queryString);
         assertEquals(1L, parameters.get("venueId"));
@@ -39,9 +39,9 @@ class FilterMovieTest {
     void testToQueryStringWithUpcomingDates() {
         filters.put("upcomingStartDate", LocalDate.now().toString());
         filters.put("upcomingEndDate", LocalDate.now().plusDays(10).toString());
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, false);
+        final String queryString = filterMovie.toQueryString(parameters, false);
 
         assertTrue(queryString.contains("m.projectionStartDate BETWEEN :upcomingStartDate AND :upcomingEndDate"));
         assertEquals(LocalDate.now(), parameters.get("upcomingStartDate"));
@@ -52,9 +52,9 @@ class FilterMovieTest {
     @Test
     void testToQueryStringWithNameFilter() {
         filters.put("name", "Inception");
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, false);
+        final String queryString = filterMovie.toQueryString(parameters, false);
 
         assertTrue(queryString.contains("LOWER(m.name) LIKE :name"));
         assertEquals("%inception%", parameters.get("name"));
@@ -64,9 +64,9 @@ class FilterMovieTest {
     void testToQueryStringWithCitiesAndVenues() {
         filters.put("cities", "New York,Los Angeles");
         filters.put("venues", "AMC,Regal");
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, true);
+        final String queryString = filterMovie.toQueryString(parameters, true);
 
         assertTrue(queryString.contains("LOWER(p.venueId.city) IN :cities"));
         assertTrue(queryString.contains("LOWER(p.venueId.name) IN :venues"));
@@ -77,9 +77,9 @@ class FilterMovieTest {
     @Test
     void testToQueryStringWithSelectedDate() {
         filters.put("selectedDate", LocalDate.now().toString());
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, false);
+        final String queryString = filterMovie.toQueryString(parameters, false);
 
         assertTrue(queryString.contains(":selectedDate BETWEEN m.projectionStartDate AND m.projectionEndDate"));
         assertEquals(LocalDate.now(), parameters.get("selectedDate"));
@@ -88,9 +88,9 @@ class FilterMovieTest {
     @Test
     void testToQueryStringWithProjectionTimes() {
         filters.put("projectionTimes", "10:00,14:00");
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, true);
+        final String queryString = filterMovie.toQueryString(parameters, true);
 
         assertTrue(queryString.contains("FUNCTION('TO_CHAR', p.projectionTime, 'HH24:MI') = :time1000 OR FUNCTION('TO_CHAR', p.projectionTime, 'HH24:MI') = :time1400"));
         assertEquals("10:00", parameters.get("time1000"));
@@ -100,9 +100,9 @@ class FilterMovieTest {
     @Test
     void testToQueryStringWithGenres() {
         filters.put("genres", "Action,Drama");
-        FilterMovie filterMovie = new FilterMovie(filters);
+        final FilterMovie filterMovie = new FilterMovie(filters);
 
-        String queryString = filterMovie.toQueryString(parameters, true);
+        final String queryString = filterMovie.toQueryString(parameters, true);
 
         assertTrue(queryString.contains("LOWER(g.name) = :genreAction OR LOWER(g.name) = :genreDrama"));
         assertEquals("action", parameters.get("genreAction"));
@@ -111,8 +111,8 @@ class FilterMovieTest {
 
     @Test
     void testToQueryStringEmptyFilters_CurrentlyShowing() {
-        FilterMovie filterMovie = FilterMovie.empty();
-        String queryString = filterMovie.toQueryString(parameters, true);
+        final FilterMovie filterMovie = FilterMovie.empty();
+        final String queryString = filterMovie.toQueryString(parameters, true);
 
         assertTrue(queryString.contains("m.projectionStartDate < :endDate AND m.projectionEndDate >= :startDate"));
         assertTrue(parameters.containsKey("startDate"));
@@ -121,8 +121,8 @@ class FilterMovieTest {
 
     @Test
     void testToQueryStringEmptyFilters_Upcoming() {
-        FilterMovie filterMovie = FilterMovie.empty();
-        String queryString = filterMovie.toQueryString(parameters, false);
+        final FilterMovie filterMovie = FilterMovie.empty();
+        final String queryString = filterMovie.toQueryString(parameters, false);
 
         assertTrue(queryString.contains("m.projectionStartDate >= :endDate"));
         assertTrue(parameters.containsKey("endDate"));

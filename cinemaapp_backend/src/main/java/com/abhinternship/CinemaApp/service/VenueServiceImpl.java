@@ -18,7 +18,7 @@ public class VenueServiceImpl implements VenueService{
 
     @Override
     public VenueDTO findAllVenues(final int page, final int size) {
-        if(size == 0) {
+        if (size == 0) {
             final List<Venue> allVenues = venueRepository.findAll();
             return new VenueDTO(allVenues, allVenues.size());
         } else {
@@ -27,7 +27,7 @@ public class VenueServiceImpl implements VenueService{
 
             return new VenueDTO(venues.getContent(), totalSize);
         }
-    } // da li se metoda pozvala i koja
+    }
 
     @Override
     public Optional<Venue> findVenueById(final Long id) {

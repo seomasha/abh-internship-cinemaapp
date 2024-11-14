@@ -31,6 +31,8 @@ import static org.mockito.Mockito.when;
 
 public class MovieServiceTest {
 
+    private static final String TEST_MOVIE_NAME = "Test Movie";
+
     @Mock
     private MovieRepository movieRepository;
 
@@ -53,7 +55,7 @@ public class MovieServiceTest {
 
         testMovie = new Movie();
         testMovie.setId(1L);
-        testMovie.setName("Test Movie");
+        testMovie.setName(TEST_MOVIE_NAME);
         testMovie.setProjectionStartDate(LocalDate.now());
         testMovie.setProjectionEndDate(LocalDate.now().plusDays(10));
 
@@ -77,7 +79,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findCurrentlyShowingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals("Test Movie", result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
     }
 
     @Test
@@ -94,7 +96,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findCurrentlyShowingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals("Test Movie", result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
     }
 
     @Test
@@ -110,7 +112,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findUpcomingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals("Test Movie", result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
     }
 
     @Test
@@ -127,7 +129,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findUpcomingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals("Test Movie", result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
     }
 
     @Test
