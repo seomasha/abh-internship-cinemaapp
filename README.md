@@ -67,6 +67,14 @@ Ensure you have the following installed on your system:
 
    The backend should now be running on `http://localhost:8080`.
 
+# Mock application.properties
+- spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+- spring.datasource.username=username
+- spring.datasource.password=password
+- server.servlet.context-path=/api/v1
+- frontend.url=http://localhost:5173/
+
+
 ### Frontend (React)
 
 1. **Install Dependencies**:
@@ -97,16 +105,6 @@ Ensure you have the following installed on your system:
      ```
 
    The frontend should now be running on `http://localhost:5173` (this is the default port used by Vite).
-
-### Running the JSON Server for Mock Data
-To fetch mock movie data while developing the application, you can set up a JSON server to serve your `mock-movie.json` file.
-#### JSON Server Setup
-1. **Install JSON Server** (if you haven't already):
-   ```bash
-   npm install -g json-server
-2. Run the following command to start the JSON server on port **8888**:
-   ```bash
-   json-server --watch data/mock-movie.json --port 888
 
 ### Running the Application Together
 

@@ -47,8 +47,6 @@ const MovieDetails = () => {
   const dateOptions = { month: "short", day: "numeric" };
   const dayOptions = { weekday: "short" };
   const nextDate = new Date(today);
-  const date = nextDate.toLocaleDateString("en-US", dateOptions);
-  const day = nextDate.toLocaleDateString("en-US", dayOptions);
 
   const scrollLeft = () => {
     dayPickerContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -73,6 +71,8 @@ const MovieDetails = () => {
   const dayPickers = [];
   for (let i = 0; i < 10; i++) {
     nextDate.setDate(today.getDate() + i);
+    const date = nextDate.toLocaleDateString("en-US", dateOptions);
+    const day = nextDate.toLocaleDateString("en-US", dayOptions);
 
     dayPickers.push(
       <DayPicker

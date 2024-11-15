@@ -13,7 +13,7 @@ const VenuesCarousel = ({
 }) => {
   const settings = {
     infinite: true,
-    dots: true,
+    dots: false,
     speed: 500,
     slidesToShow: 5,
     slidesToScroll: 1,
