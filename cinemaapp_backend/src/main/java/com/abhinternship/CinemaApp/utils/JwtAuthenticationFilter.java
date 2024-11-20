@@ -28,9 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
             if (principal instanceof User user) {
-                if (jwtUtil.validateToken(token, user)) {
-                    final String username = jwtUtil.extractEmail(token);
-                }
+                jwtUtil.validateToken(token, user);
             }
         }
 

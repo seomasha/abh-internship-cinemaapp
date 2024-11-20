@@ -31,6 +31,9 @@ public class SecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    @Value("${spring.profiles.active}")
+    private String profile;
+
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -45,18 +48,44 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
+        configureCommonSecurity(http);
+
+        if ("dev".equals(profile)) {
+            configureDevSecurity(http);
+        } else {
+            configureProductionSecurity(http);
+        }
+
+        return http.build();
+    }
+
+    private void configureCommonSecurity(final HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable);
+    }
+
+    private void configureDevSecurity(final HttpSecurity http) throws Exception {
+        http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .anyRequest().permitAll()
-                )
-                //.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class) Dodat ce se poslije da se zastite rute
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
+                );
+    }
 
-        return http.build();
+    private void configureProductionSecurity(final HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers(HttpMethod.GET, "/api/v1/movies").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/users/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/users/logout").permitAll()
+                                .anyRequest().authenticated()
+                );
     }
 
     @Bean
