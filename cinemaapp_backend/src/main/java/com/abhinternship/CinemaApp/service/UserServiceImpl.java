@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -40,5 +40,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public void deleteUser(final Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<User> findUserByEmail(final String email) {
+        return userRepository.findUserByEmail(email);
     }
 }

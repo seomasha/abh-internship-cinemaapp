@@ -38,6 +38,5 @@ public class User {
 
     private String status;
 
-    @NotBlank
     private String role;
 }

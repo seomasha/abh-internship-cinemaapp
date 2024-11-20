@@ -2,7 +2,12 @@ package com.abhinternship.CinemaApp.rest;
 
 import com.abhinternship.CinemaApp.model.User;
 import com.abhinternship.CinemaApp.service.UserService;
+import com.abhinternship.CinemaApp.utils.JwtUtil;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,7 +23,10 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 public class UserController {
+
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -37,6 +45,20 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody @Valid User user) {
         final User savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid User loginRequest) {
+        final Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        final User user = userService.findUserByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found."));
+
+        return ResponseEntity.ok(jwtUtil.generateToken(user));
     }
 
     @DeleteMapping("/{id}")
