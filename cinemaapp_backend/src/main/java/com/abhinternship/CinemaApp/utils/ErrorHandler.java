@@ -26,14 +26,15 @@ public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(final MethodArgumentNotValidException ex, final WebRequest request) {
-        final StringBuilder message = new StringBuilder("Validation failed: ");
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            message.append(error.getField())
-                    .append(": ")
-                    .append(error.getDefaultMessage())
-                    .append("; ");
-        });
-        return new ResponseEntity<>(buildErrorResponse(message.toString(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
+        final Map<String, String> fieldErrors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                fieldErrors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        final Map<String, Object> errorDetails = buildErrorResponse("Validation failed", HttpStatus.BAD_REQUEST);
+        errorDetails.put("errors", fieldErrors);
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

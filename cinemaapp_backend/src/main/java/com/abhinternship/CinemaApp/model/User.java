@@ -1,6 +1,9 @@
 package com.abhinternship.CinemaApp.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
@@ -15,8 +18,12 @@ public class User {
 
     private String lastName;
 
+    @NotBlank
+    @Email(message = "Email should be valid.")
     private String email;
 
+    @NotBlank
+    @Size(min = 8, message = "Password must have at least 8 characters")
     private String password;
 
     private String phoneNo;
@@ -31,5 +38,6 @@ public class User {
 
     private String status;
 
+    @NotBlank
     private String role;
 }
