@@ -4,6 +4,7 @@ import com.abhinternship.CinemaApp.model.User;
 import com.abhinternship.CinemaApp.service.UserService;
 import com.abhinternship.CinemaApp.utils.JwtUtil;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -59,6 +60,11 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User not found."));
 
         return ResponseEntity.ok(jwtUtil.generateToken(user));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(final HttpServletRequest request) {
+        return ResponseEntity.ok("Logged out successfully");
     }
 
     @DeleteMapping("/{id}")
