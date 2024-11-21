@@ -21,19 +21,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     final HttpServletResponse response,
                                     final FilterChain filterChain)
             throws ServletException, IOException {
-
         final String token = getTokenFromRequest(request);
 
         if (token != null) {
             final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
             if (principal instanceof User user) {
-                jwtUtil.validateToken(token, user);
+                try {
+                    jwtUtil.validateToken(token, user);
+                } catch (RuntimeException e) {
+                    logger.error("Invalid token: {}", e);
+                }
             }
         }
 
         filterChain.doFilter(request, response);
     }
+
 
     private String getTokenFromRequest(final HttpServletRequest request) {
         final String bearerToken = request.getHeader("Authorization");
