@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +32,9 @@ public class SecurityConfig {
     @Value("${spring.profiles.active}")
     private String profile;
 
+    @Value("${server.servlet.context-path}")
+    private String apiPath;
+
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -50,7 +51,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
         configureCommonSecurity(http);
 
-        if ("dev".equals(profile)) {
+        if ("local".equals(profile)) {
             configureDevSecurity(http);
         } else {
             configureProductionSecurity(http);
@@ -80,10 +81,13 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(HttpMethod.GET, "/api/v1/movies").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/users/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/users/logout").permitAll()
+                                .requestMatchers(HttpMethod.GET, apiPath + "/movies/**",
+                                        apiPath + "/venues/**",
+                                        apiPath + "/projections/**",
+                                        apiPath + "/genres").permitAll()
+                                .requestMatchers(HttpMethod.POST, apiPath + "/users",
+                                        apiPath + "/users/login",
+                                        apiPath + "/users/logout").permitAll()
                                 .anyRequest().authenticated()
                 );
     }

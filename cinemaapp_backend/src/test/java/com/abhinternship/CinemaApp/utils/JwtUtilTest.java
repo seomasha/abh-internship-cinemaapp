@@ -23,7 +23,7 @@ class JwtUtilTest {
         user.setEmail("test@example.com");
         user.setRole("USER");
 
-        String token = jwtUtil.generateToken(user);
+        final String token = jwtUtil.generateToken(user);
 
         assertNotNull(token);
         assertEquals(user.getEmail(), jwtUtil.extractEmail(token));
@@ -55,20 +55,20 @@ class JwtUtilTest {
 
     @Test
     void isTokenExpired_ShouldReturnTrueForExpiredToken() throws InterruptedException {
-        jwtUtil = new JwtUtil();
-        ReflectionTestUtils.setField(jwtUtil, "secretKey", "testSecretKey");
-        ReflectionTestUtils.setField(jwtUtil, "expirationTime", 100L);
+        JwtUtil jwtUtilWithShortExpiration = new JwtUtil(100L);
+        ReflectionTestUtils.setField(jwtUtilWithShortExpiration, "secretKey", "testSecretKey");
+
         final User user = new User();
         user.setEmail("test@example.com");
         user.setRole("USER");
-        final String token = jwtUtil.generateToken(user);
 
-        Thread.sleep(1000);
+        final String token = jwtUtilWithShortExpiration.generateToken(user);
 
-        final boolean isExpired = jwtUtil.isTokenExpired(token);
+        Thread.sleep(200);
 
-        assertTrue(isExpired);
+        assertTrue(jwtUtilWithShortExpiration.isTokenExpired(token));
     }
+
 
     @Test
     void validateToken_ShouldReturnTrueForValidToken() {
@@ -77,9 +77,7 @@ class JwtUtilTest {
         user.setRole("USER");
         final String token = jwtUtil.generateToken(user);
 
-        final boolean isValid = jwtUtil.validateToken(token, user);
-
-        assertTrue(isValid);
+        assertTrue(jwtUtil.validateToken(token, user));
     }
 
     @Test

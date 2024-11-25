@@ -33,7 +33,7 @@ class CustomUserDetailsServiceTest {
         final String email = "test@example.com";
         final String password = "securePassword";
         final String role = "USER";
-        User user = new User();
+        final User user = new User();
         user.setEmail(email);
         user.setPassword(password);
         user.setRole(role);

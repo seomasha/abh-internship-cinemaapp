@@ -13,9 +13,15 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private long expirationTime = 1000 * 60 * 60; // Final keyword je izostavljen kako bi se
-                                                  // vrijednost mogla promijeniti unutar testa putem Reflectiona
-                                                  // Komentar ce se poslije izbrisati haha :D
+    private final long expirationTime;
+
+    public JwtUtil() {
+        this.expirationTime = 1000 * 60 * 60;
+    }
+
+    public JwtUtil(final long expirationTime) {
+        this.expirationTime = expirationTime;
+    }
 
     public String generateToken(final User user) {
         return JWT.create()

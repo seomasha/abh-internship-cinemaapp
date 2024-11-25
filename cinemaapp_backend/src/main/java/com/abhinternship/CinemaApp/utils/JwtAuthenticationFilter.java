@@ -28,9 +28,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (principal instanceof User user) {
                 try {
-                    jwtUtil.validateToken(token, user);
-                } catch (RuntimeException e) {
-                    logger.error("Invalid token: {}", e);
+                    if (!jwtUtil.validateToken(token, user)) {
+                        throw new SecurityException("Token validation failed");
+                    }
+                } catch (final RuntimeException e) {
+                    logger.error("Invalid token: " + e.getLocalizedMessage());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+                    return;
                 }
             }
         }
