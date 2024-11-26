@@ -17,7 +17,15 @@ const NavBar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signInSuccess, setSignInSuccess] = useState(false);
-  const navigate = useNavigate();
+  const [signIn, setSignIn] = useState(true);
+
+  const title = signIn ? "Welcome Back" : "Hello";
+  const successMessage = signIn
+    ? "Sign In Successfull 🎉"
+    : "You're all set 🎉";
+  const description = signIn
+    ? "Please wait. You will be directed to the homepage."
+    : "Start exploring latest movies, venues and ticket options";
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
@@ -41,7 +49,7 @@ const NavBar = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSignInSubmit = (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
 
     if (email && password) {
@@ -133,7 +141,7 @@ const NavBar = () => {
             </h4>
           </div>
           <div className="d-flex justify-content-between">
-            <span className="py-2">
+            <span className="py-2 cursor-pointer">
               <FaArrowLeft
                 size={32}
                 className="text-white back-button p-2 rounded"
@@ -141,18 +149,28 @@ const NavBar = () => {
               />
             </span>
             <h3 className="text-white">
-              {signInSuccess ? "Sign In Successfull 🎉" : "Welcome Back"}
+              {signInSuccess ? successMessage : title}
             </h3>
             <div></div>
           </div>
           {signInSuccess ? (
             <>
               <div className="text-center text-white mt-3">
-                <p>Please wait. You will be redirected to the homepage.</p>
+                <p>{description}</p>
+
+                {!signIn && (
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="primary-red-button text-white py-2"
+                  >
+                    See Movies
+                  </Button>
+                )}
               </div>
             </>
           ) : (
-            <form onSubmit={handleSignInSubmit}>
+            <form onSubmit={handleFormSubmit}>
               <Input
                 label="Email"
                 placeholder="Enter your email"
@@ -178,6 +196,21 @@ const NavBar = () => {
                 onChange={handlePasswordChange}
                 type="password"
               />
+              {!signIn && (
+                <Input
+                  label="Confirm Password"
+                  placeholder="Retype Password"
+                  leadingIcon={
+                    <FiLock
+                      size={20}
+                      color={password ? colors.primary_red : ""}
+                    />
+                  }
+                  value={password}
+                  onChange={handlePasswordChange}
+                  type="password"
+                />
+              )}
               <div className="d-flex justify-content-between">
                 <div className="form-check">
                   <input
@@ -204,9 +237,14 @@ const NavBar = () => {
               </Button>
 
               <h6 className="text-center text-white mt-4 fw-light">
-                Don't have an account yet?{" "}
-                <span className="fw-bold text-decoration-underline">
-                  Sign up.
+                {signIn
+                  ? "Don't have an account yet? "
+                  : "Already have an account? "}
+                <span
+                  className="fw-bold text-decoration-underline cursor-pointer"
+                  onClick={() => setSignIn(!signIn)}
+                >
+                  {signIn ? "Sign up." : "Sign in."}
                 </span>
               </h6>
               <Separator orientation="horizontal" dashed={false} />

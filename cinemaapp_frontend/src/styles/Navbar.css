@@ -61,3 +61,7 @@
 .sign-in-camera {
   background-color: #fcfcfd1a;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
