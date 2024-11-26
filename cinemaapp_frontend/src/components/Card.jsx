@@ -17,7 +17,7 @@ const Card = ({ title, subtitle, genre, imageUrl, showDateLabel }) => {
 
   return (
     <div
-      className={`rounded-5 p-3 border shadow text-black ${
+      className={`rounded-5 p-3 bg-white border shadow text-black ${
         showDateLabel ? "card-container-upcoming" : "card-container"
       } position-relative`}
     >

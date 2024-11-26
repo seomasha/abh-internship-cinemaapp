@@ -1,0 +1,4 @@
+.no-focus:focus {
+  border: none;
+  outline: none;
+}

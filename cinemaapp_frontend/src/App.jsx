@@ -20,7 +20,7 @@ import MovieDetails from "./pages/MovieDetails";
 
 function App() {
   return (
-    <div className="main-font">
+    <div className="main-font primary-background">
       <Router>
         <ScrollToTop />
         <ToastContainer />

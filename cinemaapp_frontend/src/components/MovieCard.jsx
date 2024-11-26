@@ -25,7 +25,7 @@ const MovieCard = ({
   }).format(new Date(projectionEndDate));
 
   return (
-    <div className="d-flex flex-column flex-md-row border rounded-5 p-3 mt-4 gap-4 gap-md-5 movie-card">
+    <div className="d-flex flex-column flex-md-row border rounded-5 p-3 mt-4 gap-4 gap-md-5 movie-card bg-white">
       <img
         src={photo}
         className="rounded-4 movie-card-image"

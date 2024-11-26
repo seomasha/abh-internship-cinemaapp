@@ -15,6 +15,7 @@ const VenuesCarousel = ({
     infinite: true,
     dots: false,
     speed: 500,
+    arrows: false,
     slidesToShow: 5,
     slidesToScroll: 1,
     swipeToSlide: true,
