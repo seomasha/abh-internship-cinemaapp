@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
@@ -17,15 +17,28 @@ const NavBar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signInSuccess, setSignInSuccess] = useState(false);
-  const [signIn, setSignIn] = useState(true);
+  const [currentFlow, setCurrentFlow] = useState("signIn");
 
-  const title = signIn ? "Welcome Back" : "Hello";
-  const successMessage = signIn
-    ? "Sign In Successfull 🎉"
-    : "You're all set 🎉";
-  const description = signIn
-    ? "Please wait. You will be directed to the homepage."
-    : "Start exploring latest movies, venues and ticket options";
+  const flowDetails = {
+    signIn: {
+      title: "Welcome Back",
+      successMessage: "Sign In Successful 🎉",
+      description: "Please wait. You will be directed to the homepage.",
+    },
+    signUp: {
+      title: "Hello",
+      successMessage: "You're all set 🎉",
+      description: "Start exploring latest movies, venues and ticket options",
+    },
+    passwordReset: {
+      title: "Password Reset",
+      successMessage: "Password Reset Successful",
+      description:
+        "Provide your account's email or the one you want to reset your password for.",
+    },
+  };
+
+  const { title, successMessage, description } = flowDetails[currentFlow] || {};
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
@@ -35,6 +48,7 @@ const NavBar = () => {
 
   const handleSignInClick = () => {
     setShowSignIn(!showSignIn);
+    setCurrentFlow("signIn");
   };
 
   const handleEmailChange = (e) => {
@@ -158,7 +172,7 @@ const NavBar = () => {
               <div className="text-center text-white mt-3">
                 <p>{description}</p>
 
-                {!signIn && (
+                {!currentFlow === "signIn" && (
                   <Button
                     variant="primary"
                     type="submit"
@@ -196,7 +210,7 @@ const NavBar = () => {
                 onChange={handlePasswordChange}
                 type="password"
               />
-              {!signIn && (
+              {currentFlow === "signUp" && (
                 <Input
                   label="Confirm Password"
                   placeholder="Retype Password"
@@ -226,25 +240,34 @@ const NavBar = () => {
                     Remember me
                   </label>
                 </div>
-                <p className="text-white">Forgot password?</p>
+                <p
+                  className="text-white"
+                  onClick={() => setCurrentFlow("passwordReset")}
+                >
+                  Forgot password?
+                </p>
               </div>
               <Button
                 variant="primary"
                 type="submit"
                 className="primary-red-button text-white py-2"
               >
-                Sign In
+                {currentFlow === "signIn" ? "Sign In" : "Sign Up"}
               </Button>
 
               <h6 className="text-center text-white mt-4 fw-light">
-                {signIn
+                {currentFlow === "signIn"
                   ? "Don't have an account yet? "
                   : "Already have an account? "}
                 <span
                   className="fw-bold text-decoration-underline cursor-pointer"
-                  onClick={() => setSignIn(!signIn)}
+                  onClick={() =>
+                    setCurrentFlow(
+                      currentFlow === "signIn" ? "signUp" : "signIn"
+                    )
+                  }
                 >
-                  {signIn ? "Sign up." : "Sign in."}
+                  {currentFlow === "signIn" ? "Sign up." : "Sign in."}
                 </span>
               </h6>
               <Separator orientation="horizontal" dashed={false} />
