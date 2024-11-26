@@ -17,10 +17,33 @@ const NavBar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [signInSuccess, setSignInSuccess] = useState(false);
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
   const [passwordReset, setPasswordReset] = useState(false);
+
+  const resetFields = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setEmailError("");
+    setPasswordError("");
+    setConfirmPasswordError("");
+    setPasswordResetStep(1);
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return regex.test(password);
+  };
 
   const flowDetails = {
     signIn: {
@@ -52,11 +75,6 @@ const NavBar = () => {
     { id: 3, path: "/venues", label: "Venues" },
   ];
 
-  const currentStepDetails =
-    currentFlow === "passwordReset"
-      ? flowDetails.passwordReset.steps[passwordResetStep - 1]
-      : flowDetails[currentFlow];
-
   const handleSignInClick = () => {
     setShowSignIn(!showSignIn);
     setCurrentFlow("signIn");
@@ -70,17 +88,60 @@ const NavBar = () => {
     setPassword(e.target.value);
   };
 
-  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+  };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    if (currentFlow === "signIn" || currentFlow === "signUp") {
-      if (email && password) {
-        setSignInSuccess(true);
-        setTimeout(() => setSignInSuccess(false), 5000);
-      }
-    } else if (currentFlow === "passwordReset") {
+    let emailError = false;
+    let passwordError = false;
+    let confirmPasswordError = false;
+
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      emailError = true;
+    } else {
+      setEmailError("");
+      emailError = false;
+    }
+
+    if (!validatePassword(password) && currentFlow !== "passwordReset") {
+      setPasswordError(
+        "Password must be at least 8 characters long and contain both letters and numbers."
+      );
+      passwordError = true;
+    } else {
+      setPasswordError("");
+      passwordError = false;
+    }
+
+    if (
+      confirmPassword !== password ||
+      (currentFlow === "passwordReset" && passwordResetStep === 3)
+    ) {
+      setConfirmPasswordError("Passwords do not match.");
+      confirmPasswordError = true;
+    } else {
+      setConfirmPasswordError("");
+      confirmPasswordError = false;
+    }
+
+    if (
+      (currentFlow === "signIn" && !emailError && !passwordError) ||
+      (currentFlow === "signUp" &&
+        !emailError &&
+        !passwordError &&
+        !confirmPasswordError)
+    ) {
+      setSignInSuccess(true);
+      setTimeout(() => setSignInSuccess(false), 5000);
+      resetFields();
+    } else if (
+      currentFlow === "passwordReset" &&
+      !emailError
+    ) {
       if (passwordResetStep < 3) {
         setPasswordResetStep(passwordResetStep + 1);
       } else {
@@ -89,6 +150,7 @@ const NavBar = () => {
         setTimeout(() => {
           setSignInSuccess(false);
           setPasswordReset(false);
+          resetFields();
           setPasswordResetStep(1);
           setCurrentFlow("signIn");
         }, 5000);
@@ -246,6 +308,8 @@ const NavBar = () => {
                   }
                   value={email}
                   onChange={handleEmailChange}
+                  invalid={!!emailError}
+                  invalidMessage={emailError}
                 />
               )}
               {currentFlow !== "passwordReset" && (
@@ -261,6 +325,8 @@ const NavBar = () => {
                   value={password}
                   onChange={handlePasswordChange}
                   type="password"
+                  invalid={!!passwordError}
+                  invalidMessage={passwordError}
                 />
               )}
               {currentFlow === "signUp" && (
@@ -273,9 +339,11 @@ const NavBar = () => {
                       color={password ? colors.primary_red : ""}
                     />
                   }
-                  value={password}
-                  onChange={handlePasswordChange}
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
                   type="password"
+                  invalid={!!confirmPasswordError}
+                  invalidMessage={confirmPasswordError}
                 />
               )}
               {currentFlow !== "passwordReset" && (
@@ -314,6 +382,8 @@ const NavBar = () => {
                   }
                   value={email}
                   onChange={handleEmailChange}
+                  invalid={!!emailError}
+                  invalidMessage={emailError}
                 />
               )}
               {currentFlow === "passwordReset" && passwordResetStep === 2 && (
@@ -338,6 +408,8 @@ const NavBar = () => {
                     value={password}
                     onChange={handlePasswordChange}
                     type="password"
+                    invalid={!!passwordError}
+                    invalidMessage={passwordError}
                   />
                   <Input
                     label="Confirm New Password"
@@ -351,6 +423,8 @@ const NavBar = () => {
                     value={confirmPassword}
                     onChange={handleConfirmPasswordChange}
                     type="password"
+                    invalid={!!confirmPassword}
+                    invalidMessage={confirmPasswordError}
                   />
                 </>
               )}

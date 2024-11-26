@@ -9,6 +9,8 @@ const Input = ({
   leadingIcon,
   value,
   onChange,
+  invalid,
+  invalidMessage,
 }) => {
   const [inputType, setInputType] = useState(type);
 
@@ -18,15 +20,29 @@ const Input = ({
 
   return (
     <div className="d-flex flex-column w-100 mb-4">
-      <label className="text-white fs-6">{label}</label>
-      <div className="d-flex bg-white align-items-center gap-2 rounded px-3 mt-1">
+      <label className={`fs-6 ${invalid ? "text-danger" : "text-white"}`}>
+        {label}
+      </label>
+      <div
+        className={`d-flex bg-white align-items-center gap-2 rounded px-3 mt-1 ${
+          invalid ? "border border-2 border-danger" : ""
+        }`}
+      >
         {leadingIcon && (
-          <span className="d-flex align-items-center">{leadingIcon}</span>
+          <span
+            className={`d-flex align-items-center ${
+              invalid ? "text-danger" : ""
+            }`}
+          >
+            {leadingIcon}
+          </span>
         )}
         <input
           type={inputType}
           placeholder={placeholder}
-          className="rounded fs-6 border-0 w-100 mt-3 no-focus"
+          className={`rounded fs-6 border-0 w-100 mt-3 no-focus ${
+            invalid ? "text-danger" : ""
+          }`}
           value={value}
           onChange={onChange}
         />
@@ -43,6 +59,7 @@ const Input = ({
           </span>
         )}
       </div>
+      {invalid && <p className="text-danger mt-1">{invalidMessage}</p>}
     </div>
   );
 };
