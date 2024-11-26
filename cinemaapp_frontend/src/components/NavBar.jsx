@@ -10,14 +10,17 @@ import "../styles/Navbar.css";
 import Input from "./Input";
 import Separator from "./Separator";
 import colors from "../utils/colors";
+import OTPInput from "./OTP";
 
 const NavBar = () => {
   const [showSignIn, setShowSignIn] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [signInSuccess, setSignInSuccess] = useState(false);
   const [currentFlow, setCurrentFlow] = useState("signIn");
+  const [passwordResetStep, setPasswordResetStep] = useState(1);
+  const [passwordReset, setPasswordReset] = useState(false);
 
   const flowDetails = {
     signIn: {
@@ -33,8 +36,11 @@ const NavBar = () => {
     passwordReset: {
       title: "Password Reset",
       successMessage: "Password Reset Successful",
-      description:
-        "Provide your account's email or the one you want to reset your password for.",
+      steps: [
+        "Step 1: Enter your email",
+        "Step 2: Enter verification code",
+        "Step 3: Reset your password",
+      ],
     },
   };
 
@@ -45,6 +51,11 @@ const NavBar = () => {
     { id: 2, path: "/upcoming", label: "Upcoming movies" },
     { id: 3, path: "/venues", label: "Venues" },
   ];
+
+  const currentStepDetails =
+    currentFlow === "passwordReset"
+      ? flowDetails.passwordReset.steps[passwordResetStep - 1]
+      : flowDetails[currentFlow];
 
   const handleSignInClick = () => {
     setShowSignIn(!showSignIn);
@@ -59,20 +70,51 @@ const NavBar = () => {
     setPassword(e.target.value);
   };
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    if (email && password) {
-      setSignInSuccess(true);
-
-      setTimeout(() => {
-        setSignInSuccess(false);
-      }, 5000);
+    if (currentFlow === "signIn" || currentFlow === "signUp") {
+      if (email && password) {
+        setSignInSuccess(true);
+        setTimeout(() => setSignInSuccess(false), 5000);
+      }
+    } else if (currentFlow === "passwordReset") {
+      if (passwordResetStep < 3) {
+        setPasswordResetStep(passwordResetStep + 1);
+      } else {
+        setSignInSuccess(true);
+        setPasswordReset(true);
+        setTimeout(() => {
+          setSignInSuccess(false);
+          setPasswordReset(false);
+          setPasswordResetStep(1);
+          setCurrentFlow("signIn");
+        }, 5000);
+      }
     }
+  };
+
+  const handleOTPChange = (otp) => {
+    console.log("OTP entered: ", otp);
+  };
+
+  const handleOTPComplete = (otp) => {
+    console.log("OTP complete: ", otp);
+  };
+
+  const getStepDescription = () => {
+    if (passwordResetStep === 1) {
+      return "Provide your account's email or the one you want to reset your password for.";
+    }
+    if (passwordResetStep === 2) {
+      return `We have sent an email to ${email}. Please enter the code below to verify.`;
+    }
+    if (passwordResetStep === 3) {
+      return "Please enter and confirm your new password";
+    }
+    return "";
   };
 
   useEffect(() => {
@@ -146,7 +188,7 @@ const NavBar = () => {
 
       <div className={`sign-in-panel ${showSignIn ? "active" : ""}`}>
         <div className="sign-in-form">
-          <div className="d-flex justify-content-center my-5">
+          <div className="d-flex justify-content-center my-2">
             <span className="d-flex justify-content-center align-items-center bg-white p-2 mx-1 logo-rounded">
               <BsCameraReelsFill className="primary-red" size={14} />
             </span>
@@ -162,9 +204,16 @@ const NavBar = () => {
                 onClick={() => setShowSignIn(false)}
               />
             </span>
-            <h3 className="text-white">
-              {signInSuccess ? successMessage : title}
-            </h3>
+            <div className="text-center">
+              <h3 className="text-white">
+                {signInSuccess ? successMessage : title}
+              </h3>
+              {currentFlow === "passwordReset" && (
+                <p className="text-white">
+                  {!passwordReset ? getStepDescription() : ""}
+                </p>
+              )}
+            </div>
             <div></div>
           </div>
           {signInSuccess ? (
@@ -172,7 +221,7 @@ const NavBar = () => {
               <div className="text-center text-white mt-3">
                 <p>{description}</p>
 
-                {!currentFlow === "signIn" && (
+                {currentFlow === "signUp" && (
                   <Button
                     variant="primary"
                     type="submit"
@@ -185,31 +234,35 @@ const NavBar = () => {
             </>
           ) : (
             <form onSubmit={handleFormSubmit}>
-              <Input
-                label="Email"
-                placeholder="Enter your email"
-                leadingIcon={
-                  <AiOutlineMail
-                    size={20}
-                    color={email ? colors.primary_red : ""}
-                  />
-                }
-                value={email}
-                onChange={handleEmailChange}
-              />
-              <Input
-                label="Password"
-                placeholder="Enter your password"
-                leadingIcon={
-                  <FiLock
-                    size={20}
-                    color={password ? colors.primary_red : ""}
-                  />
-                }
-                value={password}
-                onChange={handlePasswordChange}
-                type="password"
-              />
+              {currentFlow !== "passwordReset" && (
+                <Input
+                  label="Email"
+                  placeholder="Enter your email"
+                  leadingIcon={
+                    <AiOutlineMail
+                      size={20}
+                      color={email ? colors.primary_red : ""}
+                    />
+                  }
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+              )}
+              {currentFlow !== "passwordReset" && (
+                <Input
+                  label="Password"
+                  placeholder="Enter your password"
+                  leadingIcon={
+                    <FiLock
+                      size={20}
+                      color={password ? colors.primary_red : ""}
+                    />
+                  }
+                  value={password}
+                  onChange={handlePasswordChange}
+                  type="password"
+                />
+              )}
               {currentFlow === "signUp" && (
                 <Input
                   label="Confirm Password"
@@ -225,64 +278,128 @@ const NavBar = () => {
                   type="password"
                 />
               )}
-              <div className="d-flex justify-content-between">
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    value=""
-                    id="flexCheckDefault"
-                  />
-                  <label
-                    className="form-check-label text-white fs-6"
-                    htmlFor="flexCheckDefault"
+              {currentFlow !== "passwordReset" && (
+                <div className="d-flex justify-content-between">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value=""
+                      id="flexCheckDefault"
+                    />
+                    <label
+                      className="form-check-label text-white fs-6"
+                      htmlFor="flexCheckDefault"
+                    >
+                      Remember me
+                    </label>
+                  </div>
+                  <p
+                    className="text-white cursor-pointer"
+                    onClick={() => setCurrentFlow("passwordReset")}
                   >
-                    Remember me
-                  </label>
+                    Forgot password?
+                  </p>
                 </div>
-                <p
-                  className="text-white"
-                  onClick={() => setCurrentFlow("passwordReset")}
-                >
-                  Forgot password?
-                </p>
-              </div>
+              )}
+              {currentFlow === "passwordReset" && passwordResetStep === 1 && (
+                <Input
+                  label="Email"
+                  placeholder="Enter your email"
+                  leadingIcon={
+                    <AiOutlineMail
+                      size={20}
+                      color={email ? colors.primary_red : ""}
+                    />
+                  }
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+              )}
+              {currentFlow === "passwordReset" && passwordResetStep === 2 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <OTPInput
+                    onChange={handleOTPChange}
+                    onComplete={handleOTPComplete}
+                  />
+                </div>
+              )}
+              {currentFlow === "passwordReset" && passwordResetStep === 3 && (
+                <>
+                  <Input
+                    label="New Password"
+                    placeholder="Enter your new password"
+                    leadingIcon={
+                      <FiLock
+                        size={20}
+                        color={password ? colors.primary_red : ""}
+                      />
+                    }
+                    value={password}
+                    onChange={handlePasswordChange}
+                    type="password"
+                  />
+                  <Input
+                    label="Confirm New Password"
+                    placeholder="Retype your new password"
+                    leadingIcon={
+                      <FiLock
+                        size={20}
+                        color={confirmPassword ? colors.primary_red : ""}
+                      />
+                    }
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                    type="password"
+                  />
+                </>
+              )}
               <Button
                 variant="primary"
                 type="submit"
                 className="primary-red-button text-white py-2"
               >
-                {currentFlow === "signIn" ? "Sign In" : "Sign Up"}
+                {currentFlow === "signIn"
+                  ? "Sign In"
+                  : currentFlow === "signUp"
+                  ? "Sign Up"
+                  : "Continue"}
               </Button>
 
-              <h6 className="text-center text-white mt-4 fw-light">
-                {currentFlow === "signIn"
-                  ? "Don't have an account yet? "
-                  : "Already have an account? "}
-                <span
-                  className="fw-bold text-decoration-underline cursor-pointer"
-                  onClick={() =>
-                    setCurrentFlow(
-                      currentFlow === "signIn" ? "signUp" : "signIn"
-                    )
-                  }
-                >
-                  {currentFlow === "signIn" ? "Sign up." : "Sign in."}
-                </span>
-              </h6>
-              <Separator orientation="horizontal" dashed={false} />
-              <div>
+              {currentFlow !== "passwordReset" && (
                 <h6 className="text-center text-white mt-4 fw-light">
-                  Login with
+                  {currentFlow === "signIn"
+                    ? "Don't have an account yet? "
+                    : "Already have an account? "}
+                  <span
+                    className="fw-bold text-decoration-underline cursor-pointer"
+                    onClick={() =>
+                      setCurrentFlow(
+                        currentFlow === "signIn" ? "signUp" : "signIn"
+                      )
+                    }
+                  >
+                    {currentFlow === "signIn" ? "Sign up." : "Sign in."}
+                  </span>
                 </h6>
-                <div className="mt-4 text-white d-flex justify-content-center gap-3">
-                  <FaGoogle size={24} />
-                  <FaApple size={24} />
-                </div>
-                <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
-                  Continue without Signing In
-                </h6>
-              </div>
+              )}
+              {currentFlow !== "passwordReset" && (
+                <>
+                  <Separator orientation="horizontal" dashed={false} />
+                  <div>
+                    <h6 className="text-center text-white mt-4 fw-light">
+                      Login with
+                    </h6>
+                    <div className="mt-4 text-white d-flex justify-content-center gap-3">
+                      <FaGoogle size={24} />
+                      <FaApple size={24} />
+                    </div>
+                    <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
+                      Continue without Signing In
+                    </h6>
+                  </div>
+                </>
+              )}
             </form>
           )}
         </div>
