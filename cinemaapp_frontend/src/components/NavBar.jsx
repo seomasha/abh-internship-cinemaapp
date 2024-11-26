@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
@@ -16,6 +16,8 @@ const NavBar = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signInSuccess, setSignInSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
@@ -26,17 +28,6 @@ const NavBar = () => {
   const handleSignInClick = () => {
     setShowSignIn(!showSignIn);
   };
-
-  useEffect(() => {
-    if (showSignIn) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [showSignIn]);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -50,9 +41,28 @@ const NavBar = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
+  const handleSignInSubmit = (e) => {
+    e.preventDefault();
+
+    if (email && password) {
+      setSignInSuccess(true);
+
+      setTimeout(() => {
+        setSignInSuccess(false);
+      }, 5000);
+    }
   };
+
+  useEffect(() => {
+    if (showSignIn) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showSignIn]);
 
   return (
     <Navbar expand="lg" className="p-4 main-font navbar-background">
@@ -130,76 +140,90 @@ const NavBar = () => {
                 onClick={() => setShowSignIn(false)}
               />
             </span>
-            <h3 className="text-white">Welcome Back</h3>
+            <h3 className="text-white">
+              {signInSuccess ? "Sign In Successfull 🎉" : "Welcome Back"}
+            </h3>
             <div></div>
           </div>
-          <form>
-            <Input
-              label="Email"
-              placeholder="Enter your email"
-              leadingIcon={
-                <AiOutlineMail
-                  size={20}
-                  color={email ? colors.primary_red : ""}
-                />
-              }
-              value={email}
-              onChange={handleEmailChange}
-            />
-            <Input
-              label="Password"
-              placeholder="Enter your password"
-              leadingIcon={
-                <FiLock size={20} color={password ? colors.primary_red : ""} />
-              }
-              value={password}
-              onChange={handlePasswordChange}
-              type="password"
-            />
-            <div className="d-flex justify-content-between">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="flexCheckDefault"
-                />
-                <label
-                  className="form-check-label text-white fs-6"
-                  htmlFor="flexCheckDefault"
-                >
-                  Remember me
-                </label>
+          {signInSuccess ? (
+            <>
+              <div className="text-center text-white mt-3">
+                <p>Please wait. You will be redirected to the homepage.</p>
               </div>
-              <p className="text-white">Forgot password?</p>
-            </div>
-            <Button
-              variant="primary"
-              type="submit"
-              className="primary-red-button text-white py-2"
-            >
-              Sign In
-            </Button>
-            <h6 className="text-center text-white mt-4 fw-light">
-              Don't have an account yet?{" "}
-              <span className="fw-bold text-decoration-underline">
-                Sign up.
-              </span>
-            </h6>
-            <Separator orientation="horizontal" dashed={false} />
-            <div>
+            </>
+          ) : (
+            <form onSubmit={handleSignInSubmit}>
+              <Input
+                label="Email"
+                placeholder="Enter your email"
+                leadingIcon={
+                  <AiOutlineMail
+                    size={20}
+                    color={email ? colors.primary_red : ""}
+                  />
+                }
+                value={email}
+                onChange={handleEmailChange}
+              />
+              <Input
+                label="Password"
+                placeholder="Enter your password"
+                leadingIcon={
+                  <FiLock
+                    size={20}
+                    color={password ? colors.primary_red : ""}
+                  />
+                }
+                value={password}
+                onChange={handlePasswordChange}
+                type="password"
+              />
+              <div className="d-flex justify-content-between">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="flexCheckDefault"
+                  />
+                  <label
+                    className="form-check-label text-white fs-6"
+                    htmlFor="flexCheckDefault"
+                  >
+                    Remember me
+                  </label>
+                </div>
+                <p className="text-white">Forgot password?</p>
+              </div>
+              <Button
+                variant="primary"
+                type="submit"
+                className="primary-red-button text-white py-2"
+              >
+                Sign In
+              </Button>
+
               <h6 className="text-center text-white mt-4 fw-light">
-                Login with
+                Don't have an account yet?{" "}
+                <span className="fw-bold text-decoration-underline">
+                  Sign up.
+                </span>
               </h6>
-              <div className="mt-4 text-white d-flex justify-content-center gap-3">
-                <FaGoogle size={24} />
-                <FaApple size={24} />
+              <Separator orientation="horizontal" dashed={false} />
+              <div>
+                <h6 className="text-center text-white mt-4 fw-light">
+                  Login with
+                </h6>
+                <div className="mt-4 text-white d-flex justify-content-center gap-3">
+                  <FaGoogle size={24} />
+                  <FaApple size={24} />
+                </div>
+                <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
+                  Continue without Signing In
+                </h6>
               </div>
-              <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
-                Continue without Signing In
-              </h6>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
       </div>
     </Navbar>
