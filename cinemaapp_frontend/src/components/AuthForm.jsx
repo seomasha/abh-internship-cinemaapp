@@ -6,7 +6,6 @@ import { FiLock } from "react-icons/fi";
 import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
-import { validateEmail, validatePassword } from "../utils/Validation";
 
 const AuthForm = ({
   currentFlow,
@@ -58,6 +57,16 @@ const AuthForm = ({
   };
 
   const { title, successMessage, description } = flowDetails[currentFlow] || {};
+
+  const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return regex.test(password);
+  };
 
   const getStepDescription = () => {
     if (passwordResetStep === 1) {

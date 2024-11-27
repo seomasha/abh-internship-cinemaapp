@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { FaArrowLeft } from "react-icons/fa6";
 import "../styles/Navbar.css";
 import AuthForm from "./AuthForm";
 
@@ -17,15 +16,6 @@ const NavBar = () => {
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
 
-  const resetFields = () => {
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setConfirmChangedPassword("");
-    setPasswordResetStep(1);
-    setCurrentFlow("signIn");
-  };
-
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
     { id: 2, path: "/upcoming", label: "Upcoming movies" },
@@ -33,7 +23,6 @@ const NavBar = () => {
   ];
 
   const handleSignInClick = () => {
-    resetFields();
     setShowSignIn(!showSignIn);
   };
 
