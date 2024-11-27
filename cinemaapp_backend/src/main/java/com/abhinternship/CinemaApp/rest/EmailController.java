@@ -17,7 +17,7 @@ public class EmailController {
     @PostMapping("/otp")
     public ResponseEntity<String> sendOTP(@RequestBody EmailDTO emailDTO) {
         final String email = emailDTO.getEmail();
-        emailService.sendOTPEmail(email, "OTP Code for Cinema App");
-        return ResponseEntity.ok("Successfully sent the OTP code to: " + email);
+        final String otp = emailService.sendOTPEmail(email, "OTP Code for Cinema App");
+        return ResponseEntity.ok(otp);
     }
 }

@@ -26,15 +26,17 @@ public class EmailService {
     }
 
     @Async
-    public void sendOTPEmail(final String to, final String subject) {
-        SimpleMailMessage message = new SimpleMailMessage();
+    public String sendOTPEmail(final String to, final String subject) {
+        final SimpleMailMessage message = new SimpleMailMessage();
+        final String generatedOtp = generateOtp();
 
         message.setTo(to);
         message.setFrom(sender);
         message.setSubject(subject);
-        message.setText("Your OTP password is: " + generateOtp());
+        message.setText("Your OTP password is: " + generatedOtp);
 
         mailSender.send(message);
-    }
 
+        return generatedOtp;
+    }
 }

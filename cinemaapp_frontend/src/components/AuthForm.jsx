@@ -33,6 +33,9 @@ const AuthForm = ({
     useState("");
   const [passwordReset, setPasswordReset] = useState(false);
   const [signInSuccess, setSignInSuccess] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [enteredOtp, setEnteredOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
 
   const flowDetails = {
     signIn: {
@@ -178,12 +181,23 @@ const AuthForm = ({
       "Passwords do not match."
     );
 
-    return !emailError && !changePasswordError && !confirmChangePasswordError;
+    const otpError = setError(
+      enteredOtp.toString() !== generatedOtp,
+      setOtpError,
+      "The OTP you entered is incorrect."
+    );
+
+    return (
+      !emailError &&
+      !changePasswordError &&
+      !confirmChangePasswordError &&
+      !otpError
+    );
   };
 
   const sendOtp = async () => {
     const response = await otpService.create({ email: email });
-    console.log(response);
+    setGeneratedOtp(response);
     setPasswordResetStep(2);
   };
 
@@ -250,11 +264,8 @@ const AuthForm = ({
   };
 
   const handleOTPChange = (otp) => {
-    console.log("OTP entered: ", otp);
-  };
-
-  const handleOTPComplete = (otp) => {
-    console.log("OTP complete: ", otp);
+    setEnteredOtp(otp);
+    setOtpError("");
   };
 
   const renderForm = () => {
@@ -522,11 +533,9 @@ const AuthForm = ({
         {passwordResetStep === 2 && (
           <>
             <div className="d-flex justify-content-center mt-4">
-              <OTPInput
-                onChange={handleOTPChange}
-                onComplete={handleOTPComplete}
-              />
+              <OTPInput onChange={handleOTPChange} />
             </div>
+            {otpError && <p className="text-center text-danger">{otpError}</p>}
             <ActionButton label="Continue" onClick={handleFormSubmit} />
           </>
         )}
