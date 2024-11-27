@@ -110,58 +110,48 @@ const NavBar = () => {
     setConfirmChangedPassword(e.target.value);
   };
 
+  const setError = (condition, setter, message) => {
+    if (condition) {
+      setter(message);
+      return true;
+    } else {
+      setter("");
+      return false;
+    }
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    let emailError = false;
-    let passwordError = false;
-    let confirmPasswordError = false;
-    let changePasswordError = false;
-    let confirmChangePasswordError = false;
+    let emailError = setError(
+      !validateEmail(email),
+      setEmailError,
+      "Please enter a valid email."
+    );
 
-    if (!validateEmail(email)) {
-      setEmailError("Please enter a valid email address.");
-      emailError = true;
-    } else {
-      setEmailError("");
-      emailError = false;
-    }
+    let passwordError = setError(
+      !validatePassword(password) && currentFlow !== "passwordReset",
+      setPasswordError,
+      "Password must be at least 8 characters long and contain both letters and numbers."
+    );
 
-    if (!validatePassword(password) && currentFlow !== "passwordReset") {
-      setPasswordError(
-        "Password must be at least 8 characters long and contain both letters and numbers."
-      );
-      passwordError = true;
-    } else {
-      setPasswordError("");
-      passwordError = false;
-    }
+    let confirmPasswordError = setError(
+      confirmPassword !== password,
+      setConfirmPasswordError,
+      "Passwords do not match."
+    );
 
-    if (!validatePassword(changedPassword)) {
-      setChangedPasswordError(
-        "Password must be at least 8 characters long and contain both letters and numbers."
-      );
-      changePasswordError = true;
-    } else {
-      setChangedPasswordError("");
-      changePasswordError = false;
-    }
+    let changePasswordError = setError(
+      !validatePassword(changedPassword),
+      setChangedPasswordError,
+      "Password must be at least 8 characters long and contain both letters and numbers."
+    );
 
-    if (confirmPassword !== password) {
-      setConfirmPasswordError("Passwords do not match.");
-      confirmPasswordError = true;
-    } else {
-      setConfirmPasswordError("");
-      confirmPasswordError = false;
-    }
-
-    if (confirmChangedPassword !== changedPassword) {
-      setConfirmPasswordError("Passwords do not match.");
-      confirmChangePasswordError = true;
-    } else {
-      setConfirmPasswordError("");
-      confirmChangePasswordError = false;
-    }
+    let confirmChangePasswordError = setError(
+      confirmChangedPassword !== changedPassword,
+      setConfirmChangedPasswordError,
+      "Passwords do not match."
+    );
 
     if (
       (currentFlow === "signIn" && !emailError && !passwordError) ||
@@ -224,6 +214,246 @@ const NavBar = () => {
       document.body.style.overflow = "auto";
     };
   }, [showSignIn]);
+
+  const Description = ({ text }) => <p className="text-white">{text}</p>;
+
+  const ActionButton = ({ label, onClick, disabled = false }) => (
+    <Button
+      variant="danger"
+      type="submit"
+      className="primary-red-button text-white py-2"
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {label}
+    </Button>
+  );
+
+  const renderForm = () => {
+    if (signInSuccess) {
+      return (
+        <div className="text-center">
+          <Description text={description} />
+        </div>
+      );
+    }
+
+    switch (currentFlow) {
+      case "signIn":
+        return (
+          <>
+            <Input
+              label="Email"
+              placeholder="Enter your email"
+              leadingIcon={<AiOutlineMail size={20} />}
+              value={email}
+              onChange={handleEmailChange}
+              invalid={!!emailError}
+              invalidMessage={emailError}
+            />
+            <Input
+              label="Password"
+              placeholder="Enter your password"
+              leadingIcon={<FiLock size={20} />}
+              value={password}
+              onChange={handlePasswordChange}
+              type="password"
+              invalid={!!passwordError}
+              invalidMessage={passwordError}
+            />
+            <ActionButton label="Sign In" onClick={handleFormSubmit} />
+
+            <h6 className="text-center text-white mt-4 fw-light">
+              Don't have an account yet?{" "}
+              <span
+                className="fw-bold text-decoration-underline cursor-pointer"
+                onClick={() => setCurrentFlow("signUp")}
+              >
+                Sign up.
+              </span>
+            </h6>
+
+            <div className="d-flex justify-content-between">
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  value=""
+                  id="flexCheckDefault"
+                />
+                <label
+                  className="form-check-label text-white fs-6"
+                  htmlFor="flexCheckDefault"
+                >
+                  Remember me
+                </label>
+              </div>
+              <p
+                className="text-white cursor-pointer"
+                onClick={() => setCurrentFlow("passwordReset")}
+              >
+                Forgot password?
+              </p>
+            </div>
+            <Separator orientation="horizontal" dashed={false} />
+            <div>
+              <h6 className="text-center text-white mt-4 fw-light">
+                Login with
+              </h6>
+              <div className="mt-4 text-white d-flex justify-content-center gap-3">
+                <FaGoogle size={24} />
+                <FaApple size={24} />
+              </div>
+              <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
+                Continue without Signing In
+              </h6>
+            </div>
+          </>
+        );
+      case "signUp":
+        return (
+          <>
+            <Input
+              label="Email"
+              placeholder="Enter your email"
+              leadingIcon={<AiOutlineMail size={20} />}
+              value={email}
+              onChange={handleEmailChange}
+              invalid={!!emailError}
+              invalidMessage={emailError}
+            />
+            <Input
+              label="Password"
+              placeholder="Create your password"
+              leadingIcon={<FiLock size={20} />}
+              value={password}
+              onChange={handlePasswordChange}
+              type="password"
+              invalid={!!passwordError}
+              invalidMessage={passwordError}
+            />
+            <Input
+              label="Confirm Password"
+              placeholder="Retype your password"
+              leadingIcon={<FiLock size={20} />}
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              type="password"
+              invalid={!!confirmPasswordError}
+              invalidMessage={confirmPasswordError}
+            />
+            <ActionButton label="Sign Up" onClick={handleFormSubmit} />
+
+            <h6 className="text-center text-white mt-4 fw-light">
+              Already have an account?{" "}
+              <span
+                className="fw-bold text-decoration-underline cursor-pointer"
+                onClick={() => setCurrentFlow("signIn")}
+              >
+                Sign in.
+              </span>
+            </h6>
+
+            <div className="d-flex justify-content-between">
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  value=""
+                  id="flexCheckDefault"
+                />
+                <label
+                  className="form-check-label text-white fs-6"
+                  htmlFor="flexCheckDefault"
+                >
+                  Remember me
+                </label>
+              </div>
+              <p
+                className="text-white cursor-pointer"
+                onClick={() => setCurrentFlow("passwordReset")}
+              >
+                Forgot password?
+              </p>
+            </div>
+            <Separator orientation="horizontal" dashed={false} />
+            <div>
+              <h6 className="text-center text-white mt-4 fw-light">
+                Login with
+              </h6>
+              <div className="mt-4 text-white d-flex justify-content-center gap-3">
+                <FaGoogle size={24} />
+                <FaApple size={24} />
+              </div>
+              <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
+                Continue without Signing In
+              </h6>
+            </div>
+          </>
+        );
+      case "passwordReset":
+        return renderPasswordReset();
+      default:
+        return null;
+    }
+  };
+
+  const renderPasswordReset = () => {
+    return (
+      <>
+        {passwordResetStep === 1 && (
+          <>
+            <Input
+              label="Email"
+              placeholder="Enter your email"
+              leadingIcon={<AiOutlineMail size={20} />}
+              value={email}
+              onChange={handleEmailChange}
+              invalid={!!emailError}
+              invalidMessage={emailError}
+            />
+            <ActionButton label="Continue" onClick={handleFormSubmit} />
+          </>
+        )}
+        {passwordResetStep === 2 && (
+          <>
+            <div className="d-flex justify-content-center mt-4">
+              <OTPInput
+                onChange={handleOTPChange}
+                onComplete={handleOTPComplete}
+              />
+            </div>
+            <ActionButton label="Continue" onClick={handleFormSubmit} />
+          </>
+        )}
+        {passwordResetStep === 3 && (
+          <>
+            <Input
+              label="New Password"
+              placeholder="Enter your new password"
+              leadingIcon={<FiLock size={20} />}
+              value={changedPassword}
+              onChange={handleChangedPasswordChange}
+              type="password"
+              invalid={!!changedPasswordError}
+              invalidMessage={changedPasswordError}
+            />
+            <Input
+              label="Confirm New Password"
+              placeholder="Retype your new password"
+              leadingIcon={<FiLock size={20} />}
+              value={confirmChangedPassword}
+              onChange={handleConfirmChangedPasswordChange}
+              type="password"
+              invalid={!!confirmChangedPasswordError}
+              invalidMessage={confirmChangedPasswordError}
+            />
+            <ActionButton label="Reset Password" onClick={handleFormSubmit} />
+          </>
+        )}
+      </>
+    );
+  };
 
   return (
     <Navbar expand="lg" className="p-4 main-font navbar-background">
@@ -313,204 +543,7 @@ const NavBar = () => {
             </div>
             <div></div>
           </div>
-          {signInSuccess ? (
-            <>
-              <div className="text-center text-white mt-3">
-                <p>{description}</p>
-
-                {currentFlow === "signUp" && (
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    className="primary-red-button text-white py-2"
-                  >
-                    See Movies
-                  </Button>
-                )}
-              </div>
-            </>
-          ) : (
-            <form onSubmit={handleFormSubmit}>
-              {currentFlow !== "passwordReset" && (
-                <Input
-                  label="Email"
-                  placeholder="Enter your email"
-                  leadingIcon={
-                    <AiOutlineMail
-                      size={20}
-                      color={email ? colors.primary_red : ""}
-                    />
-                  }
-                  value={email}
-                  onChange={handleEmailChange}
-                  invalid={!!emailError}
-                  invalidMessage={emailError}
-                />
-              )}
-              {currentFlow !== "passwordReset" && (
-                <Input
-                  label="Password"
-                  placeholder="Enter your password"
-                  leadingIcon={
-                    <FiLock
-                      size={20}
-                      color={password ? colors.primary_red : ""}
-                    />
-                  }
-                  value={password}
-                  onChange={handlePasswordChange}
-                  type="password"
-                  invalid={!!passwordError}
-                  invalidMessage={passwordError}
-                />
-              )}
-              {currentFlow === "signUp" && (
-                <Input
-                  label="Confirm Password"
-                  placeholder="Retype Password"
-                  leadingIcon={
-                    <FiLock
-                      size={20}
-                      color={password ? colors.primary_red : ""}
-                    />
-                  }
-                  value={confirmPassword}
-                  onChange={handleConfirmPasswordChange}
-                  type="password"
-                  invalid={!!confirmPasswordError}
-                  invalidMessage={confirmPasswordError}
-                />
-              )}
-              {currentFlow !== "passwordReset" && (
-                <div className="d-flex justify-content-between">
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      value=""
-                      id="flexCheckDefault"
-                    />
-                    <label
-                      className="form-check-label text-white fs-6"
-                      htmlFor="flexCheckDefault"
-                    >
-                      Remember me
-                    </label>
-                  </div>
-                  <p
-                    className="text-white cursor-pointer"
-                    onClick={() => setCurrentFlow("passwordReset")}
-                  >
-                    Forgot password?
-                  </p>
-                </div>
-              )}
-              {currentFlow === "passwordReset" && passwordResetStep === 1 && (
-                <Input
-                  label="Email"
-                  placeholder="Enter your email"
-                  leadingIcon={
-                    <AiOutlineMail
-                      size={20}
-                      color={email ? colors.primary_red : ""}
-                    />
-                  }
-                  value={email}
-                  onChange={handleEmailChange}
-                  invalid={!!emailError}
-                  invalidMessage={emailError}
-                />
-              )}
-              {currentFlow === "passwordReset" && passwordResetStep === 2 && (
-                <div className="d-flex justify-content-center mt-3">
-                  <OTPInput
-                    onChange={handleOTPChange}
-                    onComplete={handleOTPComplete}
-                  />
-                </div>
-              )}
-              {currentFlow === "passwordReset" && passwordResetStep === 3 && (
-                <>
-                  <Input
-                    label="New Password"
-                    placeholder="Enter your new password"
-                    leadingIcon={
-                      <FiLock
-                        size={20}
-                        color={password ? colors.primary_red : ""}
-                      />
-                    }
-                    value={changedPassword}
-                    onChange={handleChangedPasswordChange}
-                    type="password"
-                    invalid={!!changedPasswordError}
-                    invalidMessage={changedPasswordError}
-                  />
-                  <Input
-                    label="Confirm New Password"
-                    placeholder="Retype your new password"
-                    leadingIcon={
-                      <FiLock
-                        size={20}
-                        color={confirmPassword ? colors.primary_red : ""}
-                      />
-                    }
-                    value={confirmChangedPassword}
-                    onChange={handleConfirmChangedPasswordChange}
-                    type="password"
-                    invalid={!!confirmChangedPasswordError}
-                    invalidMessage={confirmChangedPasswordError}
-                  />
-                </>
-              )}
-              <Button
-                variant="danger"
-                type="submit"
-                className="primary-red-button text-white py-2"
-              >
-                {currentFlow === "signIn"
-                  ? "Sign In"
-                  : currentFlow === "signUp"
-                  ? "Sign Up"
-                  : "Continue"}
-              </Button>
-
-              {currentFlow !== "passwordReset" && (
-                <h6 className="text-center text-white mt-4 fw-light">
-                  {currentFlow === "signIn"
-                    ? "Don't have an account yet? "
-                    : "Already have an account? "}
-                  <span
-                    className="fw-bold text-decoration-underline cursor-pointer"
-                    onClick={() =>
-                      setCurrentFlow(
-                        currentFlow === "signIn" ? "signUp" : "signIn"
-                      )
-                    }
-                  >
-                    {currentFlow === "signIn" ? "Sign up." : "Sign in."}
-                  </span>
-                </h6>
-              )}
-              {currentFlow !== "passwordReset" && (
-                <>
-                  <Separator orientation="horizontal" dashed={false} />
-                  <div>
-                    <h6 className="text-center text-white mt-4 fw-light">
-                      Login with
-                    </h6>
-                    <div className="mt-4 text-white d-flex justify-content-center gap-3">
-                      <FaGoogle size={24} />
-                      <FaApple size={24} />
-                    </div>
-                    <h6 className="text-center text-white mt-5 fw-bold text-decoration-underline">
-                      Continue without Signing In
-                    </h6>
-                  </div>
-                </>
-              )}
-            </form>
-          )}
+          {renderForm()}
         </div>
       </div>
     </Navbar>
