@@ -17,9 +17,14 @@ const NavBar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [changedPassword, setChangedPassword] = useState("");
+  const [confirmChangedPassword, setConfirmChangedPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [changedPasswordError, setChangedPasswordError] = useState("");
+  const [confirmChangedPasswordError, setConfirmChangedPasswordError] =
+    useState("");
   const [signInSuccess, setSignInSuccess] = useState(false);
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
@@ -32,6 +37,10 @@ const NavBar = () => {
     setEmailError("");
     setPasswordError("");
     setConfirmPasswordError("");
+    setChangedPassword("");
+    setConfirmChangedPassword("");
+    setChangedPasswordError("");
+    setConfirmChangedPasswordError("");
     setPasswordResetStep(1);
   };
 
@@ -76,6 +85,7 @@ const NavBar = () => {
   ];
 
   const handleSignInClick = () => {
+    resetFields();
     setShowSignIn(!showSignIn);
     setCurrentFlow("signIn");
   };
@@ -92,12 +102,22 @@ const NavBar = () => {
     setConfirmPassword(e.target.value);
   };
 
+  const handleChangedPasswordChange = (e) => {
+    setChangedPassword(e.target.value);
+  };
+
+  const handleConfirmChangedPasswordChange = (e) => {
+    setConfirmChangedPassword(e.target.value);
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
     let emailError = false;
     let passwordError = false;
     let confirmPasswordError = false;
+    let changePasswordError = false;
+    let confirmChangePasswordError = false;
 
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address.");
@@ -117,15 +137,30 @@ const NavBar = () => {
       passwordError = false;
     }
 
-    if (
-      confirmPassword !== password ||
-      (currentFlow === "passwordReset" && passwordResetStep === 3)
-    ) {
+    if (!validatePassword(changedPassword)) {
+      setChangedPasswordError(
+        "Password must be at least 8 characters long and contain both letters and numbers."
+      );
+      changePasswordError = true;
+    } else {
+      setChangedPasswordError("");
+      changePasswordError = false;
+    }
+
+    if (confirmPassword !== password) {
       setConfirmPasswordError("Passwords do not match.");
       confirmPasswordError = true;
     } else {
       setConfirmPasswordError("");
       confirmPasswordError = false;
+    }
+
+    if (confirmChangedPassword !== changedPassword) {
+      setConfirmPasswordError("Passwords do not match.");
+      confirmChangePasswordError = true;
+    } else {
+      setConfirmPasswordError("");
+      confirmChangePasswordError = false;
     }
 
     if (
@@ -138,13 +173,13 @@ const NavBar = () => {
       setSignInSuccess(true);
       setTimeout(() => setSignInSuccess(false), 5000);
       resetFields();
-    } else if (
-      currentFlow === "passwordReset" &&
-      !emailError
-    ) {
+    } else if (currentFlow === "passwordReset" && !emailError) {
       if (passwordResetStep < 3) {
         setPasswordResetStep(passwordResetStep + 1);
       } else {
+        if (changePasswordError || confirmChangePasswordError) {
+          return;
+        }
         setSignInSuccess(true);
         setPasswordReset(true);
         setTimeout(() => {
@@ -405,11 +440,11 @@ const NavBar = () => {
                         color={password ? colors.primary_red : ""}
                       />
                     }
-                    value={password}
-                    onChange={handlePasswordChange}
+                    value={changedPassword}
+                    onChange={handleChangedPasswordChange}
                     type="password"
-                    invalid={!!passwordError}
-                    invalidMessage={passwordError}
+                    invalid={!!changedPasswordError}
+                    invalidMessage={changedPasswordError}
                   />
                   <Input
                     label="Confirm New Password"
@@ -420,16 +455,16 @@ const NavBar = () => {
                         color={confirmPassword ? colors.primary_red : ""}
                       />
                     }
-                    value={confirmPassword}
-                    onChange={handleConfirmPasswordChange}
+                    value={confirmChangedPassword}
+                    onChange={handleConfirmChangedPasswordChange}
                     type="password"
-                    invalid={!!confirmPassword}
-                    invalidMessage={confirmPasswordError}
+                    invalid={!!confirmChangedPasswordError}
+                    invalidMessage={confirmChangedPasswordError}
                   />
                 </>
               )}
               <Button
-                variant="primary"
+                variant="danger"
                 type="submit"
                 className="primary-red-button text-white py-2"
               >
