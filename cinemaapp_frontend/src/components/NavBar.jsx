@@ -9,7 +9,7 @@ import { AiOutlineMail } from "react-icons/ai";
 import "../styles/Navbar.css";
 import Input from "./Input";
 import Separator from "./Separator";
-import colors from "../utils/colors";
+import { validateEmail, validatePassword } from "../utils/Validation";
 import OTPInput from "./OTP";
 
 const NavBar = () => {
@@ -42,16 +42,6 @@ const NavBar = () => {
     setChangedPasswordError("");
     setConfirmChangedPasswordError("");
     setPasswordResetStep(1);
-  };
-
-  const validateEmail = (email) => {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return regex.test(email);
-  };
-
-  const validatePassword = (password) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return regex.test(password);
   };
 
   const flowDetails = {
@@ -120,56 +110,99 @@ const NavBar = () => {
     }
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-
-    let emailError = setError(
+  const validateSignIn = () => {
+    const emailError = setError(
       !validateEmail(email),
       setEmailError,
       "Please enter a valid email."
     );
 
-    let passwordError = setError(
-      !validatePassword(password) && currentFlow !== "passwordReset",
+    const passwordError = setError(
+      !validatePassword(password),
       setPasswordError,
       "Password must be at least 8 characters long and contain both letters and numbers."
     );
 
-    let confirmPasswordError = setError(
+    return !emailError && !passwordError;
+  };
+
+  const validateSignUp = () => {
+    const emailError = setError(
+      !validateEmail(email),
+      setEmailError,
+      "Please enter a valid email."
+    );
+
+    const passwordError = setError(
+      !validatePassword(password),
+      setPasswordError,
+      "Password must be at least 8 characters long and contain both letters and numbers."
+    );
+
+    const confirmPasswordError = setError(
       confirmPassword !== password,
       setConfirmPasswordError,
       "Passwords do not match."
     );
 
-    let changePasswordError = setError(
+    return !emailError && !passwordError && !confirmPasswordError;
+  };
+
+  const validatePasswordReset = () => {
+    const emailError = setError(
+      !validateEmail(email),
+      setEmailError,
+      "Please enter a valid email."
+    );
+
+    const changePasswordError = passwordResetStep !== 3 ? false : setError(
       !validatePassword(changedPassword),
       setChangedPasswordError,
       "Password must be at least 8 characters long and contain both letters and numbers."
     );
 
-    let confirmChangePasswordError = setError(
+    const confirmChangePasswordError = setError(
       confirmChangedPassword !== changedPassword,
       setConfirmChangedPasswordError,
       "Passwords do not match."
     );
 
-    if (
-      (currentFlow === "signIn" && !emailError && !passwordError) ||
-      (currentFlow === "signUp" &&
-        !emailError &&
-        !passwordError &&
-        !confirmPasswordError)
-    ) {
+    console.log(emailError);
+    console.log(changePasswordError);
+    console.log(confirmChangePasswordError);
+
+    return !emailError && !changePasswordError && !confirmChangePasswordError;
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+
+    let isValid = false;
+
+    if (currentFlow === "signIn") {
+      isValid = validateSignIn();
+    } else if (currentFlow === "signUp") {
+      isValid = validateSignUp();
+    } else if (currentFlow === "passwordReset") {
+      isValid = validatePasswordReset();
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    if (currentFlow === "signIn") {
       setSignInSuccess(true);
       setTimeout(() => setSignInSuccess(false), 5000);
       resetFields();
-    } else if (currentFlow === "passwordReset" && !emailError) {
+    } else if (currentFlow === "signUp") {
+      setSignInSuccess(true);
+      setTimeout(() => setSignInSuccess(false), 5000);
+      resetFields();
+    } else if (currentFlow === "passwordReset") {
       if (passwordResetStep < 3) {
         setPasswordResetStep(passwordResetStep + 1);
       } else {
-        if (changePasswordError || confirmChangePasswordError) {
-          return;
-        }
         setSignInSuccess(true);
         setPasswordReset(true);
         setTimeout(() => {
