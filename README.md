@@ -73,6 +73,9 @@ Ensure you have the following installed on your system:
 - spring.datasource.password=password
 - server.servlet.context-path=/api/v1
 - frontend.url=http://localhost:5173/
+- jwt.secret=secret
+- spring.jpa.hibernate.ddl-auto=update
+- spring.profiles.active=local
 
 
 ### Frontend (React)
