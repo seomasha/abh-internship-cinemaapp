@@ -109,6 +109,9 @@ Ensure you have the following installed on your system:
 
    The frontend should now be running on `http://localhost:5173` (this is the default port used by Vite).
 
+3. **Database example**:
+- Download the db example: https://drive.google.com/file/d/1DfB15AllpLHGAcgoDdYCRL-Qo8DN9TwC/view?usp=drive_link
+
 ### Running the Application Together
 
 Once both the frontend and backend are running, you can navigate to the frontend URL (`http://localhost:5173`), and it should interact with the backend API hosted at `http://localhost:8080`.
