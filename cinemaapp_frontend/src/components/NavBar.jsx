@@ -1,15 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
+import "../styles/Navbar.css";
+import AuthForm from "./AuthForm";
 
 const NavBar = () => {
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changedPassword, setChangedPassword] = useState("");
+  const [confirmChangedPassword, setConfirmChangedPassword] = useState("");
+  const [currentFlow, setCurrentFlow] = useState("signIn");
+  const [passwordResetStep, setPasswordResetStep] = useState(1);
+
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
     { id: 2, path: "/upcoming", label: "Upcoming movies" },
     { id: 3, path: "/venues", label: "Venues" },
   ];
+
+  const handleSignInClick = () => {
+    setShowSignIn(!showSignIn);
+  };
+
+  useEffect(() => {
+    if (showSignIn) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showSignIn]);
 
   return (
     <Navbar expand="lg" className="p-4 main-font navbar-background">
@@ -60,10 +86,43 @@ const NavBar = () => {
       </Navbar.Collapse>
 
       <Navbar.Collapse className="justify-content-end">
-        <Button variant="outline-light" className="px-4 py-2">
+        <Button
+          variant="outline-light"
+          className="px-4 py-2"
+          onClick={handleSignInClick}
+        >
           Sign in
         </Button>
       </Navbar.Collapse>
+
+      <div className={`sign-in-panel ${showSignIn ? "active" : ""}`}>
+        <div className="sign-in-form">
+          <div className="d-flex justify-content-center my-2">
+            <span className="d-flex justify-content-center align-items-center bg-white p-2 mx-1 logo-rounded">
+              <BsCameraReelsFill className="primary-red" size={14} />
+            </span>
+            <h4 className="d-flex my-auto fw-bold text-white">
+              Cine<span className="primary-red">bh.</span>
+            </h4>
+          </div>
+          <AuthForm
+            currentFlow={currentFlow}
+            setCurrentFlow={setCurrentFlow}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+            changedPassword={changedPassword}
+            setChangedPassword={setChangedPassword}
+            confirmChangedPassword={confirmChangedPassword}
+            setConfirmChangedPassword={setConfirmChangedPassword}
+            passwordResetStep={passwordResetStep}
+            setPasswordResetStep={setPasswordResetStep}
+          />
+        </div>
+      </div>
     </Navbar>
   );
 };

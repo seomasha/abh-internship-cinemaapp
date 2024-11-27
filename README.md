@@ -73,6 +73,9 @@ Ensure you have the following installed on your system:
 - spring.datasource.password=password
 - server.servlet.context-path=/api/v1
 - frontend.url=http://localhost:5173/
+- jwt.secret=secret
+- spring.jpa.hibernate.ddl-auto=update
+- spring.profiles.active=local
 
 
 ### Frontend (React)
@@ -105,6 +108,9 @@ Ensure you have the following installed on your system:
      ```
 
    The frontend should now be running on `http://localhost:5173` (this is the default port used by Vite).
+
+3. **Database example**:
+- Download the db example: https://drive.google.com/file/d/1DfB15AllpLHGAcgoDdYCRL-Qo8DN9TwC/view?usp=drive_link
 
 ### Running the Application Together
 

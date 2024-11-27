@@ -1,0 +1,67 @@
+.sign-in-panel {
+  position: fixed;
+  top: 90px;
+  right: -100%;
+  width: 600px;
+  transition: right 0.3s ease;
+  z-index: 9999;
+}
+
+.sign-in-panel.active {
+  right: 0;
+}
+
+.sign-in-form {
+  background: #1d2939;
+  padding: 20px;
+  height: 100vh;
+  border-top: 1px solid #fcfcfd1a;
+}
+
+.sign-in-form h3 {
+  margin-bottom: 20px;
+}
+
+.sign-in-form input {
+  margin-bottom: 15px;
+}
+
+.sign-in-form button {
+  margin-top: 10px;
+}
+
+.back-button {
+  background-color: #fcfcfd1a;
+}
+
+.form-check-input:checked {
+  background-color: #b22222;
+  border-color: #b22222;
+}
+
+.form-check-input:checked:focus {
+  box-shadow: 0 0 0 0.25rem rgba(178, 34, 34, 0.25);
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(178, 34, 34, 0.25);
+}
+
+.primary-red-button {
+  background-color: #b22222;
+  border-color: #b22222;
+  width: 100%;
+}
+
+.primary-red-button:hover {
+  background-color: #b22222c4;
+  border-color: #b22222c4;
+}
+
+.sign-in-camera {
+  background-color: #fcfcfd1a;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

@@ -4,7 +4,7 @@ import "../styles/DayPicker.css";
 const DayPicker = ({ day, date, isSelected, onSelect, small }) => {
   return (
     <div
-      className={`day-picker border d-flex flex-column justify-content-center align-items-center ${
+      className={`day-picker bg-white border d-flex flex-column justify-content-center align-items-center ${
         small ? "py-2 px-4" : "py-4 px-5"
       } rounded ${isSelected ? "bg-picker" : ""}`}
       onClick={onSelect}

@@ -14,7 +14,7 @@ const SearchBar = ({ onSearch }) => {
   }, [inputValue, onSearch]);
 
   return (
-    <div className="search-container">
+    <div className="search-container bg-white">
       <IoSearchOutline className="search-icon" />
       <input
         type="search"
