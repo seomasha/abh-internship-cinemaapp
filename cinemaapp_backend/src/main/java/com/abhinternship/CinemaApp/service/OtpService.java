@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class OtpService {
 
     private final Map<String, OtpDetails> otpStore = new HashMap<>();
-    private static final long OTP_EXPIRATION_TIME = TimeUnit.MINUTES.toMillis(1);
+    private static final long OTP_EXPIRATION_TIME = TimeUnit.MINUTES.toMillis(2);
 
     public void saveOtp(final String email, final String otp) {
         final long expirationTime = System.currentTimeMillis() + OTP_EXPIRATION_TIME;
