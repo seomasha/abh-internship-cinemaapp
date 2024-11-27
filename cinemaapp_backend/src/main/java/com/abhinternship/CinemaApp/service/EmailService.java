@@ -12,30 +12,33 @@ import java.util.Random;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final OtpService otpService;
 
     @Value("${spring.mail.username}")
     private String sender;
+
+    public EmailService(JavaMailSender mailSender, OtpService otpService) {
+        this.mailSender = mailSender;
+        this.otpService = otpService;
+    }
 
     public String generateOtp() {
         final Random random = new Random();
         return String.format("%04d", random.nextInt(9999));
     }
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-
     @Async
     public String sendOTPEmail(final String to, final String subject) {
-        final SimpleMailMessage message = new SimpleMailMessage();
         final String generatedOtp = generateOtp();
 
+        final SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setFrom(sender);
         message.setSubject(subject);
         message.setText("Your OTP password is: " + generatedOtp);
-
         mailSender.send(message);
+
+        otpService.saveOtp(to, generatedOtp);
 
         return generatedOtp;
     }

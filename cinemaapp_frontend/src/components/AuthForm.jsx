@@ -77,7 +77,7 @@ const AuthForm = ({
       return "Provide your account's email or the one you want to reset your password for.";
     }
     if (passwordResetStep === 2) {
-      return `We have sent an email to ${email}. Please enter the code below to verify.`;
+      return `We have sent an email to ${email}. Please enter the code below to verify. The code expires in 2 minutes.`;
     }
     if (passwordResetStep === 3) {
       return "Please enter and confirm your new password";
@@ -201,7 +201,17 @@ const AuthForm = ({
     setPasswordResetStep(2);
   };
 
-  const handleFormSubmit = (e) => {
+  const verify = async () => {
+    const response = await otpService.verifyOtp(email, enteredOtp);
+
+    if (response === "OTP Verified!") {
+      setPasswordResetStep(3);
+    } else {
+      setOtpError("The OTP code has expired.");
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     let isValid = false;
@@ -211,6 +221,10 @@ const AuthForm = ({
     } else if (currentFlow === "signUp") {
       isValid = validateSignUp();
     } else if (currentFlow === "passwordReset") {
+      if (passwordResetStep === 2) {
+        const otpValid = await verify();
+        if (!otpValid) return;
+      }
       isValid = validatePasswordReset();
     }
 
