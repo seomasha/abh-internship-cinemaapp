@@ -1,9 +1,11 @@
 package com.abhinternship.CinemaApp.rest;
 
+import com.abhinternship.CinemaApp.dto.EmailDTO;
 import com.abhinternship.CinemaApp.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -13,8 +15,9 @@ public class EmailController {
     private final EmailService emailService;
 
     @PostMapping("/otp")
-    public ResponseEntity<String> sendOTP() {
-        emailService.sendOTPEmail("mashasejdic@gmail.com", "OTP Code for Cinema App");
-        return ResponseEntity.ok("Successfully sent the OTP password");
+    public ResponseEntity<String> sendOTP(@RequestBody EmailDTO emailDTO) {
+        final String email = emailDTO.getEmail();
+        emailService.sendOTPEmail(email, "OTP Code for Cinema App");
+        return ResponseEntity.ok("Successfully sent the OTP code to: " + email);
     }
 }

@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
@@ -11,6 +12,9 @@ import java.util.Random;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String sender;
 
     public String generateOtp() {
         final Random random = new Random();
@@ -26,7 +30,7 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(to);
-        message.setFrom("anyname@freelance.mailtrap.link");
+        message.setFrom(sender);
         message.setSubject(subject);
         message.setText("Your OTP password is: " + generateOtp());
 

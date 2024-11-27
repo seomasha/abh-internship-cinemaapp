@@ -25,13 +25,13 @@ export const apiService = (endpoint) => {
       request(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        data: data,
       }),
     update: (data) =>
       request(endpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        data: data,
       }),
     delete: () => request(endpoint, { method: "DELETE" }),
   };

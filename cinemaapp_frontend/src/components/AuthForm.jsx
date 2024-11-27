@@ -6,6 +6,7 @@ import { FiLock } from "react-icons/fi";
 import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
+import { otpService } from "../services/otpService";
 
 const AuthForm = ({
   currentFlow,
@@ -178,6 +179,12 @@ const AuthForm = ({
     );
 
     return !emailError && !changePasswordError && !confirmChangePasswordError;
+  };
+
+  const sendOtp = async () => {
+    const response = await otpService.create({ email: email });
+    console.log(response);
+    setPasswordResetStep(2);
   };
 
   const handleFormSubmit = (e) => {
@@ -509,7 +516,7 @@ const AuthForm = ({
               invalid={!!emailError}
               invalidMessage={emailError}
             />
-            <ActionButton label="Continue" onClick={handleFormSubmit} />
+            <ActionButton label="Continue" onClick={sendOtp} />
           </>
         )}
         {passwordResetStep === 2 && (
