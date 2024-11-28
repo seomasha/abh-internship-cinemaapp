@@ -11,10 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UserServiceImplTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -65,6 +67,47 @@ class UserServiceImplTest {
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
         assertEquals("Email is already in use.", exception.getReason());
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void resetPassword_ShouldUpdatePassword_WhenUserExists() {
+        final String email = "test@example.com";
+        final String newPassword = "newPassword";
+        final String encryptedPassword = "encryptedPassword";
+
+        final User user = new User();
+        user.setEmail(email);
+        user.setPassword("oldPassword");
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(newPassword)).thenReturn(encryptedPassword);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        userService.resetPassword(email, newPassword);
+
+        assertEquals(encryptedPassword, user.getPassword());
+        verify(userRepository, times(1)).findUserByEmail(email);
+        verify(passwordEncoder, times(1)).encode(newPassword);
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void resetPassword_ShouldThrowException_WhenUserDoesNotExist() {
+        final String email = "nonexistent@example.com";
+        final String newPassword = "newPassword";
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
+
+        final ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> userService.resetPassword(email, newPassword)
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("User not found.", exception.getReason());
+        verify(userRepository, times(1)).findUserByEmail(email);
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(User.class));
     }

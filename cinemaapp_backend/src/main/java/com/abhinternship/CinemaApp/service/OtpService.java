@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.utils.OtpDetails;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Data
 public class OtpService {
 
     private final Map<String, OtpDetails> otpStore = new HashMap<>();
