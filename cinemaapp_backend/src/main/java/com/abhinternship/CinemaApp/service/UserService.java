@@ -12,4 +12,5 @@ public interface UserService {
     User saveUser(User user);
     void deleteUser(Long id);
     Optional<User> findUserByEmail(String email);
+    void resetPassword(String email, String password);
 }

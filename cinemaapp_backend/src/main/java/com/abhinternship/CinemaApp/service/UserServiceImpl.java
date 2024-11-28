@@ -46,4 +46,14 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findUserByEmail(final String email) {
         return userRepository.findUserByEmail(email);
     }
+
+    @Override
+    public void resetPassword(final String email, final String password) {
+        final User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }

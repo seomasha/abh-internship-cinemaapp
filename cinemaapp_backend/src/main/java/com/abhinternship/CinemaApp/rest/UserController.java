@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -73,4 +74,19 @@ public class UserController {
         return ResponseEntity.ok("User with the id " + id + " has been deleted.");
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) throws ResourceNotFoundException {
+        final User user = userService.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> body) {
+        final String email = body.get("email");
+        final String newPassword = body.get("password");
+
+        userService.resetPassword(email, newPassword);
+        return ResponseEntity.ok("Password has been successfully reset.");
+    }
 }

@@ -14,4 +14,19 @@ export const userService = {
 
     return response;
   },
+  findUserByEmail: async (email) => {
+    const response = await request(`${USER_ENDPOINT}/email/${email}`, {
+      method: "GET",
+    });
+
+    return response;
+  },
+  resetPassword: async ({ email, password }) => {
+    const response = await request(`${USER_ENDPOINT}/reset-password`, {
+      method: "POST",
+      data: { email, password },
+    });
+
+    return response;
+  },
 };

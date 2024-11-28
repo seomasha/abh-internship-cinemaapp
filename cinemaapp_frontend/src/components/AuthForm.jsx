@@ -177,27 +177,40 @@ const AuthForm = ({
       "Passwords do not match."
     );
 
+    return !emailError && !changePasswordError && !confirmChangePasswordError;
+  };
+
+  const sendOtp = async () => {
+    const emailExists = await userService.findUserByEmail(email);
+
+    if (!emailExists) {
+      setError(!emailExists, setEmailError, "The email doesn't exist");
+      return;
+    }
+
+    const response = await otpService.create({ email: email });
+
+    if (response && validateEmail(email) && emailExists) {
+      setGeneratedOtp(response);
+      setPasswordResetStep(2);
+    } else {
+      setError(
+        !response || (!validateEmail(email) && emailExists),
+        setEmailError,
+        "The email is not valid."
+      );
+    }
+  };
+
+  const verify = async () => {
     const otpError = setError(
-      enteredOtp.toString() !== generatedOtp,
+      enteredOtp.toString() !== generatedOtp.toString(),
       setOtpError,
       "The OTP you entered is incorrect."
     );
 
-    return (
-      !emailError &&
-      !changePasswordError &&
-      !confirmChangePasswordError &&
-      !otpError
-    );
-  };
+    if (otpError) return;
 
-  const sendOtp = async () => {
-    const response = await otpService.create({ email: email });
-    setGeneratedOtp(response);
-    setPasswordResetStep(2);
-  };
-
-  const verify = async () => {
     const response = await otpService.verifyOtp(email, enteredOtp);
 
     if (response === "OTP Verified!") {
@@ -257,9 +270,12 @@ const AuthForm = ({
         resetFields();
       }
     } else if (currentFlow === "passwordReset") {
-      if (passwordResetStep < 3) {
-        setPasswordResetStep(passwordResetStep + 1);
-      } else {
+      const passwordReset = await userService.resetPassword({
+        email: email,
+        password: changedPassword,
+      });
+
+      if (passwordReset) {
         setSignInSuccess(true);
         setPasswordReset(true);
         setTimeout(() => {
@@ -268,7 +284,7 @@ const AuthForm = ({
           resetFields();
           setPasswordResetStep(1);
           setCurrentFlow("signIn");
-        }, 5000);
+        }, 3000);
       }
     }
   };
