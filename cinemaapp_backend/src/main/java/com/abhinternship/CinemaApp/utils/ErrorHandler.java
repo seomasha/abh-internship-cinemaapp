@@ -2,6 +2,7 @@ package com.abhinternship.CinemaApp.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,6 +52,11 @@ public class ErrorHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Object> handleResponseStatusException(final ResponseStatusException ex, final WebRequest request) {
         return new ResponseEntity<>(buildErrorResponse(ex.getReason(), (HttpStatus) ex.getStatusCode()), ex.getStatusCode());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(final BadCredentialsException ex, final WebRequest request) {
+        return new ResponseEntity<>(buildErrorResponse("Invalid email or password", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
     }
 
     private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {

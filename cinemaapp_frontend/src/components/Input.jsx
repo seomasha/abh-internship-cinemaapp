@@ -31,7 +31,7 @@ const Input = ({
         {leadingIcon && (
           <span
             className={`d-flex align-items-center ${
-              invalid ? "text-danger" : ""
+              (invalid ? "text-danger" : "") || (value ? "text-danger" : "")
             }`}
           >
             {leadingIcon}

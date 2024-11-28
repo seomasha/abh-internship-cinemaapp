@@ -20,9 +20,7 @@ class ErrorHandler {
           errorMsg = "Server error. Please try again later.";
           break;
         default:
-          errorMsg = `Error: ${statusCode} - ${
-            serverMessage || "An error occurred."
-          }`;
+          errorMsg = `Error: ${serverMessage || "An error occurred."}`;
       }
     } else if (error.request) {
       errorMsg = "Error: No response from the server. Please try again.";

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { Button, Nav, Navbar } from "react-bootstrap";
+import { Button, Nav, Navbar, Dropdown } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { getUserInfoFromToken } from "../utils/JwtDecode";
 import "../styles/Navbar.css";
 import AuthForm from "./AuthForm";
 
@@ -15,6 +16,8 @@ const NavBar = () => {
   const [confirmChangedPassword, setConfirmChangedPassword] = useState("");
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
+  const [emailPrefix, setEmailPrefix] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
@@ -25,6 +28,24 @@ const NavBar = () => {
   const handleSignInClick = () => {
     setShowSignIn(!showSignIn);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+    setIsLoggedIn(false);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      const userInfo = getUserInfoFromToken(token);
+      if (userInfo) {
+        setEmailPrefix(userInfo.sub.split("@")[0]);
+        setIsLoggedIn(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (showSignIn) {
@@ -86,13 +107,28 @@ const NavBar = () => {
       </Navbar.Collapse>
 
       <Navbar.Collapse className="justify-content-end">
-        <Button
-          variant="outline-light"
-          className="px-4 py-2"
-          onClick={handleSignInClick}
-        >
-          Sign in
-        </Button>
+        {isLoggedIn ? (
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="outline-light"
+              id="dropdown-basic"
+              className="px-4 py-2"
+            >
+              {emailPrefix} <span className="caret"></span>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        ) : (
+          <Button
+            variant="outline-light"
+            className="px-4 py-2"
+            onClick={handleSignInClick}
+          >
+            Sign in
+          </Button>
+        )}
       </Navbar.Collapse>
 
       <div className={`sign-in-panel ${showSignIn ? "active" : ""}`}>
@@ -120,6 +156,8 @@ const NavBar = () => {
             setConfirmChangedPassword={setConfirmChangedPassword}
             passwordResetStep={passwordResetStep}
             setPasswordResetStep={setPasswordResetStep}
+            showSignIn={showSignIn}
+            setShowSignIn={setShowSignIn}
           />
         </div>
       </div>

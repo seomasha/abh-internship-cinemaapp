@@ -24,6 +24,7 @@ const AuthForm = ({
   setConfirmChangedPassword,
   passwordResetStep,
   setPasswordResetStep,
+  showSignIn,
   setShowSignIn,
 }) => {
   const [emailError, setEmailError] = useState("");
@@ -129,13 +130,7 @@ const AuthForm = ({
       "Please enter a valid email."
     );
 
-    const passwordError = setError(
-      !validatePassword(password),
-      setPasswordError,
-      "Password must be at least 8 characters long and contain both letters and numbers."
-    );
-
-    return !emailError && !passwordError;
+    return !emailError;
   };
 
   const validateSignUp = () => {
@@ -234,9 +229,22 @@ const AuthForm = ({
     }
 
     if (currentFlow === "signIn") {
-      setSignInSuccess(true);
-      setTimeout(() => setSignInSuccess(false), 5000);
-      resetFields();
+      const validateUserSignIn = await userService.login({
+        email: email,
+        password: password,
+      });
+
+      if (validateUserSignIn) {
+        localStorage.setItem("token", validateUserSignIn);
+
+        setSignInSuccess(true);
+        setTimeout(() => {
+          window.location.href = "/";
+          setSignInSuccess(false);
+        }, 3000);
+
+        resetFields();
+      }
     } else if (currentFlow === "signUp") {
       const validUserSignUp = await userService.create({
         email: email,
