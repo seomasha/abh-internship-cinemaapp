@@ -6,6 +6,7 @@ import { FiLock } from "react-icons/fi";
 import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
+import { otpService } from "../services/otpService";
 
 const AuthForm = ({
   currentFlow,
@@ -32,6 +33,9 @@ const AuthForm = ({
     useState("");
   const [passwordReset, setPasswordReset] = useState(false);
   const [signInSuccess, setSignInSuccess] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [enteredOtp, setEnteredOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
 
   const flowDetails = {
     signIn: {
@@ -73,7 +77,7 @@ const AuthForm = ({
       return "Provide your account's email or the one you want to reset your password for.";
     }
     if (passwordResetStep === 2) {
-      return `We have sent an email to ${email}. Please enter the code below to verify.`;
+      return `We have sent an email to ${email}. Please enter the code below to verify. The code expires in 2 minutes.`;
     }
     if (passwordResetStep === 3) {
       return "Please enter and confirm your new password";
@@ -177,10 +181,37 @@ const AuthForm = ({
       "Passwords do not match."
     );
 
-    return !emailError && !changePasswordError && !confirmChangePasswordError;
+    const otpError = setError(
+      enteredOtp.toString() !== generatedOtp,
+      setOtpError,
+      "The OTP you entered is incorrect."
+    );
+
+    return (
+      !emailError &&
+      !changePasswordError &&
+      !confirmChangePasswordError &&
+      !otpError
+    );
   };
 
-  const handleFormSubmit = (e) => {
+  const sendOtp = async () => {
+    const response = await otpService.create({ email: email });
+    setGeneratedOtp(response);
+    setPasswordResetStep(2);
+  };
+
+  const verify = async () => {
+    const response = await otpService.verifyOtp(email, enteredOtp);
+
+    if (response === "OTP Verified!") {
+      setPasswordResetStep(3);
+    } else {
+      setOtpError("The OTP code has expired.");
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     let isValid = false;
@@ -190,6 +221,10 @@ const AuthForm = ({
     } else if (currentFlow === "signUp") {
       isValid = validateSignUp();
     } else if (currentFlow === "passwordReset") {
+      if (passwordResetStep === 2) {
+        const otpValid = await verify();
+        if (!otpValid) return;
+      }
       isValid = validatePasswordReset();
     }
 
@@ -243,11 +278,8 @@ const AuthForm = ({
   };
 
   const handleOTPChange = (otp) => {
-    console.log("OTP entered: ", otp);
-  };
-
-  const handleOTPComplete = (otp) => {
-    console.log("OTP complete: ", otp);
+    setEnteredOtp(otp);
+    setOtpError("");
   };
 
   const renderForm = () => {
@@ -509,17 +541,15 @@ const AuthForm = ({
               invalid={!!emailError}
               invalidMessage={emailError}
             />
-            <ActionButton label="Continue" onClick={handleFormSubmit} />
+            <ActionButton label="Continue" onClick={sendOtp} />
           </>
         )}
         {passwordResetStep === 2 && (
           <>
             <div className="d-flex justify-content-center mt-4">
-              <OTPInput
-                onChange={handleOTPChange}
-                onComplete={handleOTPComplete}
-              />
+              <OTPInput onChange={handleOTPChange} />
             </div>
+            {otpError && <p className="text-center text-danger">{otpError}</p>}
             <ActionButton label="Continue" onClick={handleFormSubmit} />
           </>
         )}
