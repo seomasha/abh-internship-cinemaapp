@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -40,6 +41,16 @@ public class ErrorHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGlobalException(final Exception ex, final WebRequest request) {
         return new ResponseEntity<>(buildErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<Object> handleConflictException(final ConflictException ex, final WebRequest request) {
+        return new ResponseEntity<>(buildErrorResponse(ex.getReason(), HttpStatus.CONFLICT), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Object> handleResponseStatusException(final ResponseStatusException ex, final WebRequest request) {
+        return new ResponseEntity<>(buildErrorResponse(ex.getReason(), (HttpStatus) ex.getStatusCode()), ex.getStatusCode());
     }
 
     private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {

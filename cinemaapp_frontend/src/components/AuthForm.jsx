@@ -7,6 +7,7 @@ import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
 import { otpService } from "../services/otpService";
+import { userService } from "../services/userService";
 
 const AuthForm = ({
   currentFlow,
@@ -237,9 +238,16 @@ const AuthForm = ({
       setTimeout(() => setSignInSuccess(false), 5000);
       resetFields();
     } else if (currentFlow === "signUp") {
-      setSignInSuccess(true);
-      setTimeout(() => setSignInSuccess(false), 5000);
-      resetFields();
+      const validUserSignUp = await userService.create({
+        email: email,
+        password: password,
+      });
+
+      if (validUserSignUp) {
+        setSignInSuccess(true);
+        setTimeout(() => setSignInSuccess(false), 5000);
+        resetFields();
+      }
     } else if (currentFlow === "passwordReset") {
       if (passwordResetStep < 3) {
         setPasswordResetStep(passwordResetStep + 1);
