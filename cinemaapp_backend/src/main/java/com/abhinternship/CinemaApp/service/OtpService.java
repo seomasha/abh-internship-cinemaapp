@@ -40,10 +40,6 @@ public class OtpService {
         }
 
         final boolean isValid = validateOtp(email, enteredOtp);
-        if (isValid) {
-            return "OTP Verified!";
-        } else {
-            return "Invalid OTP";
-        }
+        return isValid? "OTP Verified!" : "Invalid OTP";
     }
 }

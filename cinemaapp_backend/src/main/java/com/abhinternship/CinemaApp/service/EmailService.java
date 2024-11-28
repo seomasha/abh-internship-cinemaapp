@@ -17,7 +17,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String sender;
 
-    public EmailService(JavaMailSender mailSender, OtpService otpService) {
+    public EmailService(final JavaMailSender mailSender, final OtpService otpService) {
         this.mailSender = mailSender;
         this.otpService = otpService;
     }
