@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import Input from "./Input";
 import OTPInput from "./OTP";
 import { FiLock } from "react-icons/fi";
@@ -35,9 +35,9 @@ const AuthForm = ({
     useState("");
   const [passwordReset, setPasswordReset] = useState(false);
   const [signInSuccess, setSignInSuccess] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState("");
   const [enteredOtp, setEnteredOtp] = useState("");
   const [otpError, setOtpError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const flowDetails = {
     signIn: {
@@ -181,43 +181,41 @@ const AuthForm = ({
   };
 
   const sendOtp = async () => {
+    setLoading(true);
     const emailExists = await userService.findUserByEmail(email);
 
     if (!emailExists) {
       setError(!emailExists, setEmailError, "The email doesn't exist");
+      setLoading(false);
       return;
     }
 
     const response = await otpService.create({ email: email });
 
     if (response && validateEmail(email) && emailExists) {
-      setGeneratedOtp(response);
       setPasswordResetStep(2);
+      setLoading(false);
     } else {
       setError(
         !response || (!validateEmail(email) && emailExists),
         setEmailError,
         "The email is not valid."
       );
+      setLoading(false);
     }
   };
 
   const verify = async () => {
-    const otpError = setError(
-      enteredOtp.toString() !== generatedOtp.toString(),
-      setOtpError,
-      "The OTP you entered is incorrect."
-    );
-
-    if (otpError) return;
-
+    setLoading(true);
     const response = await otpService.verifyOtp(email, enteredOtp);
 
     if (response === "OTP Verified!") {
       setPasswordResetStep(3);
     } else {
-      setOtpError("The OTP code has expired.");
+      setOtpError("The OTP code is incorrect or has expired.");
     }
+
+    setLoading(false);
   };
 
   const handleFormSubmit = async (e) => {
@@ -242,40 +240,46 @@ const AuthForm = ({
     }
 
     if (currentFlow === "signIn") {
+      setLoading(true);
       const validateUserSignIn = await userService.login({
         email: email,
         password: password,
       });
 
       if (validateUserSignIn) {
+        setLoading(false);
         localStorage.setItem("token", validateUserSignIn);
 
         setSignInSuccess(true);
         setTimeout(() => {
           window.location.href = "/";
           setSignInSuccess(false);
-        }, 3000);
+        }, 3000); // Timeout for animation purpose
 
         resetFields();
       }
     } else if (currentFlow === "signUp") {
+      setLoading(true);
       const validUserSignUp = await userService.create({
         email: email,
         password: password,
       });
 
       if (validUserSignUp) {
+        setLoading(false);
         setSignInSuccess(true);
         setTimeout(() => setSignInSuccess(false), 5000);
         resetFields();
       }
     } else if (currentFlow === "passwordReset") {
+      setLoading(true);
       const passwordReset = await userService.resetPassword({
         email: email,
         password: changedPassword,
       });
 
       if (passwordReset) {
+        setLoading(false);
         setSignInSuccess(true);
         setPasswordReset(true);
         setTimeout(() => {
@@ -284,7 +288,7 @@ const AuthForm = ({
           resetFields();
           setPasswordResetStep(1);
           setCurrentFlow("signIn");
-        }, 3000);
+        }, 3000); // Timeout for animation purposes
       }
     }
   };
@@ -614,7 +618,17 @@ const AuthForm = ({
     );
   };
 
-  return <div>{renderForm()}</div>;
+  return (
+    <div>
+      {loading ? (
+        <div className="d-flex justify-content-center mt-5">
+          <Spinner animation="border" size="lg" variant="light" />
+        </div>
+      ) : (
+        renderForm()
+      )}
+    </div>
+  );
 };
 
 export default AuthForm;
