@@ -3,7 +3,9 @@ package com.abhinternship.CinemaApp.service;
 import com.abhinternship.CinemaApp.utils.OtpDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,85 +34,57 @@ class OtpServiceTest {
     }
 
     @Test
-    void isOtpExpired_ShouldReturnTrue_WhenOtpIsExpired() throws InterruptedException {
+    void verifyOtp_ShouldReturnSuccessResponse_WhenOtpIsValid() {
+        final String email = "test@example.com";
+        final String otp = "1234";
+
+        otpService.saveOtp(email, otp);
+
+        Map<String, Object> response = otpService.verifyOtp(email, otp);
+
+        assertNotNull(response);
+        assertEquals("OTP Verified.", response.get("message"));
+        assertEquals(HttpStatus.OK.value(), response.get("statusCode"));
+    }
+
+    @Test
+    void verifyOtp_ShouldReturnErrorResponse_WhenOtpIsExpired() throws InterruptedException {
         final String email = "test@example.com";
         final String otp = "1234";
 
         otpService.saveOtp(email, otp);
         Thread.sleep(TimeUnit.MINUTES.toMillis(2) + 1);
 
-        assertTrue(otpService.isOtpExpired(email));
+        Map<String, Object> response = otpService.verifyOtp(email, otp);
+
+        assertNotNull(response);
+        assertEquals("OTP has expired.", response.get("message"));
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.get("statusCode"));
     }
 
     @Test
-    void isOtpExpired_ShouldReturnFalse_WhenOtpIsValid() {
+    void verifyOtp_ShouldReturnErrorResponse_WhenOtpIsInvalid() {
         final String email = "test@example.com";
         final String otp = "1234";
 
         otpService.saveOtp(email, otp);
 
-        assertFalse(otpService.isOtpExpired(email));
+        Map<String, Object> response = otpService.verifyOtp(email, "5678");
+
+        assertNotNull(response);
+        assertEquals("Invalid OTP.", response.get("message"));
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.get("statusCode"));
     }
 
     @Test
-    void validateOtp_ShouldReturnTrue_WhenOtpIsValid() {
+    void verifyOtp_ShouldReturnErrorResponse_WhenOtpDoesNotExist() {
         final String email = "test@example.com";
         final String otp = "1234";
 
-        otpService.saveOtp(email, otp);
+        Map<String, Object> response = otpService.verifyOtp(email, otp);
 
-        assertTrue(otpService.validateOtp(email, otp));
-    }
-
-    @Test
-    void validateOtp_ShouldReturnFalse_WhenOtpIsInvalid() {
-        final String email = "test@example.com";
-        final String otp = "1234";
-
-        otpService.saveOtp(email, otp);
-
-        assertFalse(otpService.validateOtp(email, "5678"));
-    }
-
-    @Test
-    void validateOtp_ShouldReturnFalse_WhenOtpIsExpired() throws InterruptedException {
-        final String email = "test@example.com";
-        final String otp = "1234";
-
-        otpService.saveOtp(email, otp);
-        Thread.sleep(TimeUnit.MINUTES.toMillis(2) + 1);
-
-        assertFalse(otpService.validateOtp(email, otp));
-    }
-
-    @Test
-    void verifyOtp_ShouldReturnSuccessMessage_WhenOtpIsValid() {
-        final String email = "test@example.com";
-        final String otp = "1234";
-
-        otpService.saveOtp(email, otp);
-
-        assertEquals("OTP Verified!", otpService.verifyOtp(email, otp));
-    }
-
-    @Test
-    void verifyOtp_ShouldReturnErrorMessage_WhenOtpIsExpired() throws InterruptedException {
-        final String email = "test@example.com";
-        final String otp = "1234";
-
-        otpService.saveOtp(email, otp);
-        Thread.sleep(TimeUnit.MINUTES.toMillis(2) + 1);
-
-        assertEquals("OTP has expired", otpService.verifyOtp(email, otp));
-    }
-
-    @Test
-    void verifyOtp_ShouldReturnErrorMessage_WhenOtpIsInvalid() {
-        final String email = "test@example.com";
-        final String otp = "1234";
-
-        otpService.saveOtp(email, otp);
-
-        assertEquals("Invalid OTP", otpService.verifyOtp(email, "5678"));
+        assertNotNull(response);
+        assertEquals("No OTP found for this email.", response.get("message"));
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.get("statusCode"));
     }
 }

@@ -2,6 +2,8 @@ package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.utils.OtpDetails;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -28,20 +30,32 @@ public class OtpService {
         return System.currentTimeMillis() > otpDetails.getExpirationTime();
     }
 
-    public boolean validateOtp(final String email, final String enteredOtp) {
+    public Map<String, Object> verifyOtp(final String email, final String enteredOtp) {
         final OtpDetails otpDetails = otpStore.get(email);
-        if (otpDetails == null || System.currentTimeMillis() > otpDetails.getExpirationTime()) {
-            return false;
-        }
-        return otpDetails.getOtp().equals(enteredOtp);
-    }
+        final Map<String, Object> response = new HashMap<>();
 
-    public String verifyOtp(final String email, final String enteredOtp) {
+        if (otpDetails == null) {
+            response.put("message", "No OTP found for this email.");
+            response.put("statusCode", HttpStatus.NOT_FOUND.value());
+            return response;
+        }
+
         if (isOtpExpired(email)) {
-            return "OTP has expired";
+            otpStore.remove(email);
+            response.put("message", "OTP has expired.");
+            response.put("statusCode", HttpStatus.BAD_REQUEST.value());
+            return response;
         }
 
-        final boolean isValid = validateOtp(email, enteredOtp);
-        return isValid? "OTP Verified!" : "Invalid OTP";
+        if (!otpDetails.getOtp().equals(enteredOtp)) {
+            response.put("message", "Invalid OTP.");
+            response.put("statusCode", HttpStatus.BAD_REQUEST.value());
+            return response;
+        }
+
+        otpStore.remove(email);
+        response.put("message", "OTP Verified.");
+        response.put("statusCode", HttpStatus.OK.value());
+        return response;
     }
 }

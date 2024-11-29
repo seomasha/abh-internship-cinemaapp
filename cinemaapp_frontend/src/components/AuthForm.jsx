@@ -6,7 +6,6 @@ import { FiLock } from "react-icons/fi";
 import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
-import { otpService } from "../services/otpService";
 import { userService } from "../services/userService";
 
 const AuthForm = ({
@@ -190,29 +189,31 @@ const AuthForm = ({
       return;
     }
 
-    const response = await otpService.create({ email: email });
+    await userService.sendOtp({ email: email });
 
-    if (response && validateEmail(email) && emailExists) {
+    if (validateEmail(email)) {
       setPasswordResetStep(2);
       setLoading(false);
     } else {
-      setError(
-        !response || (!validateEmail(email) && emailExists),
-        setEmailError,
-        "The email is not valid."
-      );
+      setError(!validateEmail(email), setEmailError, "The email is not valid.");
       setLoading(false);
     }
   };
 
   const verify = async () => {
     setLoading(true);
-    const response = await otpService.verifyOtp(email, enteredOtp);
 
-    if (response === "OTP Verified!") {
+    const response = await userService.verifyOtp({
+      email: email,
+      otp: enteredOtp,
+    });
+
+    if (response.statusCode === 200) {
       setPasswordResetStep(3);
-    } else {
+    } else if (response.statusCode === 400) {
       setOtpError("The OTP code is incorrect or has expired.");
+    } else if (response.statusCode === 404) {
+      setOtpError("No OTP found for this email.");
     }
 
     setLoading(false);
@@ -246,18 +247,16 @@ const AuthForm = ({
         password: password,
       });
 
-      if (validateUserSignIn) {
-        setLoading(false);
-        localStorage.setItem("token", validateUserSignIn);
+      setLoading(false);
+      localStorage.setItem("token", validateUserSignIn);
 
-        setSignInSuccess(true);
-        setTimeout(() => {
-          window.location.href = "/";
-          setSignInSuccess(false);
-        }, 3000); // Timeout for animation purpose
+      setSignInSuccess(true);
+      setTimeout(() => {
+        window.location.href = "/";
+        setSignInSuccess(false);
+      }, 3000); // Timeout for animation purpose
 
-        resetFields();
-      }
+      resetFields();
     } else if (currentFlow === "signUp") {
       setLoading(true);
       const validUserSignUp = await userService.create({
@@ -265,12 +264,10 @@ const AuthForm = ({
         password: password,
       });
 
-      if (validUserSignUp) {
-        setLoading(false);
-        setSignInSuccess(true);
-        setTimeout(() => setSignInSuccess(false), 5000);
-        resetFields();
-      }
+      setLoading(false);
+      setSignInSuccess(true);
+      setTimeout(() => setSignInSuccess(false), 5000);
+      resetFields();
     } else if (currentFlow === "passwordReset") {
       setLoading(true);
       const passwordReset = await userService.resetPassword({
@@ -278,18 +275,16 @@ const AuthForm = ({
         password: changedPassword,
       });
 
-      if (passwordReset) {
-        setLoading(false);
-        setSignInSuccess(true);
-        setPasswordReset(true);
-        setTimeout(() => {
-          setSignInSuccess(false);
-          setPasswordReset(false);
-          resetFields();
-          setPasswordResetStep(1);
-          setCurrentFlow("signIn");
-        }, 3000); // Timeout for animation purposes
-      }
+      setLoading(false);
+      setSignInSuccess(true);
+      setPasswordReset(true);
+      setTimeout(() => {
+        setSignInSuccess(false);
+        setPasswordReset(false);
+        resetFields();
+        setPasswordResetStep(1);
+        setCurrentFlow("signIn");
+      }, 3000); // Timeout for animation purposes
     }
   };
 
@@ -586,7 +581,7 @@ const AuthForm = ({
               <OTPInput onChange={handleOTPChange} />
             </div>
             {otpError && <p className="text-center text-danger">{otpError}</p>}
-            <ActionButton label="Continue" onClick={handleFormSubmit} />
+            <ActionButton label="Continue" onClick={verify} />
           </>
         )}
         {passwordResetStep === 3 && (

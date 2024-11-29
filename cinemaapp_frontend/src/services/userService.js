@@ -29,4 +29,22 @@ export const userService = {
 
     return response;
   },
+  sendOtp: async (data) => {
+    const response = await request(`${USER_ENDPOINT}/otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: data,
+    });
+    return response;
+  },
+  verifyOtp: async (data) => {
+    const response = await request(`${USER_ENDPOINT}/verify-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    });
+    return response;
+  },
 };
