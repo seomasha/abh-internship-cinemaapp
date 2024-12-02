@@ -3,6 +3,7 @@ import NavBar from "../components/NavBar";
 import { CiCircleInfo, CiStar } from "react-icons/ci";
 import { Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { ticketService } from "../services/ticketService";
 import "../styles/SeatAndTickets.css";
 
 const SeatAndTickets = () => {
@@ -33,6 +34,15 @@ const SeatAndTickets = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const handleBuyTicket = async () => {
+    const response = await ticketService.buyTickets({
+      userId: 1,
+      projectionId: 26,
+      seatNos: selectedSeats.map((seat) => seat.seat),
+      price: totalPrice,
+    });
+  };
+
   const handleSeatClick = (seat, seatType) => {
     setSelectedSeats((prevSeats) => {
       const seatAlreadySelected = prevSeats.some((item) => item.seat === seat);
@@ -40,19 +50,15 @@ const SeatAndTickets = () => {
 
       if (seatAlreadySelected) {
         newSeats = prevSeats.filter((item) => item.seat !== seat);
-        setTotalPrice(
-          prevSeats.reduce(
-            (total, item) => (item.seat !== seat ? total + item.price : total),
-            0
-          )
-        );
       } else {
         newSeats = [...prevSeats, { seat, price: seatPrices[seatType] }];
-        setTotalPrice(
-          prevSeats.reduce((total, item) => total + item.price, 0) +
-            seatPrices[seatType]
-        );
       }
+
+      const newTotalPrice = newSeats.reduce(
+        (total, item) => total + item.price,
+        0
+      );
+      setTotalPrice(newTotalPrice);
 
       return newSeats;
     });
@@ -253,7 +259,11 @@ const SeatAndTickets = () => {
                 </div>
               </div>
             </div>
-            <Button variant="danger" className="red-bg mt-5">
+            <Button
+              variant="danger"
+              onClick={handleBuyTicket}
+              className="red-bg mt-5"
+            >
               Continue to Payment
             </Button>
           </div>
@@ -261,13 +271,23 @@ const SeatAndTickets = () => {
       </div>
 
       <Modal show={showPopup} onHide={handlePopupClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Time's Up!</Modal.Title>
+        <Modal.Header>
+          <Modal.Title className="fw-bold py-1 px-3">
+            Session Expired
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body>Your session time has expired. Redirecting...</Modal.Body>
+        <Modal.Body>
+          <h6 className="fw-light px-3">
+            Your session expired and seats have been refreshed and updated.
+          </h6>
+        </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handlePopupClose}>
-            Close
+          <Button
+            variant="danger"
+            className="primary-red text-white"
+            onClick={handlePopupClose}
+          >
+            Okay
           </Button>
         </Modal.Footer>
       </Modal>

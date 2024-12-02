@@ -25,4 +25,6 @@ public class Ticket {
     private int price;
 
     private Date purchaseDate;
+
+    private String status;
 }

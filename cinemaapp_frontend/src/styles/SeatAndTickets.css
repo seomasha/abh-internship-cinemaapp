@@ -111,13 +111,18 @@
   border: 1px solid #ddd;
 }
 
-/* In SeatAndTickets.css */
 .tooltip-inner {
-  background-color: #000; /* Dark background */
-  color: #fff; /* White text */
-  border-radius: 4px; /* Rounded corners */
-  padding: 8px; /* Spacing inside the tooltip */
+  background-color: #000;
+  color: #fff;
+  border-radius: 4px;
+  padding: 8px;
 }
 .tooltip.bs-tooltip-top .arrow::before {
-  border-top-color: #000; /* Tooltip arrow color */
+  border-top-color: #000;
+}
+
+.modal-header,
+.modal-footer {
+  border-bottom: none;
+  border-top: none;
 }
