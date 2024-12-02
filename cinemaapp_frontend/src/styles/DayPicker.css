@@ -3,6 +3,6 @@
 }
 
 .bg-picker {
-  background-color: #b22222;
+  background-color: #b22222 !important;
   color: white;
 }

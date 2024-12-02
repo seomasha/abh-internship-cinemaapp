@@ -3,12 +3,11 @@ import { NavLink } from "react-router-dom";
 import { Button, Nav, Navbar, Dropdown } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { getUserInfoFromToken } from "../utils/JwtDecode";
 import "../styles/Navbar.css";
 import AuthForm from "./AuthForm";
+import { useNavBar } from "../context/NavBarContext";
 
 const NavBar = () => {
-  const [showSignIn, setShowSignIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,36 +15,15 @@ const NavBar = () => {
   const [confirmChangedPassword, setConfirmChangedPassword] = useState("");
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
-  const [emailPrefix, setEmailPrefix] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const { showSignIn, toggleSignIn, handleLogout, isLoggedIn, emailPrefix } =
+    useNavBar();
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
     { id: 2, path: "/upcoming", label: "Upcoming movies" },
     { id: 3, path: "/venues", label: "Venues" },
   ];
-
-  const handleSignInClick = () => {
-    setShowSignIn(!showSignIn);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
-    setIsLoggedIn(false);
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      const userInfo = getUserInfoFromToken(token);
-      if (userInfo) {
-        setEmailPrefix(userInfo.sub.split("@")[0]);
-        setIsLoggedIn(true);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     if (showSignIn) {
@@ -124,7 +102,7 @@ const NavBar = () => {
           <Button
             variant="outline-light"
             className="px-4 py-2"
-            onClick={handleSignInClick}
+            onClick={toggleSignIn}
           >
             Sign in
           </Button>
@@ -157,7 +135,7 @@ const NavBar = () => {
             passwordResetStep={passwordResetStep}
             setPasswordResetStep={setPasswordResetStep}
             showSignIn={showSignIn}
-            setShowSignIn={setShowSignIn}
+            setShowSignIn={toggleSignIn}
           />
         </div>
       </div>

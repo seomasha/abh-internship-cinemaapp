@@ -26,10 +26,10 @@
 }
 
 @font-face {
-    font-family: "Urbanist";
-    src: url('./assets/fonts/Urbanist-Light.ttf') format('truetype');
-    font-weight: 100;
-    font-style: light;
+  font-family: "Urbanist";
+  src: url("./assets/fonts/Urbanist-Light.ttf") format("truetype");
+  font-weight: 100;
+  font-style: light;
 }
 
 .title {
@@ -53,9 +53,14 @@
 }
 
 .navbar-background {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
   background-color: #1d2939;
 }
 
 .primary-background {
+  height: 100vh;
   background-color: #fafafa;
 }

@@ -14,6 +14,7 @@ import { Spinner } from "react-bootstrap";
 import screenSizes from "../utils/screenSizes";
 
 import { movieService } from "../services/movieService";
+import { useNavBar } from "../context/NavBarContext";
 
 import {
   FaRegBuilding,
@@ -43,6 +44,8 @@ const MovieDetails = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const itemsPerPage = 6;
 
+  const { toggleSignIn, isLoggedIn } = useNavBar();
+
   const today = new Date();
   const dateOptions = { month: "short", day: "numeric" };
   const dayOptions = { weekday: "short" };
@@ -60,12 +63,16 @@ const MovieDetails = () => {
     setSelectedTime((prevTime) => (prevTime === time ? null : time));
   };
 
-  const handleButtonClick = () => {
+  const handleReserveButton = () => {
     setShowSuccessMessage(true);
 
     setTimeout(() => {
       setShowSuccessMessage(false);
     }, 5000);
+  };
+
+  const handleButtonClick = () => {
+    window.location.href = "/seat-and-tickets";
   };
 
   const dayPickers = [];
@@ -314,14 +321,14 @@ const MovieDetails = () => {
               <div className="d-flex flex-column flex-md-row px-4 mb-4 gap-3">
                 <button
                   className="btn flex-grow-1 button-secondary"
-                  onClick={handleButtonClick}
+                  onClick={handleReserveButton}
                   disabled={selectedDay === null || selectedTime === null}
                 >
                   Reserve Ticket
                 </button>
                 <button
                   className="btn flex-grow-1 button-primary"
-                  onClick={handleButtonClick}
+                  onClick={isLoggedIn ? handleButtonClick : toggleSignIn}
                   disabled={selectedDay === null || selectedTime === null}
                 >
                   Buy Ticket
