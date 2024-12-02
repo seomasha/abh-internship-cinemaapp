@@ -15,9 +15,12 @@ export const userService = {
     return response;
   },
   findUserByEmail: async (email) => {
-    const response = await request(`${USER_ENDPOINT}/email/${email}`, {
-      method: "GET",
-    });
+    const response = await request(
+      `${USER_ENDPOINT}/email/?email=${encodeURIComponent(email)}`,
+      {
+        method: "GET",
+      }
+    );
 
     return response;
   },
