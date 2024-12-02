@@ -252,7 +252,7 @@ const AuthForm = ({
 
       setSignInSuccess(true);
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.reload();
         setSignInSuccess(false);
       }, 3000); // Timeout for animation purpose
 

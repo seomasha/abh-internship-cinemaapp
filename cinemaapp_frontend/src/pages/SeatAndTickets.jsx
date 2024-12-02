@@ -11,6 +11,8 @@ const SeatAndTickets = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [timeLeft, setTimeLeft] = useState(300);
   const [showPopup, setShowPopup] = useState(false);
+  const [showNoSeatPopup, setShowNoSeatPopup] = useState(false);
+  const [reservedSeats, setReservedSeats] = useState([]);
 
   const navigate = useNavigate();
 
@@ -21,6 +23,12 @@ const SeatAndTickets = () => {
   };
 
   useEffect(() => {
+    const fetchReservedSeats = async () => {
+      const seats = await ticketService.getReservedSeats(26);
+      setReservedSeats(seats);
+    };
+    fetchReservedSeats();
+
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime === 1) {
@@ -35,15 +43,28 @@ const SeatAndTickets = () => {
   }, []);
 
   const handleBuyTicket = async () => {
-    const response = await ticketService.buyTickets({
+    if (selectedSeats.length === 0) {
+      setShowNoSeatPopup(true);
+      return;
+    }
+
+    const buyResponse = await ticketService.buyTickets({
       userId: 1,
       projectionId: 26,
       seatNos: selectedSeats.map((seat) => seat.seat),
       price: totalPrice,
     });
+
+    if (buyResponse) {
+      navigate("/checkout");
+    }
   };
 
   const handleSeatClick = (seat, seatType) => {
+    if (reservedSeats.includes(seat)) {
+      return;
+    }
+
     setSelectedSeats((prevSeats) => {
       const seatAlreadySelected = prevSeats.some((item) => item.seat === seat);
       let newSeats = [];
@@ -65,6 +86,9 @@ const SeatAndTickets = () => {
   };
 
   const getSeatClass = (seat) => {
+    if (reservedSeats.includes(seat)) {
+      return "reserved";
+    }
     return selectedSeats.some((s) => s.seat === seat)
       ? "selected"
       : "available";
@@ -73,6 +97,10 @@ const SeatAndTickets = () => {
   const handlePopupClose = () => {
     setShowPopup(false);
     navigate("/");
+  };
+
+  const handleNoSeatPopupClose = () => {
+    setShowNoSeatPopup(false);
   };
 
   return (
@@ -94,7 +122,7 @@ const SeatAndTickets = () => {
             </h6>
           </div>
         </div>
-        <div className="line" />
+        <div className="line-sat" />
         <div className="d-flex gap-5 p-3">
           <img
             src="http://127.0.0.1:9001/api/v1/buckets/images/objects/download?preview=true&prefix=eternal-winter.jpg&version_id=null"
@@ -288,6 +316,26 @@ const SeatAndTickets = () => {
             onClick={handlePopupClose}
           >
             Okay
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showNoSeatPopup} onHide={handleNoSeatPopupClose}>
+        <Modal.Header>
+          <Modal.Title className="fw-bold py-1 px-3">Warning</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h6 className="fw-light px-3">
+            Please select at least one seat before proceeding.
+          </h6>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="danger"
+            className="primary-red text-white"
+            onClick={handleNoSeatPopupClose}
+          >
+            Close
           </Button>
         </Modal.Footer>
       </Modal>

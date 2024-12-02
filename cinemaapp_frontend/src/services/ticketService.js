@@ -13,4 +13,10 @@ export const ticketService = {
     });
     return response;
   },
+  getReservedSeats: async (projectionId) => {
+    const response = await request(
+      `${TICKET_ENDPOINT}/reserved-seats?projectionId=${projectionId}`
+    );
+    return response;
+  },
 };
