@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import Input from "./Input";
 import OTPInput from "./OTP";
 import { FiLock } from "react-icons/fi";
 import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
-import { otpService } from "../services/otpService";
+import { userService } from "../services/userService";
 
 const AuthForm = ({
   currentFlow,
@@ -23,6 +23,7 @@ const AuthForm = ({
   setConfirmChangedPassword,
   passwordResetStep,
   setPasswordResetStep,
+  showSignIn,
   setShowSignIn,
 }) => {
   const [emailError, setEmailError] = useState("");
@@ -33,9 +34,9 @@ const AuthForm = ({
     useState("");
   const [passwordReset, setPasswordReset] = useState(false);
   const [signInSuccess, setSignInSuccess] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState("");
   const [enteredOtp, setEnteredOtp] = useState("");
   const [otpError, setOtpError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const flowDetails = {
     signIn: {
@@ -128,13 +129,7 @@ const AuthForm = ({
       "Please enter a valid email."
     );
 
-    const passwordError = setError(
-      !validatePassword(password),
-      setPasswordError,
-      "Password must be at least 8 characters long and contain both letters and numbers."
-    );
-
-    return !emailError && !passwordError;
+    return !emailError;
   };
 
   const validateSignUp = () => {
@@ -181,34 +176,47 @@ const AuthForm = ({
       "Passwords do not match."
     );
 
-    const otpError = setError(
-      enteredOtp.toString() !== generatedOtp,
-      setOtpError,
-      "The OTP you entered is incorrect."
-    );
-
-    return (
-      !emailError &&
-      !changePasswordError &&
-      !confirmChangePasswordError &&
-      !otpError
-    );
+    return !emailError && !changePasswordError && !confirmChangePasswordError;
   };
 
   const sendOtp = async () => {
-    const response = await otpService.create({ email: email });
-    setGeneratedOtp(response);
-    setPasswordResetStep(2);
+    setLoading(true);
+    const emailExists = await userService.findUserByEmail(email);
+
+    if (!emailExists) {
+      setError(!emailExists, setEmailError, "The email doesn't exist");
+      setLoading(false);
+      return;
+    }
+
+    await userService.sendOtp({ email: email });
+
+    if (validateEmail(email)) {
+      setPasswordResetStep(2);
+      setLoading(false);
+    } else {
+      setError(!validateEmail(email), setEmailError, "The email is not valid.");
+      setLoading(false);
+    }
   };
 
   const verify = async () => {
-    const response = await otpService.verifyOtp(email, enteredOtp);
+    setLoading(true);
 
-    if (response === "OTP Verified!") {
+    const response = await userService.verifyOtp({
+      email: email,
+      otp: enteredOtp,
+    });
+
+    if (response.statusCode === 200) {
       setPasswordResetStep(3);
-    } else {
-      setOtpError("The OTP code has expired.");
+    } else if (response.statusCode === 400) {
+      setOtpError("The OTP code is incorrect or has expired.");
+    } else if (response.statusCode === 404) {
+      setOtpError("No OTP found for this email.");
     }
+
+    setLoading(false);
   };
 
   const handleFormSubmit = async (e) => {
@@ -233,27 +241,50 @@ const AuthForm = ({
     }
 
     if (currentFlow === "signIn") {
+      setLoading(true);
+      const validateUserSignIn = await userService.login({
+        email: email,
+        password: password,
+      });
+
+      setLoading(false);
+      localStorage.setItem("token", validateUserSignIn);
+
       setSignInSuccess(true);
-      setTimeout(() => setSignInSuccess(false), 5000);
+      setTimeout(() => {
+        window.location.href = "/";
+        setSignInSuccess(false);
+      }, 3000); // Timeout for animation purpose
+
       resetFields();
     } else if (currentFlow === "signUp") {
+      setLoading(true);
+      const validUserSignUp = await userService.create({
+        email: email,
+        password: password,
+      });
+
+      setLoading(false);
       setSignInSuccess(true);
       setTimeout(() => setSignInSuccess(false), 5000);
       resetFields();
     } else if (currentFlow === "passwordReset") {
-      if (passwordResetStep < 3) {
-        setPasswordResetStep(passwordResetStep + 1);
-      } else {
-        setSignInSuccess(true);
-        setPasswordReset(true);
-        setTimeout(() => {
-          setSignInSuccess(false);
-          setPasswordReset(false);
-          resetFields();
-          setPasswordResetStep(1);
-          setCurrentFlow("signIn");
-        }, 5000);
-      }
+      setLoading(true);
+      const passwordReset = await userService.resetPassword({
+        email: email,
+        password: changedPassword,
+      });
+
+      setLoading(false);
+      setSignInSuccess(true);
+      setPasswordReset(true);
+      setTimeout(() => {
+        setSignInSuccess(false);
+        setPasswordReset(false);
+        resetFields();
+        setPasswordResetStep(1);
+        setCurrentFlow("signIn");
+      }, 3000); // Timeout for animation purposes
     }
   };
 
@@ -550,7 +581,7 @@ const AuthForm = ({
               <OTPInput onChange={handleOTPChange} />
             </div>
             {otpError && <p className="text-center text-danger">{otpError}</p>}
-            <ActionButton label="Continue" onClick={handleFormSubmit} />
+            <ActionButton label="Continue" onClick={verify} />
           </>
         )}
         {passwordResetStep === 3 && (
@@ -582,7 +613,17 @@ const AuthForm = ({
     );
   };
 
-  return <div>{renderForm()}</div>;
+  return (
+    <div>
+      {loading ? (
+        <div className="d-flex justify-content-center mt-5">
+          <Spinner animation="border" size="lg" variant="light" />
+        </div>
+      ) : (
+        renderForm()
+      )}
+    </div>
+  );
 };
 
 export default AuthForm;

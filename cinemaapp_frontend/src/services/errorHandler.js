@@ -5,17 +5,33 @@ class ErrorHandler {
     let errorMsg = "An unknown error occurred.";
 
     if (error.response) {
-      errorMsg = `Error: ${error.response.status} - ${
-        error.response.data.message || errorMsg
-      }`;
+      const statusCode = error.response.status;
+      const serverMessage = error.response.data.message;
+
+      switch (statusCode) {
+        case 409:
+          errorMsg = serverMessage || "This email is already registered.";
+          break;
+        case 400:
+          errorMsg =
+            serverMessage || "Invalid request. Please check your input.";
+          break;
+        case 500:
+          errorMsg = "Server error. Please try again later.";
+          break;
+        default:
+          errorMsg = `Error: ${serverMessage || "An error occurred."}`;
+      }
     } else if (error.request) {
-      errorMsg = `Error: No response received | ", ${error.request}`;
+      errorMsg = "Error: No response from the server. Please try again.";
     } else {
       errorMsg = `Error: ${error.message}`;
     }
 
-    console.error(`Error: ${error.response.status} - ${errorMsg}`);
-    ToastService.error(`Error: ${error.response.status} - ${errorMsg}`);
+    console.error(errorMsg);
+    ToastService.error(errorMsg);
+
+    return errorMsg;
   }
 }
 

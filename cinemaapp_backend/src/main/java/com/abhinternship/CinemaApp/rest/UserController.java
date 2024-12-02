@@ -1,6 +1,10 @@
 package com.abhinternship.CinemaApp.rest;
 
+import com.abhinternship.CinemaApp.dto.EmailDTO;
+import com.abhinternship.CinemaApp.dto.OtpDTO;
 import com.abhinternship.CinemaApp.model.User;
+import com.abhinternship.CinemaApp.service.EmailService;
+import com.abhinternship.CinemaApp.service.OtpService;
 import com.abhinternship.CinemaApp.service.UserService;
 import com.abhinternship.CinemaApp.utils.JwtUtil;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
@@ -18,6 +22,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -28,6 +34,8 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
+    private final OtpService otpService;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -73,4 +81,41 @@ public class UserController {
         return ResponseEntity.ok("User with the id " + id + " has been deleted.");
     }
 
+    @GetMapping("/email")
+    public ResponseEntity<User> getUserByEmail(@RequestParam String email) throws ResourceNotFoundException {
+        final User user = userService.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> body) {
+        final String email = body.get("email");
+        final String newPassword = body.get("password");
+
+        userService.resetPassword(email, newPassword);
+        return ResponseEntity.ok("Password has been successfully reset.");
+    }
+
+    @PostMapping("/otp")
+    public ResponseEntity<String> sendOTP(@RequestBody EmailDTO emailDTO) {
+        final String email = emailDTO.getEmail();
+        final Optional<User> userExists = userService.findUserByEmail(email);
+
+        if(userExists.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        final String otp = emailService.sendOTPEmail(email, "OTP Code for Cinema App");
+        otpService.saveOtp(email, otp);
+        return ResponseEntity.ok(otp);
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Map<String, Object>> verifyOtp(@RequestBody OtpDTO otpDTO) {
+        final String email = otpDTO.getEmail();
+        final String enteredOtp = otpDTO.getOtp();
+
+        return ResponseEntity.ok(otpService.verifyOtp(email, enteredOtp));
+    }
 }
