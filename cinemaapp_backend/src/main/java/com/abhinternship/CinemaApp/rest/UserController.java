@@ -82,7 +82,8 @@ public class UserController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<User> getUserByEmail(@RequestParam String email) throws ResourceNotFoundException {
+    public ResponseEntity<User> getUserByEmail(@RequestBody EmailDTO emailDTO) throws ResourceNotFoundException {
+        final String email = emailDTO.getEmail();
         final User user = userService.findUserByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         return ResponseEntity.ok(user);
