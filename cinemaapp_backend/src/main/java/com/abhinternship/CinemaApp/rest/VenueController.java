@@ -5,7 +5,6 @@ import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.service.VenueService;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +35,19 @@ public class VenueController {
     public ResponseEntity<List<String>> getAllCities() {
         final List<String> cities = venueService.findAllCities();
         return ResponseEntity.of(Optional.ofNullable(cities));
+    }
+
+    @GetMapping("/cities-by-movie")
+    public ResponseEntity<List<String>> getCitiesByMovieName(@RequestParam String movieName) {
+        final List<String> cities = venueService.findCitiesByMovieName(movieName);
+        return ResponseEntity.ok(cities);
+    }
+
+    @GetMapping("/venues-for-movie")
+    public ResponseEntity<List<String>> getCitiesByMovieName(@RequestParam String movieName,
+                                                             @RequestParam String cityName) {
+        final List<String> cities = venueService.findVenuesByCityAndMovieName(movieName, cityName);
+        return ResponseEntity.ok(cities);
     }
 
     @PostMapping

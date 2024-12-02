@@ -35,13 +35,15 @@ const MovieDetails = () => {
   const [movie, setMovie] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [cities, setCities] = useState([]);
-  const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
+  const [venues, setVenues] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recommendedMoviesPage, setRecommendedMoviesPage] = useState(0);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedVenue, setSelectedVenue] = useState(null);
   const itemsPerPage = 6;
 
   const { toggleSignIn, isLoggedIn } = useNavBar();
@@ -112,18 +114,21 @@ const MovieDetails = () => {
 
   useEffect(() => {
     const fetchCities = async () => {
-      const cityList = await venueService.getAllCities();
+      const cityList = await venueService.getCitiesByMovieName(movie.name);
       setCities(cityList);
     };
 
     const fetchVenues = async () => {
-      const venueList = await venueService.getAll();
-      setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
+      const venueList = await venueService.getVenuesByCityAndMovieName(
+        movie.name,
+        selectedCity
+      );
+      setVenues(venueList);
     };
 
     fetchCities();
     fetchVenues();
-  }, []);
+  }, [movie.name, selectedCity]);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -280,15 +285,19 @@ const MovieDetails = () => {
                     icon={CiLocationOn}
                     title="Choose City"
                     options={cities}
-                    onChange={() => console.log("test")}
+                    onChange={(selectedCity) => setSelectedCity(selectedCity)}
+                    isUnique={true}
                   />
                 </div>
                 <div className="dropdown-full-width col-12 col-md-6">
                   <Dropdown
                     icon={FaRegBuilding}
                     title="Choose Cinema"
-                    options={venues.venues.map((venue) => venue.name)}
-                    onChange={() => console.log("test")}
+                    options={venues}
+                    onChange={(selectedVenue) =>
+                      setSelectedVenue(selectedVenue)
+                    }
+                    isUnique={true}
                   />
                 </div>
               </div>

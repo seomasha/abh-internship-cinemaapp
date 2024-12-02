@@ -20,7 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class TicketServiceTest {
+class TicketServiceImplTest {
 
     @Mock
     private TicketRepository ticketRepository;
@@ -32,7 +32,7 @@ class TicketServiceTest {
     private ProjectionRepository projectionRepository;
 
     @InjectMocks
-    private TicketService ticketService;
+    private TicketServiceImpl ticketService;
 
     @BeforeEach
     void setUp() {
@@ -130,5 +130,42 @@ class TicketServiceTest {
         verify(userRepository, times(1)).findById(userId);
         verify(projectionRepository, times(1)).findById(projectionId);
         verifyNoInteractions(ticketRepository);
+    }
+
+    @Test
+    void getReservedSeats_Success() {
+        final Long projectionId = 2L;
+        final List<String> reservedSeats = Arrays.asList("A1", "A2");
+
+        final Ticket ticket1 = new Ticket();
+        ticket1.setSeatNo("A1");
+
+        final Ticket ticket2 = new Ticket();
+        ticket2.setSeatNo("A2");
+
+        when(ticketRepository.findByProjectionId_Id(projectionId)).thenReturn(Arrays.asList(ticket1, ticket2));
+
+        final List<String> seats = ticketService.getReservedSeats(projectionId);
+
+        assertNotNull(seats);
+        assertEquals(2, seats.size());
+        assertTrue(seats.contains("A1"));
+        assertTrue(seats.contains("A2"));
+
+        verify(ticketRepository, times(1)).findByProjectionId_Id(projectionId);
+    }
+
+    @Test
+    void getReservedSeats_NoSeatsReserved() {
+        final Long projectionId = 2L;
+
+        when(ticketRepository.findByProjectionId_Id(projectionId)).thenReturn(Arrays.asList());
+
+        final List<String> seats = ticketService.getReservedSeats(projectionId);
+
+        assertNotNull(seats);
+        assertTrue(seats.isEmpty());
+
+        verify(ticketRepository, times(1)).findByProjectionId_Id(projectionId);
     }
 }
