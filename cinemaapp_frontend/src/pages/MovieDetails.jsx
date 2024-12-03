@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import movieRatingApiService from "../services/movieRatingApiService";
 
 import NavBar from "../components/NavBar";
@@ -37,16 +37,32 @@ const MovieDetails = () => {
   const [ratings, setRatings] = useState([]);
   const [cities, setCities] = useState([]);
   const [venues, setVenues] = useState([]);
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState({
+    index: null,
+    day: null,
+    date: null,
+  });
   const [selectedTime, setSelectedTime] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recommendedMoviesPage, setRecommendedMoviesPage] = useState(0);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
-  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [selectedVenue, setSelectedVenue] = useState("");
   const [projectionTimes, setProjectionTimes] = useState([]);
+  const [selectedProjection, setSelectedProjection] = useState(null);
   const itemsPerPage = 6;
+
+  const navigate = useNavigate();
+
+  const splitVenues = venues.map((venue) => {
+    const [id, name] = venue.split(",");
+    return { id: parseInt(id), name: name };
+  });
+
+  const selectedVenueId = splitVenues.find(
+    (venue) => venue.name === selectedVenue[0]
+  );
 
   const { toggleSignIn, isLoggedIn } = useNavBar();
 
@@ -75,8 +91,26 @@ const MovieDetails = () => {
     }, 5000);
   };
 
+  useEffect(() => {
+    const fetchSelectedProjection = async () => {
+      if (selectedVenue.length > 0) {
+        const projection = await projectionService.getProjection(
+          id,
+          selectedVenueId.id
+        );
+        setSelectedProjection(projection);
+      }
+    };
+    fetchSelectedProjection();
+  }, [id, selectedVenueId, selectedVenue.length]);
+
   const handleButtonClick = () => {
-    window.location.href = "/seat-and-tickets";
+    const movieDetails = {
+      projection: selectedProjection,
+      selectedDay: selectedDay,
+    };
+
+    navigate("/seat-and-tickets", { state: movieDetails });
   };
 
   const dayPickers = [];
@@ -87,15 +121,15 @@ const MovieDetails = () => {
 
     dayPickers.push(
       <DayPicker
-        key={i}
+        key={date}
         date={date}
         day={day}
-        isSelected={selectedDay === i}
+        isSelected={selectedDay.index === i}
         onSelect={() => {
-          if (i === selectedDay) {
-            setSelectedDay(null);
+          if (i === selectedDay?.index) {
+            setSelectedDay({ index: null, day: null, date: null });
           } else {
-            setSelectedDay(i);
+            setSelectedDay({ index: i, day: day, date: date });
           }
         }}
         small={true}
@@ -138,7 +172,7 @@ const MovieDetails = () => {
         movie.name,
         selectedCity
       );
-      setVenues(venueList);
+      setVenues(venueList.map((venue) => venue));
     };
 
     fetchCities();
@@ -193,7 +227,6 @@ const MovieDetails = () => {
     <div>
       <NavBar />
       <h3 className="px-5 py-4">Movie Details</h3>
-
       <div className="px-5 pb-3 d-flex flex-column flex-lg-row  align-items-center">
         <div className="video-container me-5 container d-flex justify-content-center">
           <iframe
@@ -308,7 +341,7 @@ const MovieDetails = () => {
                   <Dropdown
                     icon={FaRegBuilding}
                     title="Choose Cinema"
-                    options={venues}
+                    options={splitVenues.map((venue) => venue.name)}
                     onChange={(selectedVenue) =>
                       setSelectedVenue(selectedVenue)
                     }

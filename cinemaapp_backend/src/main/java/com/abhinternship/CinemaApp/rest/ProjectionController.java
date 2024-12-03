@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/projections")
@@ -24,10 +25,26 @@ public class ProjectionController {
         return ResponseEntity.ok(projections);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Projection> getProjectionByID(@PathVariable Long id) {
+        final Optional<Projection> projection = projectionService.findProjectionById(id);
+        return projection.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/times")
     public ResponseEntity<List<LocalTime>> getAllDistinctProjectionTimes() {
         final List<LocalTime> projectionTimes = projectionService.findAllDistinctProjectionTimes();
         return ResponseEntity.ok(projectionTimes);
+    }
+
+    @GetMapping("/movie-venue")
+    public ResponseEntity<Projection> getProjectionByMovieAndVenue(
+            @RequestParam Long movieId,
+            @RequestParam Long venueId) {
+        final Optional<Projection> projection = projectionService.findProjectionByMovieIdAndVenueId(movieId, venueId);
+        return projection.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/movie-times")

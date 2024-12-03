@@ -46,8 +46,8 @@ public class VenueController {
     @GetMapping("/venues-for-movie")
     public ResponseEntity<List<String>> getCitiesByMovieName(@RequestParam String movieName,
                                                              @RequestParam String cityName) {
-        final List<String> cities = venueService.findVenuesByCityAndMovieName(movieName, cityName);
-        return ResponseEntity.ok(cities);
+        final List<String> venues = venueService.findVenuesByCityAndMovieName(movieName, cityName);
+        return ResponseEntity.ok(venues);
     }
 
     @PostMapping

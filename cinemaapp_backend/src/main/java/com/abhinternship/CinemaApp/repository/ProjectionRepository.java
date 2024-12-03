@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -27,4 +28,5 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
             String movieName,
             String city,
             String venueName);
+    Optional<Projection> findProjectionByMovieId_IdAndVenueId_Id(Long movieId, Long venueId);
 }

@@ -1,5 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getUserInfoFromToken } from "../utils/JwtDecode";
+import { userService } from "../services/userService";
 
 const NavBarContext = createContext();
 
@@ -11,17 +13,30 @@ export const NavBarProvider = ({ children }) => {
   const [showSignIn, setShowSignIn] = useState(false);
   const [emailPrefix, setEmailPrefix] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const getUserId = async (email) => {
+      const response = await userService.findUserByEmail(email);
+      return response?.id;
+    };
 
-    if (token) {
-      const userInfo = getUserInfoFromToken(token);
-      if (userInfo) {
-        setEmailPrefix(userInfo.sub.split("@")[0]);
-        setIsLoggedIn(true);
+    const setUp = async () => {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        const userInfo = getUserInfoFromToken(token);
+
+        if (userInfo) {
+          setEmailPrefix(userInfo.sub.split("@")[0]);
+          setIsLoggedIn(true);
+          const id = await getUserId(userInfo.sub);
+          setUserId(id);
+        }
       }
-    }
+    };
+
+    setUp();
   }, []);
 
   const toggleSignIn = () => setShowSignIn((prevState) => !prevState);
@@ -30,6 +45,7 @@ export const NavBarProvider = ({ children }) => {
     localStorage.removeItem("token");
     window.location.href = "/";
     setIsLoggedIn(false);
+    setUserId(null);
   };
 
   return (
@@ -40,6 +56,7 @@ export const NavBarProvider = ({ children }) => {
         handleLogout,
         isLoggedIn,
         emailPrefix,
+        userId,
       }}
     >
       {children}

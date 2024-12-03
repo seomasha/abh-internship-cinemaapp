@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { CiCircleInfo, CiStar } from "react-icons/ci";
 import { Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { ticketService } from "../services/ticketService";
 import "../styles/SeatAndTickets.css";
+import { useNavBar } from "../context/NavBarContext";
 
 const SeatAndTickets = () => {
   const [selectedSeats, setSelectedSeats] = useState([]);
@@ -15,6 +17,11 @@ const SeatAndTickets = () => {
   const [reservedSeats, setReservedSeats] = useState([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { projection, selectedDay } = location.state || {};
+
+  const { userId } = useNavBar();
 
   const seatPrices = {
     regular: 7,
@@ -24,7 +31,7 @@ const SeatAndTickets = () => {
 
   useEffect(() => {
     const fetchReservedSeats = async () => {
-      const seats = await ticketService.getReservedSeats(26);
+      const seats = await ticketService.getReservedSeats(projection.id);
       setReservedSeats(seats);
     };
     fetchReservedSeats();
@@ -40,7 +47,7 @@ const SeatAndTickets = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [projection]);
 
   const handleBuyTicket = async () => {
     if (selectedSeats.length === 0) {
@@ -49,8 +56,8 @@ const SeatAndTickets = () => {
     }
 
     const buyResponse = await ticketService.buyTickets({
-      userId: 1,
-      projectionId: 26,
+      userId: userId,
+      projectionId: projection.id,
       seatNos: selectedSeats.map((seat) => seat.seat),
       price: totalPrice,
     });
@@ -125,23 +132,37 @@ const SeatAndTickets = () => {
         <div className="line-sat" />
         <div className="d-flex gap-5 p-3">
           <img
-            src="http://127.0.0.1:9001/api/v1/buckets/images/objects/download?preview=true&prefix=eternal-winter.jpg&version_id=null"
+            src={
+              projection.movieId.photos.find(
+                (photo) =>
+                  photo.entityType === "movie" && photo.role === "poster"
+              )?.url
+            }
             alt="image"
             className="rounded image"
           />
           <div>
-            <h4>Avatar: The way of water</h4>
+            <h4>{projection.movieId.name}</h4>
             <p>
-              PG 13 <span className="primary-red">|</span> English{" "}
-              <span className="primary-red">|</span> 117 min
+              {projection.movieId.pgRating}{" "}
+              <span className="primary-red">|</span>{" "}
+              {projection.movieId.language}{" "}
+              <span className="primary-red">|</span>{" "}
+              {projection.movieId.movieDuration} min
             </p>
           </div>
           <div>
             <h6>Booking Details</h6>
-            <p>Monday, Dec 22 at 18:00</p>
-            <p>Cineplexx: Cinebh, Zmaja od Bosne 4, Sarajevo 71000</p>
+            <p>
+              {selectedDay.day}, {selectedDay.date} at{" "}
+              {projection.projectionTime.slice(0, 5)}
+            </p>
+            <p>
+              {projection.venueId.name}: Cinebh, {projection.venueId.street}{" "}
+              {projection.venueId.streetNo}, {projection.venueId.city}
+            </p>
             <br />
-            <p>Hall 1</p>
+            <p>Hall {projection.hallId.number}</p>
           </div>
         </div>
         <div className="gray-line" />

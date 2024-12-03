@@ -51,4 +51,9 @@ public class ProjectionServiceImpl implements ProjectionService {
         return projectionRepository.findDistinctProjectionTimesByMovieAndVenue(
                 movieName, city, venueName);
     }
+
+    @Override
+    public Optional<Projection> findProjectionByMovieIdAndVenueId(Long movieId, Long venueId) {
+        return projectionRepository.findProjectionByMovieId_IdAndVenueId_Id(movieId, venueId);
+    }
 }

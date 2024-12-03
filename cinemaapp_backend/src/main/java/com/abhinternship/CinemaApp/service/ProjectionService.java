@@ -2,7 +2,6 @@ package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.Projection;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,4 +14,5 @@ public interface ProjectionService {
     List<LocalTime> findAllDistinctProjectionTimes();
     List<LocalTime> findProjectionTimesByMovieAndVenue(
             String movieName, String city, String venueName);
+    Optional<Projection> findProjectionByMovieIdAndVenueId(Long movieId, Long venueId);
 }

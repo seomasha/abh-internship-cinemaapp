@@ -22,4 +22,10 @@ export const projectionService = {
     );
     return response;
   },
+  getProjection: async (movieId, venueId) => {
+    const response = await request(
+      `${PROJECTION_ENDPOINT}/movie-venue?movieId=${movieId}&venueId=${venueId}`
+    );
+    return response;
+  },
 };

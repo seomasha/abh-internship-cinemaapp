@@ -81,7 +81,7 @@ public class UserController {
         return ResponseEntity.ok("User with the id " + id + " has been deleted.");
     }
 
-    @GetMapping("/email")
+    @PostMapping("/email")
     public ResponseEntity<User> getUserByEmail(@RequestBody EmailDTO emailDTO) throws ResourceNotFoundException {
         final String email = emailDTO.getEmail();
         final User user = userService.findUserByEmail(email)
