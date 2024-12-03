@@ -13,4 +13,6 @@ public interface ProjectionService {
     Projection saveProjection(Projection projection);
     void deleteProjection(Long id);
     List<LocalTime> findAllDistinctProjectionTimes();
+    List<LocalTime> findProjectionTimesByMovieAndVenue(
+            String movieName, String city, String venueName);
 }

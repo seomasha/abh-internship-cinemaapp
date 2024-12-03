@@ -29,4 +29,14 @@ public class ProjectionController {
         final List<LocalTime> projectionTimes = projectionService.findAllDistinctProjectionTimes();
         return ResponseEntity.ok(projectionTimes);
     }
+
+    @GetMapping("/movie-times")
+    public ResponseEntity<List<LocalTime>> getProjectionTimesByMovieAndVenue(
+            @RequestParam String movieName,
+            @RequestParam String city,
+            @RequestParam String venueName) {
+        List<LocalTime> projectionTimes = projectionService.findProjectionTimesByMovieAndVenue(
+                movieName, city, venueName);
+        return ResponseEntity.ok(projectionTimes);
+    }
 }

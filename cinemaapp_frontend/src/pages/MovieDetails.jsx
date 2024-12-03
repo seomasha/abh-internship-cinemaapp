@@ -27,6 +27,7 @@ import { CiLocationOn } from "react-icons/ci";
 import "../styles/MovieDetails.css";
 import { venueService } from "../services/venueService";
 import Rating from "../components/Rating";
+import { projectionService } from "../services/projectionService";
 
 const MovieDetails = () => {
   const dayPickerContainerRef = useRef(null);
@@ -44,6 +45,7 @@ const MovieDetails = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedVenue, setSelectedVenue] = useState(null);
+  const [projectionTimes, setProjectionTimes] = useState([]);
   const itemsPerPage = 6;
 
   const { toggleSignIn, isLoggedIn } = useNavBar();
@@ -111,6 +113,19 @@ const MovieDetails = () => {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const fetchProjectionTimes = async () => {
+      const projectionTimes =
+        await projectionService.getFilteredProjectionTimes(
+          movie.name,
+          selectedCity,
+          selectedVenue
+        );
+      setProjectionTimes(projectionTimes);
+    };
+    fetchProjectionTimes();
+  }, [movie.name, selectedCity, selectedVenue]);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -319,7 +334,7 @@ const MovieDetails = () => {
               <h5 className="mt-5 px-4">Standard</h5>
               <div className="d-flex flex-column flex-md-row px-4 py-2 gap-3">
                 <ProjectionTimes
-                  projectionTimes={movie.projectionTimes}
+                  projectionTimes={projectionTimes}
                   selectedTime={selectedTime}
                   onTimeClick={handleTimeClick}
                 />
