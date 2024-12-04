@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getUserInfoFromToken } from "../utils/JwtDecode";
 import { userService } from "../services/userService";
@@ -43,6 +42,7 @@ export const NavBarProvider = ({ children }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("redirectAfterLogin");
     window.location.href = "/";
     setIsLoggedIn(false);
     setUserId(null);

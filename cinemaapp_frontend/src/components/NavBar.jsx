@@ -7,7 +7,7 @@ import "../styles/Navbar.css";
 import AuthForm from "./AuthForm";
 import { useNavBar } from "../context/NavBarContext";
 
-const NavBar = () => {
+const NavBar = ({ state }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -136,6 +136,7 @@ const NavBar = () => {
             setPasswordResetStep={setPasswordResetStep}
             showSignIn={showSignIn}
             setShowSignIn={toggleSignIn}
+            state={state}
           />
         </div>
       </div>

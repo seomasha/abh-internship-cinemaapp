@@ -53,6 +53,11 @@ const MovieDetails = () => {
   const [selectedProjection, setSelectedProjection] = useState(null);
   const itemsPerPage = 6;
 
+  const movieDetails = {
+    projection: selectedProjection,
+    selectedDay: selectedDay,
+  };
+
   const navigate = useNavigate();
 
   const splitVenues = venues.map((venue) => {
@@ -105,12 +110,12 @@ const MovieDetails = () => {
   }, [id, selectedVenueId, selectedVenue.length]);
 
   const handleButtonClick = () => {
-    const movieDetails = {
-      projection: selectedProjection,
-      selectedDay: selectedDay,
-    };
-
     navigate("/seat-and-tickets", { state: movieDetails });
+  };
+
+  const handleNotLoggedIn = () => {
+    sessionStorage.setItem("redirectAfterLogin", `/seat-and-tickets`);
+    toggleSignIn();
   };
 
   const dayPickers = [];
@@ -136,6 +141,12 @@ const MovieDetails = () => {
       />
     );
   }
+
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem("redirectAfterLogin");
+    };
+  }, [id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -225,7 +236,7 @@ const MovieDetails = () => {
 
   return (
     <div>
-      <NavBar />
+      <NavBar state={movieDetails} />
       <h3 className="px-5 py-4">Movie Details</h3>
       <div className="px-5 pb-3 d-flex flex-column flex-lg-row  align-items-center">
         <div className="video-container me-5 container d-flex justify-content-center">
@@ -385,7 +396,7 @@ const MovieDetails = () => {
                 </button>
                 <button
                   className="btn flex-grow-1 button-primary"
-                  onClick={isLoggedIn ? handleButtonClick : toggleSignIn}
+                  onClick={isLoggedIn ? handleButtonClick : handleNotLoggedIn}
                   disabled={selectedDay === null || selectedTime === null}
                 >
                   Buy Ticket
