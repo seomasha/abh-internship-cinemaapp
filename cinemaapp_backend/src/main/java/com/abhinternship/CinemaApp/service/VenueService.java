@@ -13,4 +13,6 @@ public interface VenueService {
     Venue saveVenue(Venue venue);
     void deleteVenue(Long id);
     List<String> findAllCities();
+    List<String> findCitiesByMovieName(String movieName);
+    List<String> findVenuesByCityAndMovieName(String movieName, String cityName);
 }

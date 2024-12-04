@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -15,4 +16,17 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
     @Query("SELECT DISTINCT p.projectionTime FROM Projection p ORDER BY p.projectionTime")
     List<LocalTime> findAllDistinctProjectionTimes();
     Set<Projection> findByMovieIdOrderByProjectionTime(Movie movieId);
+    @Query("SELECT DISTINCT p.projectionTime " +
+            "FROM Venue v " +
+            "JOIN Projection p ON v.id = p.venueId.id " +
+            "JOIN Movie m ON m.id = p.movieId.id " +
+            "WHERE m.name LIKE :movieName " +
+            "AND v.city LIKE :city " +
+            "AND v.name LIKE :venueName " +
+            "ORDER BY p.projectionTime")
+    List<LocalTime> findDistinctProjectionTimesByMovieAndVenue(
+            String movieName,
+            String city,
+            String venueName);
+    Optional<Projection> findProjectionByMovieId_IdAndVenueId_Id(Long movieId, Long venueId);
 }

@@ -7,6 +7,7 @@ import { AiOutlineMail } from "react-icons/ai";
 import Separator from "./Separator";
 import { FaGoogle, FaApple, FaArrowLeft } from "react-icons/fa";
 import { userService } from "../services/userService";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = ({
   currentFlow,
@@ -25,6 +26,7 @@ const AuthForm = ({
   setPasswordResetStep,
   showSignIn,
   setShowSignIn,
+  state
 }) => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -37,6 +39,8 @@ const AuthForm = ({
   const [enteredOtp, setEnteredOtp] = useState("");
   const [otpError, setOtpError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const flowDetails = {
     signIn: {
@@ -249,10 +253,12 @@ const AuthForm = ({
 
       setLoading(false);
       localStorage.setItem("token", validateUserSignIn);
+      const redirectTo = sessionStorage.getItem("redirectAfterLogin");
 
       setSignInSuccess(true);
       setTimeout(() => {
-        window.location.href = "/";
+        navigate(redirectTo, { state: state });
+        window.location.reload();
         setSignInSuccess(false);
       }, 3000); // Timeout for animation purpose
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import movieRatingApiService from "../services/movieRatingApiService";
 
 import NavBar from "../components/NavBar";
@@ -14,6 +14,7 @@ import { Spinner } from "react-bootstrap";
 import screenSizes from "../utils/screenSizes";
 
 import { movieService } from "../services/movieService";
+import { useNavBar } from "../context/NavBarContext";
 
 import {
   FaRegBuilding,
@@ -26,6 +27,7 @@ import { CiLocationOn } from "react-icons/ci";
 import "../styles/MovieDetails.css";
 import { venueService } from "../services/venueService";
 import Rating from "../components/Rating";
+import { projectionService } from "../services/projectionService";
 
 const MovieDetails = () => {
   const dayPickerContainerRef = useRef(null);
@@ -34,14 +36,40 @@ const MovieDetails = () => {
   const [movie, setMovie] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [cities, setCities] = useState([]);
-  const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [venues, setVenues] = useState([]);
+  const [selectedDay, setSelectedDay] = useState({
+    index: null,
+    day: null,
+    date: null,
+  });
   const [selectedTime, setSelectedTime] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recommendedMoviesPage, setRecommendedMoviesPage] = useState(0);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedVenue, setSelectedVenue] = useState("");
+  const [projectionTimes, setProjectionTimes] = useState([]);
+  const [selectedProjection, setSelectedProjection] = useState(null);
   const itemsPerPage = 6;
+
+  const movieDetails = {
+    projection: selectedProjection,
+    selectedDay: selectedDay,
+  };
+
+  const navigate = useNavigate();
+
+  const splitVenues = venues.map((venue) => {
+    const [id, name] = venue.split(",");
+    return { id: parseInt(id), name: name };
+  });
+
+  const selectedVenueId = splitVenues.find(
+    (venue) => venue.name === selectedVenue[0]
+  );
+
+  const { toggleSignIn, isLoggedIn } = useNavBar();
 
   const today = new Date();
   const dateOptions = { month: "short", day: "numeric" };
@@ -60,12 +88,34 @@ const MovieDetails = () => {
     setSelectedTime((prevTime) => (prevTime === time ? null : time));
   };
 
-  const handleButtonClick = () => {
+  const handleReserveButton = () => {
     setShowSuccessMessage(true);
 
     setTimeout(() => {
       setShowSuccessMessage(false);
     }, 5000);
+  };
+
+  useEffect(() => {
+    const fetchSelectedProjection = async () => {
+      if (selectedVenue.length > 0) {
+        const projection = await projectionService.getProjection(
+          id,
+          selectedVenueId.id
+        );
+        setSelectedProjection(projection);
+      }
+    };
+    fetchSelectedProjection();
+  }, [id, selectedVenueId, selectedVenue.length]);
+
+  const handleButtonClick = () => {
+    navigate("/seat-and-tickets", { state: movieDetails });
+  };
+
+  const handleNotLoggedIn = () => {
+    sessionStorage.setItem("redirectAfterLogin", `/seat-and-tickets`);
+    toggleSignIn();
   };
 
   const dayPickers = [];
@@ -76,21 +126,27 @@ const MovieDetails = () => {
 
     dayPickers.push(
       <DayPicker
-        key={i}
+        key={date}
         date={date}
         day={day}
-        isSelected={selectedDay === i}
+        isSelected={selectedDay.index === i}
         onSelect={() => {
-          if (i === selectedDay) {
-            setSelectedDay(null);
+          if (i === selectedDay?.index) {
+            setSelectedDay({ index: null, day: null, date: null });
           } else {
-            setSelectedDay(i);
+            setSelectedDay({ index: i, day: day, date: date });
           }
         }}
         small={true}
       />
     );
   }
+
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem("redirectAfterLogin");
+    };
+  }, [id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -104,19 +160,35 @@ const MovieDetails = () => {
   }, []);
 
   useEffect(() => {
+    const fetchProjectionTimes = async () => {
+      const projectionTimes =
+        await projectionService.getFilteredProjectionTimes(
+          movie.name,
+          selectedCity,
+          selectedVenue
+        );
+      setProjectionTimes(projectionTimes);
+    };
+    fetchProjectionTimes();
+  }, [movie.name, selectedCity, selectedVenue]);
+
+  useEffect(() => {
     const fetchCities = async () => {
-      const cityList = await venueService.getAllCities();
+      const cityList = await venueService.getCitiesByMovieName(movie.name);
       setCities(cityList);
     };
 
     const fetchVenues = async () => {
-      const venueList = await venueService.getAll();
-      setVenues({ venues: venueList.venues, totalSize: venueList.totalSize });
+      const venueList = await venueService.getVenuesByCityAndMovieName(
+        movie.name,
+        selectedCity
+      );
+      setVenues(venueList.map((venue) => venue));
     };
 
     fetchCities();
     fetchVenues();
-  }, []);
+  }, [movie.name, selectedCity]);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -164,9 +236,8 @@ const MovieDetails = () => {
 
   return (
     <div>
-      <NavBar />
+      <NavBar state={movieDetails} />
       <h3 className="px-5 py-4">Movie Details</h3>
-
       <div className="px-5 pb-3 d-flex flex-column flex-lg-row  align-items-center">
         <div className="video-container me-5 container d-flex justify-content-center">
           <iframe
@@ -273,15 +344,19 @@ const MovieDetails = () => {
                     icon={CiLocationOn}
                     title="Choose City"
                     options={cities}
-                    onChange={() => console.log("test")}
+                    onChange={(selectedCity) => setSelectedCity(selectedCity)}
+                    isUnique={true}
                   />
                 </div>
                 <div className="dropdown-full-width col-12 col-md-6">
                   <Dropdown
                     icon={FaRegBuilding}
                     title="Choose Cinema"
-                    options={venues.venues.map((venue) => venue.name)}
-                    onChange={() => console.log("test")}
+                    options={splitVenues.map((venue) => venue.name)}
+                    onChange={(selectedVenue) =>
+                      setSelectedVenue(selectedVenue)
+                    }
+                    isUnique={true}
                   />
                 </div>
               </div>
@@ -303,7 +378,7 @@ const MovieDetails = () => {
               <h5 className="mt-5 px-4">Standard</h5>
               <div className="d-flex flex-column flex-md-row px-4 py-2 gap-3">
                 <ProjectionTimes
-                  projectionTimes={movie.projectionTimes}
+                  projectionTimes={projectionTimes}
                   selectedTime={selectedTime}
                   onTimeClick={handleTimeClick}
                 />
@@ -314,14 +389,14 @@ const MovieDetails = () => {
               <div className="d-flex flex-column flex-md-row px-4 mb-4 gap-3">
                 <button
                   className="btn flex-grow-1 button-secondary"
-                  onClick={handleButtonClick}
+                  onClick={handleReserveButton}
                   disabled={selectedDay === null || selectedTime === null}
                 >
                   Reserve Ticket
                 </button>
                 <button
                   className="btn flex-grow-1 button-primary"
-                  onClick={handleButtonClick}
+                  onClick={isLoggedIn ? handleButtonClick : handleNotLoggedIn}
                   disabled={selectedDay === null || selectedTime === null}
                 >
                   Buy Ticket
