@@ -52,7 +52,7 @@ public class ProjectionController {
             @RequestParam String movieName,
             @RequestParam String city,
             @RequestParam String venueName) {
-        List<LocalTime> projectionTimes = projectionService.findProjectionTimesByMovieAndVenue(
+        final List<LocalTime> projectionTimes = projectionService.findProjectionTimesByMovieAndVenue(
                 movieName, city, venueName);
         return ResponseEntity.ok(projectionTimes);
     }

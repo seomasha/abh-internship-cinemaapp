@@ -20,7 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class TicketServiceImplTest {
+class TicketServiceTest {
 
     @Mock
     private TicketRepository ticketRepository;
@@ -34,27 +34,33 @@ class TicketServiceImplTest {
     @InjectMocks
     private TicketServiceImpl ticketService;
 
+    private Long userId;
+    private Long projectionId;
+    private List<String> seatNos;
+    private int price;
+    private User user;
+    private Projection projection;
+    private Ticket ticket1;
+    private Ticket ticket2;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
 
-    @Test
-    void buyTickets_Success() {
-        final Long userId = 1L;
-        final Long projectionId = 2L;
-        final List<String> seatNos = Arrays.asList("A1", "A2");
-        final int price = 7;
+        userId = 1L;
+        projectionId = 2L;
+        seatNos = Arrays.asList("A1", "A2");
+        price = 7;
 
-        final User user = new User();
+        user = new User();
         user.setId(userId);
         user.setFirstName("John");
         user.setLastName("Doe");
 
-        final Projection projection = new Projection();
+        projection = new Projection();
         projection.setId(projectionId);
 
-        final Ticket ticket1 = new Ticket();
+        ticket1 = new Ticket();
         ticket1.setSeatNo("A1");
         ticket1.setPrice(price);
         ticket1.setUserId(user);
@@ -62,14 +68,17 @@ class TicketServiceImplTest {
         ticket1.setPurchaseDate(new Date());
         ticket1.setStatus("purchased");
 
-        final Ticket ticket2 = new Ticket();
+        ticket2 = new Ticket();
         ticket2.setSeatNo("A2");
         ticket2.setPrice(price);
         ticket2.setUserId(user);
         ticket2.setProjectionId(projection);
         ticket2.setPurchaseDate(new Date());
         ticket2.setStatus("purchased");
+    }
 
+    @Test
+    void buyTickets_Success() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.of(projection));
         when(ticketRepository.saveAll(anyList())).thenReturn(Arrays.asList(ticket1, ticket2));
@@ -92,11 +101,6 @@ class TicketServiceImplTest {
 
     @Test
     void buyTickets_UserNotFound() {
-        final Long userId = 1L;
-        final Long projectionId = 2L;
-        final List<String> seatNos = Arrays.asList("A1", "A2");
-        final int price = 7;
-
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
@@ -111,14 +115,6 @@ class TicketServiceImplTest {
 
     @Test
     void buyTickets_ProjectionNotFound() {
-        final Long userId = 1L;
-        final Long projectionId = 2L;
-        final List<String> seatNos = Arrays.asList("A1", "A2");
-        final int price = 7;
-
-        final User user = new User();
-        user.setId(userId);
-
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.empty());
 
@@ -134,15 +130,6 @@ class TicketServiceImplTest {
 
     @Test
     void getReservedSeats_Success() {
-        final Long projectionId = 2L;
-        final List<String> reservedSeats = Arrays.asList("A1", "A2");
-
-        final Ticket ticket1 = new Ticket();
-        ticket1.setSeatNo("A1");
-
-        final Ticket ticket2 = new Ticket();
-        ticket2.setSeatNo("A2");
-
         when(ticketRepository.findByProjectionId_Id(projectionId)).thenReturn(Arrays.asList(ticket1, ticket2));
 
         final List<String> seats = ticketService.getReservedSeats(projectionId);
@@ -157,8 +144,6 @@ class TicketServiceImplTest {
 
     @Test
     void getReservedSeats_NoSeatsReserved() {
-        final Long projectionId = 2L;
-
         when(ticketRepository.findByProjectionId_Id(projectionId)).thenReturn(Arrays.asList());
 
         final List<String> seats = ticketService.getReservedSeats(projectionId);

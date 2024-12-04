@@ -21,9 +21,14 @@ public class TicketServiceImpl implements TicketService {
     private final UserRepository userRepository;
     private final ProjectionRepository projectionRepository;
 
-    public List<Ticket> buyTickets(final Long userId, final Long projectionId, final List<String> seatNos, final int price) {
-        final User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        final Projection projection = projectionRepository.findById(projectionId).orElseThrow(() -> new RuntimeException("Projection not found"));
+    public List<Ticket> buyTickets(final Long userId,
+                                   final Long projectionId,
+                                   final List<String> seatNos,
+                                   final int price) {
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        final Projection projection = projectionRepository.findById(projectionId)
+                .orElseThrow(() -> new RuntimeException("Projection not found"));
 
         final List<Ticket> tickets = new ArrayList<>();
         for (String seatNo : seatNos) {
