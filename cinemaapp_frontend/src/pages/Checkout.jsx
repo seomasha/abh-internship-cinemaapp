@@ -56,7 +56,7 @@ const Checkout = () => {
         <div className="line-checkout" />
 
         <div className="w-100 d-flex p-5 gap-3">
-          <div className="col-9">
+          <div className="col-8">
             <h4>Saved Cards</h4>
 
             <CreditCard />
@@ -84,7 +84,7 @@ const Checkout = () => {
               Make Payment - 24KM
             </Button>
           </div>
-          <div className="col-3">
+          <div className="col-4">
             <h4 className="mb-3">Booking Summary</h4>
             <div
               style={{ backgroundColor: colors.dark_gray }}
@@ -100,7 +100,7 @@ const Checkout = () => {
                   <h5 className="text-white fs-4">
                     Avatar The Way Of The Water
                   </h5>
-                  <p className="text-white mt-3 fs-6">
+                  <p className="text-white mt-3">
                     PG - 13
                     <span className="primary-red"> |</span> English
                     <span className="primary-red"> |</span> 120 min
@@ -108,16 +108,22 @@ const Checkout = () => {
                 </div>
               </div>
               <div className="mt-3 d-flex flex-column gap-2">
-                <h5>Date and Time</h5>
+                <h5 style={{ color: colors.text_gray }}>Date and Time</h5>
                 <h5 className="text-white">Monday, Dec 22 at 18:00</h5>
-                <h5 className="mt-2">Cinema Details</h5>
+                <h5 className="mt-2" style={{ color: colors.text_gray }}>
+                  Cinema Details
+                </h5>
                 <h5 className="text-white">
                   Cineplex: Cinebh, Zmaja od Bosne 4, Sarajevo 71000
                 </h5>
                 <h5 className="text-white">Hall 1</h5>
-                <h5 className="mt-2">Seat(s) details</h5>
+                <h5 className="mt-2" style={{ color: colors.text_gray }}>
+                  Seat(s) details
+                </h5>
                 <h5 className="text-white">Seat(s): H3, H4</h5>
-                <h5 className="mt-2">Price Details</h5>
+                <h5 className="mt-2" style={{ color: colors.text_gray }}>
+                  Price Details
+                </h5>
                 <h5 className="text-white">Total Price: 24 KM</h5>
               </div>
             </div>

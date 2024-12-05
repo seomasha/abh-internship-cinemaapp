@@ -26,7 +26,7 @@ const AuthForm = ({
   setPasswordResetStep,
   showSignIn,
   setShowSignIn,
-  state
+  state,
 }) => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -252,6 +252,9 @@ const AuthForm = ({
       });
 
       setLoading(false);
+
+      if (!validateUserSignIn) return;
+
       localStorage.setItem("token", validateUserSignIn);
       const redirectTo = sessionStorage.getItem("redirectAfterLogin");
 
