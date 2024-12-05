@@ -36,22 +36,4 @@ class PaymentServiceTest {
             mockedPaymentIntent.verify(() -> PaymentIntent.create(any(PaymentIntentCreateParams.class)), times(1));
         }
     }
-
-    @Test
-    void testConfirmPayment() throws StripeException {
-        try (final MockedStatic<PaymentIntent> mockedPaymentIntent = mockStatic(PaymentIntent.class)) {
-            final String paymentIntentId = "pi_test_123";
-            final PaymentIntent mockPaymentIntent = mock(PaymentIntent.class);
-            when(mockPaymentIntent.confirm()).thenReturn(mockPaymentIntent);
-
-            mockedPaymentIntent.when(() -> PaymentIntent.retrieve(paymentIntentId))
-                    .thenReturn(mockPaymentIntent);
-
-            final PaymentIntent result = paymentService.confirmPayment(paymentIntentId);
-
-            assertNotNull(result);
-            mockedPaymentIntent.verify(() -> PaymentIntent.retrieve(paymentIntentId), times(1));
-            verify(mockPaymentIntent, times(1)).confirm();
-        }
-    }
 }

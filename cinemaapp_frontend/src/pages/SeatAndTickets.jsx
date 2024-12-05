@@ -55,16 +55,14 @@ const SeatAndTickets = () => {
       return;
     }
 
-    const buyResponse = await ticketService.buyTickets({
-      userId: userId,
-      projectionId: projection.id,
+    const buyResponse = {
+      projection: projection,
       seatNos: selectedSeats.map((seat) => seat.seat),
       price: totalPrice,
-    });
+      selectedDay: selectedDay,
+    };
 
-    if (buyResponse) {
-      navigate("/checkout");
-    }
+    navigate("/checkout", { state: buyResponse });
   };
 
   const handleSeatClick = (seat, seatType) => {

@@ -14,4 +14,14 @@ export const paymentService = {
 
     return response;
   },
+  confirmPayment: async (email) => {
+    const response = await request(
+      `${PAYMENT_ENDPOINT}/confirm-payment?email=${email}`,
+      {
+        method: "POST",
+      }
+    );
+
+    return response;
+  },
 };

@@ -17,9 +17,4 @@ public class PaymentService {
 
         return PaymentIntent.create(params);
     }
-
-    public PaymentIntent confirmPayment(final String paymentIntentId) throws StripeException {
-        final PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
-        return paymentIntent.confirm();
-    }
 }

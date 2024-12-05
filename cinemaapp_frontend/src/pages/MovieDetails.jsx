@@ -107,7 +107,7 @@ const MovieDetails = () => {
       }
     };
     fetchSelectedProjection();
-  }, [id, selectedVenueId, selectedVenue.length]);
+  }, [id, selectedVenue]);
 
   const handleButtonClick = () => {
     navigate("/seat-and-tickets", { state: movieDetails });
@@ -390,14 +390,22 @@ const MovieDetails = () => {
                 <button
                   className="btn flex-grow-1 button-secondary"
                   onClick={handleReserveButton}
-                  disabled={selectedDay === null || selectedTime === null}
+                  disabled={
+                    selectedTime === null ||
+                    selectedDay.day === null ||
+                    selectedDay.date === null
+                  }
                 >
                   Reserve Ticket
                 </button>
                 <button
                   className="btn flex-grow-1 button-primary"
                   onClick={isLoggedIn ? handleButtonClick : handleNotLoggedIn}
-                  disabled={selectedDay === null || selectedTime === null}
+                  disabled={
+                    selectedDay.day === null ||
+                    selectedDay.date === null ||
+                    selectedTime === null
+                  }
                 >
                   Buy Ticket
                 </button>

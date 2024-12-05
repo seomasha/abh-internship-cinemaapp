@@ -47,7 +47,7 @@ const NavBar = ({ state }) => {
             <span className="d-flex justify-content-center align-items-center bg-white p-2 mx-1 logo-rounded">
               <BsCameraReelsFill className="primary-red" size={14} />
             </span>
-            <h4 className="d-flex my-auto fw-bold">
+            <h4 className="d-flex my-auto fw-bold text-white">
               Cine<span className="primary-red">bh.</span>
             </h4>
           </div>
