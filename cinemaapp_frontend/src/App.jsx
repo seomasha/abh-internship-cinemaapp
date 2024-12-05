@@ -20,6 +20,7 @@ import MovieDetails from "./pages/MovieDetails";
 
 import { NavBarProvider } from "./context/NavBarContext";
 import SeatAndTickets from "./pages/SeatAndTickets";
+import Checkout from "./pages/Checkout";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/upcoming" element={<UpcomingMovies />} />
             <Route path="/movie-details/:id" element={<MovieDetails />} />
             <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </NavBarProvider>

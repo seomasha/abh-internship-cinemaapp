@@ -115,7 +115,7 @@ const SeatAndTickets = () => {
       <NavBar />
       <div>
         <div className="d-flex justify-content-between align-items-center p-3">
-          <h3>Seat Options</h3>
+          <h3 className="px-5">Seat Options</h3>
           <div className="d-flex align-items-center gap-2 position-relative">
             <div className="d-flex">
               <CiCircleInfo size={20} />
