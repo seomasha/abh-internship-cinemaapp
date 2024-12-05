@@ -21,9 +21,6 @@ const Checkout = () => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [showPopup, setShowPopup] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvc, setCvc] = useState("");
 
   const navigate = useNavigate();
   const elements = useElements();
@@ -45,7 +42,7 @@ const Checkout = () => {
 
   const handlePopupClose = () => {
     setShowPopup(false);
-    //navigate("/");
+    navigate("/");
   };
 
   const handlePaymentButton = async () => {
@@ -65,7 +62,7 @@ const Checkout = () => {
       return;
     }
 
-    const cardElement = elements.getElement(CardNumberElement); // Use specific element if split
+    const cardElement = elements.getElement(CardNumberElement);
 
     const { error, paymentMethod } = await stripe.createPaymentMethod({
       type: "card",
