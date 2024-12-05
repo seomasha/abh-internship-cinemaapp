@@ -8,12 +8,17 @@ import Separator from "../components/Separator";
 import "../styles/Checkout.css";
 import Input from "../components/Input";
 import colors from "../utils/colors";
+import { paymentService } from "../services/paymentService";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 
 const Checkout = () => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [showPopup, setShowPopup] = useState(false);
+  const [clientSecret, setClientSecret] = useState("");
 
   const navigate = useNavigate();
+  const elements = useElements();
+  const stripe = useStripe();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,6 +37,46 @@ const Checkout = () => {
   const handlePopupClose = () => {
     setShowPopup(false);
     //navigate("/");
+  };
+
+  const handlePaymentButton = async () => {
+    const response = await paymentService.createPaymentIntent({
+      amount: 1000,
+      currency: "usd",
+      receiptEmail: "maseticsead@gmail.com",
+    });
+
+    setClientSecret(response.clientSecret);
+  };
+
+  const handleConfirmPayment = async () => {
+    const cardElement = elements.getElement(CardElement);
+
+    if (!cardElement) {
+      console.error("CardElement is not available");
+      return;
+    }
+
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: "Customer Name",
+            email: "customer-email@example.com",
+          },
+        },
+      }
+    );
+
+    if (error) {
+      console.error("Payment failed", error);
+    } else {
+      if (paymentIntent.status === "succeeded") {
+        console.log("Payment successful!");
+      }
+    }
   };
 
   return (
@@ -80,9 +125,18 @@ const Checkout = () => {
             <Button
               variant="danger"
               className="w-100 primary-red-background py-2 mt-5"
+              onClick={handlePaymentButton}
             >
               Make Payment - 24KM
             </Button>
+            <Button
+              variant="danger"
+              className="w-100 primary-red-background py-2 mt-5"
+              onClick={handleConfirmPayment}
+            >
+              Make Payment - 24KM
+            </Button>
+            <CardElement />
           </div>
           <div className="col-4">
             <h4 className="mb-3">Booking Summary</h4>

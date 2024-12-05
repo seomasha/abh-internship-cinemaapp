@@ -22,6 +22,11 @@ import { NavBarProvider } from "./context/NavBarContext";
 import SeatAndTickets from "./pages/SeatAndTickets";
 import Checkout from "./pages/Checkout";
 
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
+
 function App() {
   return (
     <div className="main-font primary-background">
@@ -29,17 +34,19 @@ function App() {
         <NavBarProvider>
           <ScrollToTop />
           <ToastContainer />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/tickets" element={<Tickets />} />
-            <Route path="/currently-showing" element={<CurrentlyShowing />} />
-            <Route path="/upcoming" element={<UpcomingMovies />} />
-            <Route path="/movie-details/:id" element={<MovieDetails />} />
-            <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Elements stripe={stripePromise}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/tickets" element={<Tickets />} />
+              <Route path="/currently-showing" element={<CurrentlyShowing />} />
+              <Route path="/upcoming" element={<UpcomingMovies />} />
+              <Route path="/movie-details/:id" element={<MovieDetails />} />
+              <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Elements>
         </NavBarProvider>
       </Router>
     </div>
