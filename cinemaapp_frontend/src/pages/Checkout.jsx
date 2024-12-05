@@ -9,12 +9,21 @@ import "../styles/Checkout.css";
 import Input from "../components/Input";
 import colors from "../utils/colors";
 import { paymentService } from "../services/paymentService";
-import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import {
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
 
 const Checkout = () => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [showPopup, setShowPopup] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvc, setCvc] = useState("");
 
   const navigate = useNavigate();
   const elements = useElements();
@@ -47,35 +56,40 @@ const Checkout = () => {
     });
 
     setClientSecret(response.clientSecret);
+    handleConfirmPayment();
   };
 
   const handleConfirmPayment = async () => {
-    const cardElement = elements.getElement(CardElement);
-
-    if (!cardElement) {
-      console.error("CardElement is not available");
+    if (!stripe || !elements) {
+      console.error("Stripe or Elements not loaded");
       return;
     }
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: "Customer Name",
-            email: "customer-email@example.com",
-          },
-        },
-      }
-    );
+    const cardElement = elements.getElement(CardNumberElement); // Use specific element if split
+
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardElement,
+      billing_details: {
+        name: "Customer Name",
+        email: "customer-email@example.com",
+      },
+    });
 
     if (error) {
-      console.error("Payment failed", error);
-    } else {
-      if (paymentIntent.status === "succeeded") {
-        console.log("Payment successful!");
-      }
+      console.error("Payment method creation failed", error.message);
+      return;
+    }
+
+    const { error: confirmError, paymentIntent } =
+      await stripe.confirmCardPayment(clientSecret, {
+        payment_method: paymentMethod.id,
+      });
+
+    if (confirmError) {
+      console.error("Payment confirmation failed", confirmError.message);
+    } else if (paymentIntent.status === "succeeded") {
+      console.log("Payment successful!", paymentIntent);
     }
   };
 
@@ -110,16 +124,39 @@ const Checkout = () => {
             <Separator dark={true} />
 
             <h4 className="my-4">Add New Card</h4>
-            <Input
-              label="Card Number"
-              placeholder="**** **** **** ****"
-              leadingIcon={<CiCreditCard1 size={20} />}
-              dark={true}
+            <label className="fw-bold">Card Number</label>
+            <CardNumberElement
+              className="border rounded p-2 bg-white"
+              options={{
+                style: {
+                  invalid: { color: "#9e2146" },
+                },
+              }}
             />
 
-            <div className="d-flex gap-5">
-              <Input label="Expiry Date" placeholder="00/00" dark={true} />
-              <Input label="CVV" placeholder="000" dark={true} />
+            <div className="d-flex gap-5 mt-4">
+              <div className="w-100">
+                <label className="fw-bold">Expiry Date</label>
+                <CardExpiryElement
+                  className="border rounded p-2 bg-white"
+                  options={{
+                    style: {
+                      invalid: { color: "#9e2146" },
+                    },
+                  }}
+                />
+              </div>
+              <div className="w-100">
+                <label className="fw-bold">CVV</label>
+                <CardCvcElement
+                  className="border rounded p-2 bg-white"
+                  options={{
+                    style: {
+                      invalid: { color: "#9e2146" },
+                    },
+                  }}
+                />
+              </div>
             </div>
 
             <Button
@@ -129,14 +166,6 @@ const Checkout = () => {
             >
               Make Payment - 24KM
             </Button>
-            <Button
-              variant="danger"
-              className="w-100 primary-red-background py-2 mt-5"
-              onClick={handleConfirmPayment}
-            >
-              Make Payment - 24KM
-            </Button>
-            <CardElement />
           </div>
           <div className="col-4">
             <h4 className="mb-3">Booking Summary</h4>
