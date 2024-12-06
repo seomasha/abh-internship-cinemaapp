@@ -7,7 +7,7 @@ import {
   FaCcDiscover,
 } from "react-icons/fa";
 
-const CreditCard = ({ id, last4, brand }) => {
+const CreditCard = ({ id, last4, brand, onDelete }) => {
   const renderIcon = () => {
     switch (brand) {
       case "visa":
@@ -23,6 +23,10 @@ const CreditCard = ({ id, last4, brand }) => {
     }
   };
 
+  const handleDeleteCard = () => {
+    if (onDelete) onDelete(id);
+  };
+
   return (
     <div className="mt-3">
       <div className="d-flex justify-content-between border align-items-center rounded-4 py-4">
@@ -33,7 +37,10 @@ const CreditCard = ({ id, last4, brand }) => {
           <p>****</p>
           <p className="mb-2">{last4}</p>
         </div>
-        <p className="px-4 primary-red text-decoration-underline fw-bold">
+        <p
+          className="px-4 primary-red text-decoration-underline fw-bold"
+          onClick={handleDeleteCard}
+        >
           Delete Card
         </p>
       </div>

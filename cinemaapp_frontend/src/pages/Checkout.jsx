@@ -88,6 +88,17 @@ const Checkout = () => {
     handlePaymentButton();
   }, []);
 
+  const handleDeleteCard = async (cardId) => {
+    const response = await paymentService.deletePaymentMethod(cardId);
+
+    if (response) {
+      setPaymentMethods((prevMethods) =>
+        prevMethods.filter((method) => method.id !== cardId)
+      );
+      alert("Deleted card succesfully");
+    }
+  };
+
   const handlePaymentIntent = async () => {
     const exchangeRate = await exchangeRateService.getExchangeRate("bam");
 
@@ -233,6 +244,7 @@ const Checkout = () => {
                   key={method.id}
                   last4={method.card.last4}
                   brand={method.card.brand}
+                  onDelete={() => handleDeleteCard(method.id)}
                 />
               );
             })}

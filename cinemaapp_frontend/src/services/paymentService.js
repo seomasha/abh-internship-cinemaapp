@@ -48,4 +48,12 @@ export const paymentService = {
 
     return response;
   },
+  deletePaymentMethod: async (id) => {
+    const response = await request(
+      `${PAYMENT_ENDPOINT}/payment-methods/delete/${id}`,
+      { method: "DELETE" }
+    );
+
+    return response;
+  },
 };

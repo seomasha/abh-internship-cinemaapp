@@ -83,4 +83,9 @@ public class PaymentService {
 
         return paymentMethods.getData();
     }
+
+    public void deletePaymentMethod(final String paymentMethodId) throws StripeException {
+        final PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
+        paymentMethod.detach();
+    }
 }

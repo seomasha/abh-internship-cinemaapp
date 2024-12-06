@@ -10,6 +10,7 @@ import com.stripe.model.PaymentMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,5 +67,12 @@ public class PaymentController {
     public ResponseEntity<List<PaymentMethod>> getPaymentMethods(@RequestParam String customerId) throws StripeException {
         final List<PaymentMethod> paymentMethods = paymentService.getPaymentMethodsForCustomer(customerId);
         return ResponseEntity.ok(paymentMethods);
+    }
+
+    @DeleteMapping("/payment-methods/delete/{id}")
+    public ResponseEntity<String> deletePaymentMethod(@PathVariable String id) throws StripeException {
+        paymentService.deletePaymentMethod(id);
+        return ResponseEntity.ok("Payment method deleted successfully.");
+
     }
 }
