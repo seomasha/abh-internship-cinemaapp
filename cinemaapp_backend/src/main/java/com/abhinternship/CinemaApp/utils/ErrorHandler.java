@@ -62,7 +62,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(StripeException.class)
     public ResponseEntity<Object> handleStripeException(final StripeException ex, final WebRequest request) {
-        return new ResponseEntity<>(buildErrorResponse("Stripe error: " + ex.getMessage(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(buildErrorResponse("Payment processing error: " + ex.getMessage(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 
     private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {

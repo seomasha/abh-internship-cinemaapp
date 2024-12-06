@@ -19,6 +19,7 @@ import {
 import { getUserInfoFromToken } from "../utils/JwtDecode";
 import { ticketService } from "../services/ticketService";
 import { useNavBar } from "../context/NavBarContext";
+import exchangeRateService from "../services/exchangeRateService";
 
 const Checkout = () => {
   const [timeLeft, setTimeLeft] = useState(300);
@@ -30,6 +31,7 @@ const Checkout = () => {
     expiryDate: "",
     cvc: "",
   });
+  const [paymentError, setPaymentError] = useState("");
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
@@ -68,8 +70,10 @@ const Checkout = () => {
   };
 
   const handlePaymentButton = async () => {
+    const exchangeRate = await exchangeRateService.getExchangeRate("bam");
+
     const response = await paymentService.createPaymentIntent({
-      amount: price * 100 * 0.51, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
+      amount: price * 100 * exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
       currency: "eur",
       receiptEmail: userEmail,
     });
@@ -79,7 +83,8 @@ const Checkout = () => {
 
   const handleConfirmPayment = async (secret) => {
     if (!stripe || !elements) {
-      console.error("Stripe or Elements not loaded");
+      console.error("Something went wrong.");
+      setPaymentError("Something went wrong.");
       return;
     }
 
@@ -96,6 +101,7 @@ const Checkout = () => {
 
     if (error) {
       console.error("Payment method creation failed", error.message);
+      setPaymentError("Payment failed.");
       return;
     }
 
@@ -106,6 +112,7 @@ const Checkout = () => {
 
     if (confirmError) {
       console.error("Payment confirmation failed", confirmError.message);
+      setPaymentError("Payment confirmation failed.");
     } else if (paymentIntent.status === "succeeded") {
       const formattedDate = formatDateToISO(selectedDay.date);
       if (!formattedDate) {
@@ -118,9 +125,8 @@ const Checkout = () => {
         projectionId: projection.id,
       });
 
-      console.log(buyResponse)
-
       if (buyResponse) {
+        setPaymentError("");
         setShowSuccessPopup(true);
         await paymentService.confirmPayment(paymentIntent.receipt_email);
       }
@@ -245,6 +251,9 @@ const Checkout = () => {
             >
               Make Payment - {price}KM
             </Button>
+            {paymentError && (
+              <p className="text-danger text-center mt-4">{paymentError}</p>
+            )}
           </div>
           <div className="col-4">
             <h4 className="mb-3">Booking Summary</h4>
