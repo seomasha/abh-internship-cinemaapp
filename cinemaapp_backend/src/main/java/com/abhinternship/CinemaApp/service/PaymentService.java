@@ -1,15 +1,11 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.stripe.exception.StripeException;
-import com.stripe.model.Customer;
-import com.stripe.model.CustomerCollection;
-import com.stripe.model.PaymentIntent;
-import com.stripe.model.PaymentMethod;
-import com.stripe.param.CustomerCreateParams;
-import com.stripe.param.CustomerListParams;
-import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.PaymentMethodAttachParams;
+import com.stripe.model.*;
+import com.stripe.param.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -43,12 +39,23 @@ public class PaymentService {
     public void attachPaymentMethodToCustomer(final String paymentMethodId, final String customerId) throws StripeException {
         final PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
 
+        final List<PaymentMethod> existingPaymentMethods = getPaymentMethodsForCustomer(customerId);
+        boolean isDuplicate = existingPaymentMethods.stream()
+                .anyMatch(pm -> pm.getCard() != null
+                        && pm.getCard().getLast4().equals(paymentMethod.getCard().getLast4())
+                        && pm.getCard().getBrand().equals(paymentMethod.getCard().getBrand()));
+
+        if (isDuplicate) {
+            return;
+        }
+
         final PaymentMethodAttachParams params = PaymentMethodAttachParams.builder()
                 .setCustomer(customerId)
                 .build();
 
         paymentMethod.attach(params);
     }
+
 
     private Customer findCustomerByEmail(final String email) throws StripeException {
         final CustomerListParams params = CustomerListParams.builder()
@@ -64,5 +71,16 @@ public class PaymentService {
         }
 
         return null;
+    }
+
+    public List<PaymentMethod> getPaymentMethodsForCustomer(final String customerId) throws StripeException {
+        final PaymentMethodListParams params = PaymentMethodListParams.builder()
+                .setCustomer(customerId)
+                .setType(PaymentMethodListParams.Type.CARD)
+                .build();
+
+        final PaymentMethodCollection paymentMethods = PaymentMethod.list(params);
+
+        return paymentMethods.getData();
     }
 }

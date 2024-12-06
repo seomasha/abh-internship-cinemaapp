@@ -41,4 +41,11 @@ export const paymentService = {
     );
     return response;
   },
+  getPaymentMethods: async (customerId) => {
+    const response = await request(
+      `${PAYMENT_ENDPOINT}/payment-methods?customerId=${customerId}`
+    );
+
+    return response;
+  },
 };

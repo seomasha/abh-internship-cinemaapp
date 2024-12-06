@@ -6,14 +6,12 @@ import com.abhinternship.CinemaApp.service.PaymentService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.PaymentMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -62,5 +60,11 @@ public class PaymentController {
     public ResponseEntity<String> attachPaymentMethodToCustomer(@RequestParam String paymentMethodId, @RequestParam String customerId) throws StripeException {
         paymentService.attachPaymentMethodToCustomer(paymentMethodId, customerId);
         return ResponseEntity.ok("Payment method attached successfully.");
+    }
+
+    @GetMapping("/payment-methods")
+    public ResponseEntity<List<PaymentMethod>> getPaymentMethods(@RequestParam String customerId) throws StripeException {
+        final List<PaymentMethod> paymentMethods = paymentService.getPaymentMethodsForCustomer(customerId);
+        return ResponseEntity.ok(paymentMethods);
     }
 }

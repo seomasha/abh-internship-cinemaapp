@@ -109,6 +109,10 @@ const Checkout = () => {
 
     const cardElement = elements.getElement(CardNumberElement);
 
+    const paymentMethods = await paymentService.getPaymentMethods(customerId);
+
+    console.log(paymentMethods.map((card) => card.card));
+
     const { error, paymentMethod } = await stripe.createPaymentMethod({
       type: "card",
       card: cardElement,
