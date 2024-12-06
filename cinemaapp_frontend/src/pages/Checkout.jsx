@@ -75,10 +75,9 @@ const Checkout = () => {
     });
 
     setClientSecret(response.clientSecret);
-    handleConfirmPayment();
   };
 
-  const handleConfirmPayment = async () => {
+  const handleConfirmPayment = async (secret) => {
     if (!stripe || !elements) {
       console.error("Stripe or Elements not loaded");
       return;
@@ -101,7 +100,7 @@ const Checkout = () => {
     }
 
     const { error: confirmError, paymentIntent } =
-      await stripe.confirmCardPayment(clientSecret, {
+      await stripe.confirmCardPayment(secret, {
         payment_method: paymentMethod.id,
       });
 
@@ -128,6 +127,12 @@ const Checkout = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (clientSecret) {
+      handleConfirmPayment(clientSecret);
+    }
+  }, [clientSecret]);
 
   const formatDateToISO = (dateString, year = new Date().getFullYear()) => {
     const fullDateString = `${dateString} ${year}`;
