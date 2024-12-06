@@ -6,8 +6,8 @@ const ticketApiService = apiService(TICKET_ENDPOINT);
 
 export const ticketService = {
   ...ticketApiService,
-  buyTickets: async (data) => {
-    const response = await request(`${TICKET_ENDPOINT}/buy`, {
+  reserveTickets: async (data) => {
+    const response = await request(`${TICKET_ENDPOINT}/reserve`, {
       method: "POST",
       data: data,
     });
@@ -17,6 +17,13 @@ export const ticketService = {
     const response = await request(
       `${TICKET_ENDPOINT}/reserved-seats?projectionId=${projectionId}&date=${date}`
     );
+    return response;
+  },
+  buyTickets: async (data) => {
+    const response = await request(`${TICKET_ENDPOINT}/buy`, {
+      method: "PUT",
+      data: data,
+    });
     return response;
   },
 };

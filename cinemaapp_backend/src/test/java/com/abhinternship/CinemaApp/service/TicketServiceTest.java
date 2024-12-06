@@ -81,12 +81,12 @@ class TicketServiceTest {
     }
 
     @Test
-    void buyTickets_Success() {
+    void reserveTickets_Success() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.of(projection));
         when(ticketRepository.saveAll(anyList())).thenReturn(Arrays.asList(ticket1, ticket2));
 
-        final List<Ticket> tickets = ticketService.buyTickets(userId, projectionId, seatNos, price, date);
+        final List<Ticket> tickets = ticketService.reserveTickets(userId, projectionId, seatNos, price, date);
 
         assertNotNull(tickets);
         assertEquals(2, tickets.size());
@@ -103,11 +103,11 @@ class TicketServiceTest {
     }
 
     @Test
-    void buyTickets_UserNotFound() {
+    void reserveTickets_UserNotFound() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                ticketService.buyTickets(userId, projectionId, seatNos, price, date)
+                ticketService.reserveTickets(userId, projectionId, seatNos, price, date)
         );
         assertEquals("User not found", exception.getMessage());
 
@@ -117,12 +117,12 @@ class TicketServiceTest {
     }
 
     @Test
-    void buyTickets_ProjectionNotFound() {
+    void reserveTickets_ProjectionNotFound() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                ticketService.buyTickets(userId, projectionId, seatNos, price, date)
+                ticketService.reserveTickets(userId, projectionId, seatNos, price, date)
         );
         assertEquals("Projection not found", exception.getMessage());
 

@@ -21,6 +21,8 @@ const SeatAndTickets = () => {
 
   const { projection, selectedDay } = location.state || {};
 
+  const { userId } = useNavBar();
+
   const seatPrices = {
     regular: 7,
     vip: 10,
@@ -57,14 +59,22 @@ const SeatAndTickets = () => {
       return;
     }
 
-    const buyResponse = {
+    const reserveDetails = {
       projection: projection,
       seatNos: selectedSeats.map((seat) => seat.seat),
       price: totalPrice,
       selectedDay: selectedDay,
-    };
+    }
 
-    navigate("/checkout", { state: buyResponse });
+    const buyResponse = await ticketService.reserveTickets({
+      userId: userId,
+      projectionId: projection.id,
+      seatNos: selectedSeats.map((seat) => seat.seat),
+      price: totalPrice,
+      date: formatDateToISO(selectedDay.date),
+    });
+
+    if (buyResponse) navigate("/checkout", { state: reserveDetails });
   };
 
   const handleSeatClick = (seat, seatType) => {

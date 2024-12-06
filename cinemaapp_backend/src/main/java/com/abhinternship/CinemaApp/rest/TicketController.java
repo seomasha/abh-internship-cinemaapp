@@ -16,9 +16,9 @@ import java.util.List;
 public class TicketController {
     private final TicketService ticketService;
 
-    @PostMapping("/buy")
+    @PostMapping("/reserve")
     public List<Ticket> buyTicket(@RequestBody TicketDTO ticketPurchaseDTO) {
-        return ticketService.buyTickets(
+        return ticketService.reserveTickets(
                 ticketPurchaseDTO.getUserId(),
                 ticketPurchaseDTO.getProjectionId(),
                 ticketPurchaseDTO.getSeatNos(),
@@ -31,5 +31,10 @@ public class TicketController {
     public List<String> getReservedSeats(@RequestParam Long projectionId,
                                          @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         return ticketService.getReservedSeats(projectionId, date);
+    }
+
+    @PutMapping("/buy")
+    public List<Ticket> updateTicketStatus(@RequestBody TicketDTO ticketDTO) {
+        return ticketService.buyTickets(ticketDTO.getProjectionId(), ticketDTO.getUserId());
     }
 }

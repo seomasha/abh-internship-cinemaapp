@@ -59,7 +59,7 @@ const Checkout = () => {
 
   const handlePopupClose = () => {
     setShowPopup(false);
-    //navigate("/");
+    navigate("/");
   };
 
   const handleSuccessPopupClose = () => {
@@ -89,7 +89,7 @@ const Checkout = () => {
       type: "card",
       card: cardElement,
       billing_details: {
-        name: "Customer Name",
+        name: userEmail.split("@")[0],
         email: userEmail,
       },
     });
@@ -116,10 +116,9 @@ const Checkout = () => {
       const buyResponse = await ticketService.buyTickets({
         userId: userId,
         projectionId: projection.id,
-        seatNos: seatNos,
-        price: price,
-        date: formattedDate,
       });
+
+      console.log(buyResponse)
 
       if (buyResponse) {
         setShowSuccessPopup(true);

@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TicketService {
-    List<Ticket> buyTickets(Long userId, Long projectionId, List<String> seatNos, int price, LocalDate date);
+    List<Ticket> reserveTickets(Long userId, Long projectionId, List<String> seatNos, int price, LocalDate date);
     List<String> getReservedSeats(Long projectionId, LocalDate date);
+    List<Ticket> buyTickets(Long projectionId, Long userId);
+    void deleteExpiredReservedTickets();
 }
