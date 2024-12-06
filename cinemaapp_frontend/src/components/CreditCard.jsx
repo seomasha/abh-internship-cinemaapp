@@ -1,5 +1,5 @@
 import React from "react";
-
+import "../styles/CreditCard.css";
 import {
   FaCcVisa,
   FaCcMastercard,
@@ -7,7 +7,7 @@ import {
   FaCcDiscover,
 } from "react-icons/fa";
 
-const CreditCard = ({ id, last4, brand, onDelete }) => {
+const CreditCard = ({ id, last4, brand, onDelete, onSelect, isSelected }) => {
   const renderIcon = () => {
     switch (brand) {
       case "visa":
@@ -28,8 +28,12 @@ const CreditCard = ({ id, last4, brand, onDelete }) => {
   };
 
   return (
-    <div className="mt-3">
-      <div className="d-flex justify-content-between border align-items-center rounded-4 py-4">
+    <div className="mt-3" onClick={onSelect}>
+      <div
+        className={`credit-card d-flex justify-content-between ${
+          isSelected ? "card-selected" : ""
+        }}  align-items-center rounded-4 py-4`}
+      >
         <div className="d-flex gap-5 align-items-center">
           <div className="px-4">{renderIcon()}</div>
           <p className="mt-2">****</p>
@@ -37,10 +41,7 @@ const CreditCard = ({ id, last4, brand, onDelete }) => {
           <p>****</p>
           <p className="mb-2">{last4}</p>
         </div>
-        <p
-          className="px-4 primary-red text-decoration-underline fw-bold"
-          onClick={handleDeleteCard}
-        >
+        <p className="px-4 primary-red delete" onClick={handleDeleteCard}>
           Delete Card
         </p>
       </div>

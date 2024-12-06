@@ -34,6 +34,7 @@ const Checkout = () => {
   });
   const [paymentError, setPaymentError] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedCardId, setSelectedCardId] = useState(null);
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
@@ -99,6 +100,14 @@ const Checkout = () => {
     }
   };
 
+  const handleSelectCard = (cardId) => {
+    if (cardId === selectedCardId) {
+      setSelectedCardId(null);
+    } else {
+      setSelectedCardId(cardId);
+    }
+  };
+
   const handlePaymentIntent = async () => {
     const exchangeRate = await exchangeRateService.getExchangeRate("bam");
 
@@ -134,26 +143,33 @@ const Checkout = () => {
 
     const cardElement = elements.getElement(CardNumberElement);
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card: cardElement,
-      billing_details: {
-        name: userEmail.split("@")[0],
-        email: userEmail,
-      },
-    });
+    let paymentMethodId;
 
-    if (error) {
-      console.error("Payment method creation failed", error.message);
-      setPaymentError(error.message);
-      return;
+    if (!selectedCardId) {
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+        billing_details: {
+          name: userEmail.split("@")[0],
+          email: userEmail,
+        },
+      });
+
+      if (error) {
+        console.error("Payment method creation failed", error.message);
+        setPaymentError(error.message);
+        return;
+      }
+
+      paymentMethodId = paymentMethod.id;
+      await paymentService.attachPaymentMethod(paymentMethod.id, customerId);
+    } else {
+      paymentMethodId = selectedCardId;
     }
-
-    await paymentService.attachPaymentMethod(paymentMethod.id, customerId);
 
     const { error: confirmError, paymentIntent } =
       await stripe.confirmCardPayment(secret, {
-        payment_method: paymentMethod.id,
+        payment_method: paymentMethodId,
       });
 
     if (confirmError) {
@@ -236,8 +252,6 @@ const Checkout = () => {
           <div className="col-8">
             <h4>Saved Cards</h4>
 
-            {console.log(paymentMethods)}
-
             {paymentMethods.map((method) => {
               return (
                 <CreditCard
@@ -245,6 +259,8 @@ const Checkout = () => {
                   last4={method.card.last4}
                   brand={method.card.brand}
                   onDelete={() => handleDeleteCard(method.id)}
+                  onSelect={() => handleSelectCard(method.id)}
+                  isSelected={selectedCardId === method.id}
                 />
               );
             })}
