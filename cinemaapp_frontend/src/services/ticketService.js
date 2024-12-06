@@ -13,9 +13,9 @@ export const ticketService = {
     });
     return response;
   },
-  getReservedSeats: async (projectionId) => {
+  getReservedSeats: async (projectionId, date) => {
     const response = await request(
-      `${TICKET_ENDPOINT}/reserved-seats?projectionId=${projectionId}`
+      `${TICKET_ENDPOINT}/reserved-seats?projectionId=${projectionId}&date=${date}`
     );
     return response;
   },

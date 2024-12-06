@@ -25,6 +25,11 @@ const Checkout = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
+  const [errors, setErrors] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvc: "",
+  });
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
@@ -103,17 +108,50 @@ const Checkout = () => {
     if (confirmError) {
       console.error("Payment confirmation failed", confirmError.message);
     } else if (paymentIntent.status === "succeeded") {
-      await paymentService.confirmPayment(paymentIntent.receipt_email);
+      const formattedDate = formatDateToISO(selectedDay.date);
+      if (!formattedDate) {
+        console.error("Failed to format date");
+        return;
+      }
+
       const buyResponse = await ticketService.buyTickets({
         userId: userId,
         projectionId: projection.id,
         seatNos: seatNos,
         price: price,
+        date: formattedDate,
       });
 
       if (buyResponse) {
         setShowSuccessPopup(true);
+        await paymentService.confirmPayment(paymentIntent.receipt_email);
       }
+    }
+  };
+
+  const formatDateToISO = (dateString, year = new Date().getFullYear()) => {
+    const fullDateString = `${dateString} ${year}`;
+
+    const parsedDate = new Date(fullDateString);
+    if (isNaN(parsedDate)) {
+      console.error("Invalid date format");
+      return null;
+    }
+
+    const formattedYear = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+
+    return `${formattedYear}-${month}-${day}`;
+  };
+
+  const handleElementChange = (event, field) => {
+    if (event.empty) {
+      setErrors((prev) => ({ ...prev, [field]: "This field is required" }));
+    } else if (event.error) {
+      setErrors((prev) => ({ ...prev, [field]: event.error.message }));
+    } else {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -154,9 +192,14 @@ const Checkout = () => {
               options={{
                 style: {
                   invalid: { color: "#9e2146" },
+                  empty: { color: "#9e2146" },
                 },
               }}
+              onChange={(event) => handleElementChange(event, "cardNumber")}
             />
+            {errors.cardNumber && (
+              <p className="text-danger">{errors.cardNumber}</p>
+            )}
 
             <div className="d-flex gap-5 mt-4">
               <div className="w-100">
@@ -166,9 +209,14 @@ const Checkout = () => {
                   options={{
                     style: {
                       invalid: { color: "#9e2146" },
+                      empty: { color: "#9e2146" },
                     },
                   }}
+                  onChange={(event) => handleElementChange(event, "expiryDate")}
                 />
+                {errors.expiryDate && (
+                  <p className="text-danger">{errors.expiryDate}</p>
+                )}
               </div>
               <div className="w-100">
                 <label className="fw-bold">CVV</label>
@@ -177,9 +225,12 @@ const Checkout = () => {
                   options={{
                     style: {
                       invalid: { color: "#9e2146" },
+                      empty: { color: "#9e2146" },
                     },
                   }}
+                  onChange={(event) => handleElementChange(event, "cvc")}
                 />
+                {errors.cvc && <p className="text-danger">{errors.cvc}</p>}
               </div>
             </div>
 

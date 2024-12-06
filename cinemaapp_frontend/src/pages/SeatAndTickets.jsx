@@ -21,8 +21,6 @@ const SeatAndTickets = () => {
 
   const { projection, selectedDay } = location.state || {};
 
-  const { userId } = useNavBar();
-
   const seatPrices = {
     regular: 7,
     vip: 10,
@@ -31,7 +29,11 @@ const SeatAndTickets = () => {
 
   useEffect(() => {
     const fetchReservedSeats = async () => {
-      const seats = await ticketService.getReservedSeats(projection.id);
+      const formattedDate = formatDateToISO(selectedDay.date);
+      const seats = await ticketService.getReservedSeats(
+        projection.id,
+        formattedDate
+      );
       setReservedSeats(seats);
     };
     fetchReservedSeats();
@@ -97,6 +99,22 @@ const SeatAndTickets = () => {
     return selectedSeats.some((s) => s.seat === seat)
       ? "selected"
       : "available";
+  };
+
+  const formatDateToISO = (dateString, year = new Date().getFullYear()) => {
+    const fullDateString = `${dateString} ${year}`;
+
+    const parsedDate = new Date(fullDateString);
+    if (isNaN(parsedDate)) {
+      console.error("Invalid date format");
+      return null;
+    }
+
+    const formattedYear = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+
+    return `${formattedYear}-${month}-${day}`;
   };
 
   const handlePopupClose = () => {

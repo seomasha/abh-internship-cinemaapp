@@ -9,6 +9,7 @@ import com.abhinternship.CinemaApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,8 @@ public class TicketServiceImpl implements TicketService {
     public List<Ticket> buyTickets(final Long userId,
                                    final Long projectionId,
                                    final List<String> seatNos,
-                                   final int price) {
+                                   final int price,
+                                   final LocalDate date) {
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         final Projection projection = projectionRepository.findById(projectionId)
@@ -38,6 +40,7 @@ public class TicketServiceImpl implements TicketService {
             ticket.setSeatNo(seatNo);
             ticket.setPrice(price);
             ticket.setPurchaseDate(new Date());
+            ticket.setDate(date);
             ticket.setStatus("purchased");
             tickets.add(ticket);
         }
@@ -46,8 +49,8 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<String> getReservedSeats(final Long projectionId) {
-        final List<Ticket> tickets = ticketRepository.findByProjectionId_Id(projectionId);
+    public List<String> getReservedSeats(final Long projectionId, final LocalDate localDate) {
+        final List<Ticket> tickets = ticketRepository.findByProjectionId_IdAndDate(projectionId, localDate);
         return tickets.stream()
                 .map(Ticket::getSeatNo)
                 .collect(Collectors.toList());

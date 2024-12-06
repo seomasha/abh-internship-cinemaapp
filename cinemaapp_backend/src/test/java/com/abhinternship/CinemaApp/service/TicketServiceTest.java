@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ class TicketServiceTest {
     private Long projectionId;
     private List<String> seatNos;
     private int price;
+    private LocalDate date;
     private User user;
     private Projection projection;
     private Ticket ticket1;
@@ -51,6 +53,7 @@ class TicketServiceTest {
         projectionId = 2L;
         seatNos = Arrays.asList("A1", "A2");
         price = 7;
+        date = LocalDate.now();
 
         user = new User();
         user.setId(userId);
@@ -83,7 +86,7 @@ class TicketServiceTest {
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.of(projection));
         when(ticketRepository.saveAll(anyList())).thenReturn(Arrays.asList(ticket1, ticket2));
 
-        final List<Ticket> tickets = ticketService.buyTickets(userId, projectionId, seatNos, price);
+        final List<Ticket> tickets = ticketService.buyTickets(userId, projectionId, seatNos, price, date);
 
         assertNotNull(tickets);
         assertEquals(2, tickets.size());
@@ -104,7 +107,7 @@ class TicketServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                ticketService.buyTickets(userId, projectionId, seatNos, price)
+                ticketService.buyTickets(userId, projectionId, seatNos, price, date)
         );
         assertEquals("User not found", exception.getMessage());
 
@@ -119,7 +122,7 @@ class TicketServiceTest {
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                ticketService.buyTickets(userId, projectionId, seatNos, price)
+                ticketService.buyTickets(userId, projectionId, seatNos, price, date)
         );
         assertEquals("Projection not found", exception.getMessage());
 
@@ -130,27 +133,27 @@ class TicketServiceTest {
 
     @Test
     void getReservedSeats_Success() {
-        when(ticketRepository.findByProjectionId_Id(projectionId)).thenReturn(Arrays.asList(ticket1, ticket2));
+        when(ticketRepository.findByProjectionId_IdAndDate(projectionId, date)).thenReturn(Arrays.asList(ticket1, ticket2));
 
-        final List<String> seats = ticketService.getReservedSeats(projectionId);
+        final List<String> seats = ticketService.getReservedSeats(projectionId, date);
 
         assertNotNull(seats);
         assertEquals(2, seats.size());
         assertTrue(seats.contains("A1"));
         assertTrue(seats.contains("A2"));
 
-        verify(ticketRepository, times(1)).findByProjectionId_Id(projectionId);
+        verify(ticketRepository, times(1)).findByProjectionId_IdAndDate(projectionId, date);
     }
 
     @Test
     void getReservedSeats_NoSeatsReserved() {
-        when(ticketRepository.findByProjectionId_Id(projectionId)).thenReturn(Arrays.asList());
+        when(ticketRepository.findByProjectionId_IdAndDate(projectionId, date)).thenReturn(Arrays.asList());
 
-        final List<String> seats = ticketService.getReservedSeats(projectionId);
+        final List<String> seats = ticketService.getReservedSeats(projectionId, date);
 
         assertNotNull(seats);
         assertTrue(seats.isEmpty());
 
-        verify(ticketRepository, times(1)).findByProjectionId_Id(projectionId);
+        verify(ticketRepository, times(1)).findByProjectionId_IdAndDate(projectionId, date);
     }
 }
