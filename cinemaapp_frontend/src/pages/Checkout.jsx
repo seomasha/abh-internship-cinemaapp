@@ -23,6 +23,7 @@ import { useNavBar } from "../context/NavBarContext";
 const Checkout = () => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [showPopup, setShowPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
 
   const token = localStorage.getItem("token");
@@ -54,6 +55,11 @@ const Checkout = () => {
   const handlePopupClose = () => {
     setShowPopup(false);
     //navigate("/");
+  };
+
+  const handleSuccessPopupClose = () => {
+    setShowSuccessPopup(false);
+    navigate("/");
   };
 
   const handlePaymentButton = async () => {
@@ -106,7 +112,7 @@ const Checkout = () => {
       });
 
       if (buyResponse) {
-        navigate("/");
+        setShowSuccessPopup(true);
       }
     }
   };
@@ -240,6 +246,7 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
       <Modal show={showPopup} onHide={handlePopupClose}>
         <Modal.Header>
           <Modal.Title className="fw-bold py-1 px-3">
@@ -258,6 +265,37 @@ const Checkout = () => {
             onClick={handlePopupClose}
           >
             Okay
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showSuccessPopup} onHide={handleSuccessPopupClose}>
+        <Modal.Header>
+          <Modal.Title className="fw-bold py-1 px-3">
+            Payment Successful
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h6 className="fw-light px-3">
+            The receipt and ticket have been sent to your email. You may
+            download them immediately, or retrieve them later from your User
+            profile.
+          </h6>
+        </Modal.Body>
+        <Modal.Footer className="d-flex">
+          <Button
+            variant="danger"
+            className="back-to-home"
+            onClick={handleSuccessPopupClose}
+          >
+            Back to Home
+          </Button>
+          <Button
+            variant="danger"
+            className="primary-red-background text-white"
+            onClick={handleSuccessPopupClose}
+          >
+            Download
           </Button>
         </Modal.Footer>
       </Modal>
