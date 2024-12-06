@@ -33,6 +33,7 @@ const Checkout = () => {
     cvc: "",
   });
   const [paymentError, setPaymentError] = useState("");
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
@@ -70,34 +71,47 @@ const Checkout = () => {
     navigate("/");
   };
 
-  const handlePaymentButton = async () => {
-    const customerData = {
-      email: userEmail,
-      name: userEmail.split("@")[0],
+  useEffect(() => {
+    const handlePaymentButton = async () => {
+      const customerData = {
+        email: userEmail,
+        name: userEmail.split("@")[0],
+      };
+
+      const customerCreateResponse = await paymentService.createCustomer(
+        customerData
+      );
+
+      setCustomerId(customerCreateResponse.customerId);
     };
 
-    const customerCreateResponse = await paymentService.createCustomer(
-      customerData
-    );
+    handlePaymentButton();
+  }, []);
 
-    setCustomerId(customerCreateResponse.customerId);
+  const handlePaymentIntent = async () => {
+    const exchangeRate = await exchangeRateService.getExchangeRate("bam");
+
+    const response = await paymentService.createPaymentIntent({
+      customerId: customerId,
+      amount: price * 100 * exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
+      currency: "eur",
+      receiptEmail: userEmail,
+    });
+
+    setClientSecret(response.clientSecret);
   };
 
   useEffect(() => {
-    const handlePaymentIntent = async () => {
-      const exchangeRate = await exchangeRateService.getExchangeRate("bam");
-
-      const response = await paymentService.createPaymentIntent({
-        customerId: customerId,
-        amount: price * 100 * exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
-        currency: "eur",
-        receiptEmail: userEmail,
-      });
-
-      setClientSecret(response.clientSecret);
+    const getPaymentMethods = async () => {
+      if (customerId) {
+        const paymentMethods = await paymentService.getPaymentMethods(
+          customerId
+        );
+        setPaymentMethods(paymentMethods);
+      }
     };
 
-    if (customerId) handlePaymentIntent();
+    getPaymentMethods();
   }, [customerId]);
 
   const handleConfirmPayment = async (secret) => {
@@ -108,10 +122,6 @@ const Checkout = () => {
     }
 
     const cardElement = elements.getElement(CardNumberElement);
-
-    const paymentMethods = await paymentService.getPaymentMethods(customerId);
-
-    console.log(paymentMethods.map((card) => card.card));
 
     const { error, paymentMethod } = await stripe.createPaymentMethod({
       type: "card",
@@ -215,8 +225,17 @@ const Checkout = () => {
           <div className="col-8">
             <h4>Saved Cards</h4>
 
-            <CreditCard />
-            <CreditCard />
+            {console.log(paymentMethods)}
+
+            {paymentMethods.map((method) => {
+              return (
+                <CreditCard
+                  key={method.id}
+                  last4={method.card.last4}
+                  brand={method.card.brand}
+                />
+              );
+            })}
 
             <Separator dark={true} />
 
@@ -272,7 +291,7 @@ const Checkout = () => {
             <Button
               variant="danger"
               className="w-100 primary-red-background py-2 mt-5"
-              onClick={handlePaymentButton}
+              onClick={handlePaymentIntent}
             >
               Make Payment - {price}KM
             </Button>
