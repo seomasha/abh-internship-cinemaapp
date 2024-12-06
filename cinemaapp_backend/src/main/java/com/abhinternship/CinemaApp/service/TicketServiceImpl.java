@@ -9,6 +9,7 @@ import com.abhinternship.CinemaApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,6 +71,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Scheduled(fixedRate = 60000)
+    @Transactional
     @Override
     public void deleteExpiredReservedTickets() {
         ticketRepository.deleteExpiredReservedTickets();
