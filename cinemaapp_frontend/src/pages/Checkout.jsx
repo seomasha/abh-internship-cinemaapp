@@ -22,6 +22,7 @@ import { useNavBar } from "../context/NavBarContext";
 import exchangeRateService from "../services/exchangeRateService";
 
 const Checkout = () => {
+  const [customerId, setCustomerId] = useState("");
   const [timeLeft, setTimeLeft] = useState(300);
   const [showPopup, setShowPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -70,16 +71,34 @@ const Checkout = () => {
   };
 
   const handlePaymentButton = async () => {
-    const exchangeRate = await exchangeRateService.getExchangeRate("bam");
+    const customerData = {
+      email: userEmail,
+      name: userEmail.split("@")[0],
+    };
 
-    const response = await paymentService.createPaymentIntent({
-      amount: price * 100 * exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
-      currency: "eur",
-      receiptEmail: userEmail,
-    });
+    const customerCreateResponse = await paymentService.createCustomer(
+      customerData
+    );
 
-    setClientSecret(response.clientSecret);
+    setCustomerId(customerCreateResponse.customerId);
   };
+
+  useEffect(() => {
+    const handlePaymentIntent = async () => {
+      const exchangeRate = await exchangeRateService.getExchangeRate("bam");
+
+      const response = await paymentService.createPaymentIntent({
+        customerId: customerId,
+        amount: price * 100 * exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
+        currency: "eur",
+        receiptEmail: userEmail,
+      });
+
+      setClientSecret(response.clientSecret);
+    };
+
+    if (customerId) handlePaymentIntent();
+  }, [customerId]);
 
   const handleConfirmPayment = async (secret) => {
     if (!stripe || !elements) {
@@ -104,6 +123,8 @@ const Checkout = () => {
       setPaymentError(error.message);
       return;
     }
+
+    await paymentService.attachPaymentMethod(paymentMethod.id, customerId);
 
     const { error: confirmError, paymentIntent } =
       await stripe.confirmCardPayment(secret, {
@@ -137,7 +158,7 @@ const Checkout = () => {
     if (clientSecret) {
       handleConfirmPayment(clientSecret);
     }
-  }, [clientSecret]);
+  }, [clientSecret, customerId]);
 
   const formatDateToISO = (dateString, year = new Date().getFullYear()) => {
     const fullDateString = `${dateString} ${year}`;

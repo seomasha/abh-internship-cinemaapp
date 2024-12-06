@@ -26,11 +26,12 @@ class PaymentServiceTest {
             mockedPaymentIntent.when(() -> PaymentIntent.create(any(PaymentIntentCreateParams.class)))
                     .thenReturn(mockPaymentIntent);
 
+            final String customerId = "test";
             final Long amount = 1000L;
             final String currency = "usd";
             final String receiptEmail = "test@example.com";
 
-            final PaymentIntent result = paymentService.createPaymentIntent(amount, currency, receiptEmail);
+            final PaymentIntent result = paymentService.createPaymentIntent(customerId, amount, currency, receiptEmail);
 
             assertNotNull(result);
             mockedPaymentIntent.verify(() -> PaymentIntent.create(any(PaymentIntentCreateParams.class)), times(1));
