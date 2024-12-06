@@ -101,7 +101,7 @@ const Checkout = () => {
 
     if (error) {
       console.error("Payment method creation failed", error.message);
-      setPaymentError("Payment failed.");
+      setPaymentError(error.message);
       return;
     }
 
