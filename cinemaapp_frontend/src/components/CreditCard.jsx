@@ -30,9 +30,9 @@ const CreditCard = ({ id, last4, brand, onDelete, onSelect, isSelected }) => {
   return (
     <div className="mt-3" onClick={onSelect}>
       <div
-        className={`credit-card d-flex justify-content-between ${
-          isSelected ? "card-selected" : ""
-        }}  align-items-center rounded-4 py-4`}
+        className={`credit-card d-flex justify-content-between 
+          ${isSelected ? "card-selected" : ""}
+        align-items-center rounded-4 py-4`}
       >
         <div className="d-flex gap-5 align-items-center">
           <div className="px-4">{renderIcon()}</div>
