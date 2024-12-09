@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { CiCircleInfo } from "react-icons/ci";
 import { useLocation } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, ProgressBar } from "react-bootstrap";
 import CreditCard from "../components/CreditCard";
 import Separator from "../components/Separator";
 import "../styles/Checkout.css";
@@ -37,6 +37,7 @@ const Checkout = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedCardId, setSelectedCardId] = useState(null);
   const [price, setPrice] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
@@ -140,6 +141,8 @@ const Checkout = () => {
   }, [customerId]);
 
   const handleConfirmPayment = async (secret) => {
+    setLoading(true);
+
     if (!stripe || !elements) {
       console.error("Something went wrong.");
       setPaymentError("Something went wrong.");
@@ -163,6 +166,7 @@ const Checkout = () => {
       if (error) {
         console.error("Payment method creation failed", error.message);
         setPaymentError(error.message);
+        setLoading(false);
         return;
       }
 
@@ -180,10 +184,12 @@ const Checkout = () => {
     if (confirmError) {
       console.error("Payment confirmation failed", confirmError.message);
       setPaymentError("Payment confirmation failed.");
+      setLoading(false);
     } else if (paymentIntent.status === "succeeded") {
       const formattedDate = formatDateToISO(selectedDay.date);
       if (!formattedDate) {
         console.error("Failed to format date");
+        setLoading(false);
         return;
       }
 
@@ -195,6 +201,7 @@ const Checkout = () => {
       if (buyResponse) {
         setPaymentError("");
         setShowSuccessPopup(true);
+        setLoading(false);
         await paymentService.confirmPayment(paymentIntent.receipt_email);
       }
     }
@@ -328,6 +335,16 @@ const Checkout = () => {
             >
               Make Payment - {price}KM
             </Button>
+
+            {loading && (
+              <ProgressBar
+                animated
+                now={100}
+                variant="danger"
+                className="mt-4"
+              />
+            )}
+
             {paymentError && (
               <p className="text-danger text-center mt-4">{paymentError}</p>
             )}
