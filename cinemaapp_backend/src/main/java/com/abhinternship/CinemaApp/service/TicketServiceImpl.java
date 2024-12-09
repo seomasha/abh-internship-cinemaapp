@@ -40,9 +40,9 @@ public class TicketServiceImpl implements TicketService {
         final Projection projection = projectionRepository.findById(projectionId)
                 .orElseThrow(() -> new RuntimeException("Projection not found"));
 
-        String seats = String.join(",", seatNos);
+        final String seats = String.join(",", seatNos);
 
-        Ticket ticket = new Ticket();
+        final Ticket ticket = new Ticket();
         ticket.setUserId(user);
         ticket.setProjectionId(projection);
         ticket.setSeatNo(seats);
@@ -73,10 +73,8 @@ public class TicketServiceImpl implements TicketService {
         return ticketRepository.saveAll(reservedTickets);
     }
 
-    private int getSeatPrice(String seatNo) {
-        if (seatNo.startsWith("A") || seatNo.startsWith("B") || seatNo.startsWith("C") || seatNo.startsWith("D") || seatNo.startsWith("E") || seatNo.startsWith("F")) {
-            return seatPrices.get("regular");
-        } else if (seatNo.startsWith("G") || seatNo.startsWith("H")) {
+    private int getSeatPrice(final String seatNo) {
+        if (seatNo.startsWith("G") || seatNo.startsWith("H")) {
             return seatPrices.get("vip");
         } else if (seatNo.startsWith("I")) {
             return seatPrices.get("love");

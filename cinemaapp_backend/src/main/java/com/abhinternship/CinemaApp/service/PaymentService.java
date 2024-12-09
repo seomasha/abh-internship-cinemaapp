@@ -52,7 +52,7 @@ public class PaymentService {
         final PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
 
         final List<PaymentMethod> existingPaymentMethods = getPaymentMethodsForCustomer(customerId);
-        boolean isDuplicate = existingPaymentMethods.stream()
+        final boolean isDuplicate = existingPaymentMethods.stream()
                 .anyMatch(pm -> pm.getCard() != null
                         && pm.getCard().getLast4().equals(paymentMethod.getCard().getLast4())
                         && pm.getCard().getBrand().equals(paymentMethod.getCard().getBrand()));

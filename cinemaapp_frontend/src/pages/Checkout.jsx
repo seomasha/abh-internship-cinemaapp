@@ -105,7 +105,7 @@ const Checkout = () => {
       setPaymentMethods((prevMethods) =>
         prevMethods.filter((method) => method.id !== cardId)
       );
-      ToastService.info("Deleted card.");
+      ToastService.success("Deleted card.");
     }
   };
 
