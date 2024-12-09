@@ -17,12 +17,11 @@ public class TicketController {
     private final TicketService ticketService;
 
     @PostMapping("/reserve")
-    public List<Ticket> buyTicket(@RequestBody TicketDTO ticketPurchaseDTO) {
+    public Ticket buyTicket(@RequestBody TicketDTO ticketPurchaseDTO) {
         return ticketService.reserveTickets(
                 ticketPurchaseDTO.getUserId(),
                 ticketPurchaseDTO.getProjectionId(),
                 ticketPurchaseDTO.getSeatNos(),
-                ticketPurchaseDTO.getPrice(),
                 ticketPurchaseDTO.getDate()
         );
     }
@@ -36,5 +35,10 @@ public class TicketController {
     @PutMapping("/buy")
     public List<Ticket> updateTicketStatus(@RequestBody TicketDTO ticketDTO) {
         return ticketService.buyTickets(ticketDTO.getProjectionId(), ticketDTO.getUserId());
+    }
+
+    @PostMapping("/seat-price")
+    public int getSeatPrice(@RequestBody List<String> seatNos) {
+        return ticketService.calculateTotalPrice(seatNos);
     }
 }

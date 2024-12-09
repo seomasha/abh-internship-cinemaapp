@@ -64,7 +64,7 @@ class TicketServiceTest {
         projection.setId(projectionId);
 
         ticket1 = new Ticket();
-        ticket1.setSeatNo("A1");
+        ticket1.setSeatNo("A1,A2");
         ticket1.setPrice(price);
         ticket1.setUserId(user);
         ticket1.setProjectionId(projection);
@@ -84,30 +84,28 @@ class TicketServiceTest {
     void reserveTickets_Success() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.of(projection));
-        when(ticketRepository.saveAll(anyList())).thenReturn(Arrays.asList(ticket1, ticket2));
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket1);
 
-        final List<Ticket> tickets = ticketService.reserveTickets(userId, projectionId, seatNos, price, date);
+        final Ticket ticket = ticketService.reserveTickets(userId, projectionId, seatNos, date);
 
-        assertNotNull(tickets);
-        assertEquals(2, tickets.size());
-        assertEquals("A1", tickets.get(0).getSeatNo());
-        assertEquals("A2", tickets.get(1).getSeatNo());
-        assertEquals(price, tickets.get(0).getPrice());
-        assertEquals(price, tickets.get(1).getPrice());
-        assertEquals(user, tickets.get(0).getUserId());
-        assertEquals(projection, tickets.get(0).getProjectionId());
+        assertNotNull(ticket);
+        assertEquals("A1,A2", ticket.getSeatNo());
+        assertEquals(price, ticket.getPrice());
+        assertEquals(user, ticket.getUserId());
+        assertEquals(projection, ticket.getProjectionId());
 
         verify(userRepository, times(1)).findById(userId);
         verify(projectionRepository, times(1)).findById(projectionId);
-        verify(ticketRepository, times(1)).saveAll(anyList());
+        verify(ticketRepository, times(1)).save(any(Ticket.class));
     }
+
 
     @Test
     void reserveTickets_UserNotFound() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                ticketService.reserveTickets(userId, projectionId, seatNos, price, date)
+                ticketService.reserveTickets(userId, projectionId, seatNos, date)
         );
         assertEquals("User not found", exception.getMessage());
 
@@ -122,7 +120,7 @@ class TicketServiceTest {
         when(projectionRepository.findById(projectionId)).thenReturn(Optional.empty());
 
         final RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                ticketService.reserveTickets(userId, projectionId, seatNos, price, date)
+                ticketService.reserveTickets(userId, projectionId, seatNos, date)
         );
         assertEquals("Projection not found", exception.getMessage());
 
@@ -138,7 +136,7 @@ class TicketServiceTest {
         final List<String> seats = ticketService.getReservedSeats(projectionId, date);
 
         assertNotNull(seats);
-        assertEquals(2, seats.size());
+        assertEquals(3, seats.size());
         assertTrue(seats.contains("A1"));
         assertTrue(seats.contains("A2"));
 

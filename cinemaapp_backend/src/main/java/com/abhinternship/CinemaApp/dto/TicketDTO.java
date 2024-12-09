@@ -10,6 +10,5 @@ public class TicketDTO {
     private final Long userId;
     private final Long projectionId;
     private final List<String> seatNos;
-    private final int price;
     private final LocalDate date;
 }

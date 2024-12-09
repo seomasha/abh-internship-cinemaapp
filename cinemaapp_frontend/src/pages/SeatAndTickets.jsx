@@ -23,12 +23,6 @@ const SeatAndTickets = () => {
 
   const { userId } = useNavBar();
 
-  const seatPrices = {
-    regular: 7,
-    vip: 10,
-    love: 24,
-  };
-
   useEffect(() => {
     const fetchReservedSeats = async () => {
       const formattedDate = formatDateToISO(selectedDay.date);
@@ -62,22 +56,20 @@ const SeatAndTickets = () => {
     const reserveDetails = {
       projection: projection,
       seatNos: selectedSeats.map((seat) => seat.seat),
-      price: totalPrice,
       selectedDay: selectedDay,
-    }
+    };
 
     const buyResponse = await ticketService.reserveTickets({
       userId: userId,
       projectionId: projection.id,
       seatNos: selectedSeats.map((seat) => seat.seat),
-      price: totalPrice,
       date: formatDateToISO(selectedDay.date),
     });
 
     if (buyResponse) navigate("/checkout", { state: reserveDetails });
   };
 
-  const handleSeatClick = (seat, seatType) => {
+  const handleSeatClick = (seat) => {
     if (reservedSeats.includes(seat)) {
       return;
     }
@@ -89,18 +81,23 @@ const SeatAndTickets = () => {
       if (seatAlreadySelected) {
         newSeats = prevSeats.filter((item) => item.seat !== seat);
       } else {
-        newSeats = [...prevSeats, { seat, price: seatPrices[seatType] }];
+        newSeats = [...prevSeats, { seat }];
       }
-
-      const newTotalPrice = newSeats.reduce(
-        (total, item) => total + item.price,
-        0
-      );
-      setTotalPrice(newTotalPrice);
 
       return newSeats;
     });
   };
+
+  useEffect(() => {
+    const getPrice = async () => {
+      const response = await ticketService.getSeatPrice(
+        selectedSeats.map((seat) => seat.seat)
+      );
+      setTotalPrice(response);
+    };
+
+    getPrice();
+  }, [selectedSeats]);
 
   const getSeatClass = (seat) => {
     if (reservedSeats.includes(seat)) {

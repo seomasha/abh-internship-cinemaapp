@@ -3,16 +3,28 @@ package com.abhinternship.CinemaApp.service;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 import com.stripe.param.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
-    public PaymentIntent createPaymentIntent(final String customerId, final Long amount, final String currency, final String receiptEmail) throws StripeException {
+
+    private final TicketService ticketService;
+
+    public PaymentIntent createPaymentIntent(final String customerId,
+                                             final List<String> seats,
+                                             final double currencyRate,
+                                             final String currency,
+                                             final String receiptEmail) throws StripeException {
+
+        final int totalPrice = ticketService.calculateTotalPrice(seats);
+
         final PaymentIntentCreateParams params =
                 PaymentIntentCreateParams.builder()
-                        .setAmount(amount) // Amount in the smallest currency unit (e.g., cents for USD)
+                        .setAmount((long) (totalPrice * 100 * currencyRate)) // Amount in the smallest currency unit (e.g., cents for USD)
                         .setCurrency(currency)
                         .setReceiptEmail(receiptEmail)
                         .setCustomer(customerId)

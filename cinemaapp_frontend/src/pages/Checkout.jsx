@@ -20,6 +20,7 @@ import { getUserInfoFromToken } from "../utils/JwtDecode";
 import { ticketService } from "../services/ticketService";
 import { useNavBar } from "../context/NavBarContext";
 import exchangeRateService from "../services/exchangeRateService";
+import ToastService from "../services/toastService";
 
 const Checkout = () => {
   const [customerId, setCustomerId] = useState("");
@@ -35,6 +36,7 @@ const Checkout = () => {
   const [paymentError, setPaymentError] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const [price, setPrice] = useState(0);
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
@@ -44,7 +46,7 @@ const Checkout = () => {
   const stripe = useStripe();
   const location = useLocation();
 
-  const { projection, selectedDay, seatNos, price } = location.state || {};
+  const { projection, selectedDay, seatNos } = location.state || {};
 
   const { userId } = useNavBar();
 
@@ -86,6 +88,12 @@ const Checkout = () => {
       setCustomerId(customerCreateResponse.customerId);
     };
 
+    const getPrice = async () => {
+      const response = await ticketService.getSeatPrice(seatNos);
+      setPrice(response);
+    };
+
+    getPrice();
     handlePaymentButton();
   }, []);
 
@@ -96,16 +104,12 @@ const Checkout = () => {
       setPaymentMethods((prevMethods) =>
         prevMethods.filter((method) => method.id !== cardId)
       );
-      alert("Deleted card succesfully");
+      ToastService.info("Deleted card.");
     }
   };
 
   const handleSelectCard = (cardId) => {
-    if (cardId === selectedCardId) {
-      setSelectedCardId(null);
-    } else {
-      setSelectedCardId(cardId);
-    }
+    setSelectedCardId(cardId === selectedCardId ? null : cardId);
   };
 
   const handlePaymentIntent = async () => {
@@ -113,7 +117,8 @@ const Checkout = () => {
 
     const response = await paymentService.createPaymentIntent({
       customerId: customerId,
-      amount: price * 100 * exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
+      seats: seatNos,
+      currencyRate: exchangeRate.conversion_rates.EUR, // Since Stripe doesn't support BAM, I use euros and convert them into BAM
       currency: "eur",
       receiptEmail: userEmail,
     });

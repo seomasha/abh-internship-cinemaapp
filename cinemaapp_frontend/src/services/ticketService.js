@@ -26,4 +26,11 @@ export const ticketService = {
     });
     return response;
   },
+  getSeatPrice: async (data) => {
+    const response = await request(`${TICKET_ENDPOINT}/seat-price`, {
+      method: "POST",
+      data: data,
+    });
+    return response;
+  },
 };

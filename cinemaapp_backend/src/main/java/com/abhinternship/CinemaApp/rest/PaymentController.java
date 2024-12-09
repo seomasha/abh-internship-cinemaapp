@@ -27,7 +27,8 @@ public class PaymentController {
     public ResponseEntity<Map<String, String>> createPayment(@RequestBody PaymentRequestDTO paymentRequest) throws StripeException {
         final PaymentIntent paymentIntent = paymentService.createPaymentIntent(
                 paymentRequest.getCustomerId(),
-                paymentRequest.getAmount(),
+                paymentRequest.getSeats(),
+                paymentRequest.getCurrencyRate(),
                 paymentRequest.getCurrency(),
                 paymentRequest.getReceiptEmail());
 

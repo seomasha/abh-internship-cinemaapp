@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,37 +25,40 @@ public class TicketServiceImpl implements TicketService {
     private final UserRepository userRepository;
     private final ProjectionRepository projectionRepository;
 
-    public List<Ticket> reserveTickets(final Long userId,
-                                   final Long projectionId,
-                                   final List<String> seatNos,
-                                   final int price,
-                                   final LocalDate date) {
+    private final Map<String, Integer> seatPrices = Map.of(
+            "regular", 7,
+            "vip", 10,
+            "love", 24
+    );
+
+    public Ticket reserveTickets(final Long userId,
+                                       final Long projectionId,
+                                       final List<String> seatNos,
+                                       final LocalDate date) {
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         final Projection projection = projectionRepository.findById(projectionId)
                 .orElseThrow(() -> new RuntimeException("Projection not found"));
 
-        final List<Ticket> tickets = new ArrayList<>();
-        for (String seatNo : seatNos) {
-            Ticket ticket = new Ticket();
-            ticket.setUserId(user);
-            ticket.setProjectionId(projection);
-            ticket.setSeatNo(seatNo);
-            ticket.setPrice(price);
-            ticket.setPurchaseDate(new Date());
-            ticket.setDate(date);
-            ticket.setStatus("reserved");
-            tickets.add(ticket);
-        }
+        String seats = String.join(",", seatNos);
 
-        return ticketRepository.saveAll(tickets);
+        Ticket ticket = new Ticket();
+        ticket.setUserId(user);
+        ticket.setProjectionId(projection);
+        ticket.setSeatNo(seats);
+        ticket.setPrice(calculateTotalPrice(seatNos));
+        ticket.setPurchaseDate(new Date());
+        ticket.setDate(date);
+        ticket.setStatus("reserved");
+
+        return ticketRepository.save(ticket);
     }
 
     @Override
     public List<String> getReservedSeats(final Long projectionId, final LocalDate localDate) {
         final List<Ticket> tickets = ticketRepository.findByProjectionId_IdAndDate(projectionId, localDate);
         return tickets.stream()
-                .map(Ticket::getSeatNo)
+                .flatMap(ticket -> Arrays.stream(ticket.getSeatNo().split(",")))
                 .collect(Collectors.toList());
     }
 
@@ -68,6 +71,25 @@ public class TicketServiceImpl implements TicketService {
         }
 
         return ticketRepository.saveAll(reservedTickets);
+    }
+
+    private int getSeatPrice(String seatNo) {
+        if (seatNo.startsWith("A") || seatNo.startsWith("B") || seatNo.startsWith("C") || seatNo.startsWith("D") || seatNo.startsWith("E") || seatNo.startsWith("F")) {
+            return seatPrices.get("regular");
+        } else if (seatNo.startsWith("G") || seatNo.startsWith("H")) {
+            return seatPrices.get("vip");
+        } else if (seatNo.startsWith("I")) {
+            return seatPrices.get("love");
+        }
+        return seatPrices.get("regular");
+    }
+
+    public int calculateTotalPrice(final List<String> seatNos) {
+        int totalPrice = 0;
+        for (String seatNo : seatNos) {
+            totalPrice += getSeatPrice(seatNo);
+        }
+        return totalPrice;
     }
 
     @Scheduled(fixedRate = 60000)
