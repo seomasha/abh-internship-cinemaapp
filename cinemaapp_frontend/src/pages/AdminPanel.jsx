@@ -12,11 +12,62 @@ import { Button } from "react-bootstrap";
 import Input from "../components/Input";
 import TextArea from "../components/TextArea.jsx";
 import Dropdown from "../components/Dropdown.jsx";
+import MovieTable from "../components/MovieTable.jsx";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
   const [currentFlow, setCurrentFlow] = useState("default");
   const [movieCreationStep, setMovieCreationStep] = useState(1);
+  const [movies, setMovies] = useState([
+    {
+      id: 1,
+      name: "Movie 1",
+      imageUrl: "https://via.placeholder.com/150",
+      projectionDate: "2024-12-15",
+      venue: "Venue 1",
+      status: "Step 1/3",
+    },
+    {
+      id: 2,
+      name: "Movie 2",
+      imageUrl: "https://via.placeholder.com/150",
+      projectionDate: "2024-12-20",
+      venue: "Venue 2",
+      status: "Step 2/3",
+    },
+    {
+      id: 3,
+      name: "Movie 2",
+      imageUrl: "https://via.placeholder.com/150",
+      projectionDate: "2024-12-20",
+      venue: "Venue 2",
+      status: "Step 3/3",
+    },
+    {
+      id: 3,
+      name: "Movie 2",
+      imageUrl: "https://via.placeholder.com/150",
+      projectionDate: "2024-12-20",
+      venue: "Venue 2",
+      status: "Step 3/3",
+    },
+    {
+      id: 3,
+      name: "Movie 2",
+      imageUrl: "https://via.placeholder.com/150",
+      projectionDate: "2024-12-20",
+      venue: "Venue 2",
+      status: "Step 3/3",
+    },
+    {
+      id: 3,
+      name: "Movie 2",
+      imageUrl: "https://via.placeholder.com/150",
+      projectionDate: "2024-12-20",
+      venue: "Venue 2",
+      status: "Step 3/3",
+    },
+  ]);
 
   return (
     <div>
@@ -66,7 +117,7 @@ const AdminPanel = () => {
               </div>
 
               <div className="mt-4">
-                {activeTab === "drafts" && (
+                {activeTab === "drafts" && !movies.length && (
                   <div className="text-center">
                     <TbMovieOff size={64} className="mt-5" />
                     <h5 className="fw-bold mt-3">No movies added</h5>
@@ -81,6 +132,11 @@ const AdminPanel = () => {
                       Add Movie
                     </Button>
                   </div>
+                )}
+                {activeTab === "drafts" && movies.length && (
+                  <>
+                    <MovieTable movies={movies} />
+                  </>
                 )}
                 {activeTab === "currently-showing" && (
                   <p>Here are the Currently Showing Movies</p>

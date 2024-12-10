@@ -18,28 +18,31 @@ import CurrentlyShowing from "./pages/CurrentlyShowing";
 import UpcomingMovies from "./pages/UpcomingMovies";
 import MovieDetails from "./pages/MovieDetails";
 import AdminPanel from "./pages/AdminPanel";
+import SeatAndTickets from "./pages/SeatAndTickets";
 
 import { NavBarProvider } from "./context/NavBarContext";
-import SeatAndTickets from "./pages/SeatAndTickets";
+import { PrimeReactProvider } from "primereact/api";
 
 function App() {
   return (
     <div className="main-font primary-background">
       <Router>
         <NavBarProvider>
-          <ScrollToTop />
-          <ToastContainer />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/tickets" element={<Tickets />} />
-            <Route path="/currently-showing" element={<CurrentlyShowing />} />
-            <Route path="/upcoming" element={<UpcomingMovies />} />
-            <Route path="/movie-details/:id" element={<MovieDetails />} />
-            <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <PrimeReactProvider>
+            <ScrollToTop />
+            <ToastContainer />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/tickets" element={<Tickets />} />
+              <Route path="/currently-showing" element={<CurrentlyShowing />} />
+              <Route path="/upcoming" element={<UpcomingMovies />} />
+              <Route path="/movie-details/:id" element={<MovieDetails />} />
+              <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PrimeReactProvider>
         </NavBarProvider>
       </Router>
     </div>
