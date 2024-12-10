@@ -6,7 +6,7 @@ import TabButton from "../components/TabButton";
 import "../styles/AdminPanel.css";
 import { TbMovieOff } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
 import { Button } from "react-bootstrap";
 import Input from "../components/Input";
@@ -199,7 +199,7 @@ const AdminPanel = () => {
                 <div className="w-100">
                   <h6>Writers</h6>
                   <div className="border p-5 rounded-3">
-                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold">
+                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
                       <FaPlus /> Upload Writes via CSV
                     </p>
                   </div>
@@ -207,7 +207,7 @@ const AdminPanel = () => {
                 <div className="w-100">
                   <h6>Cast</h6>
                   <div className="border p-5 rounded-3">
-                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold">
+                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
                       <FaPlus /> Upload Cast via CSV
                     </p>
                   </div>
@@ -216,7 +216,7 @@ const AdminPanel = () => {
               <div className="w-100 p-2">
                 <h6>Upload Photos</h6>
                 <div className="border p-5 rounded-3">
-                  <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold">
+                  <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
                     <FaPlus /> Upload Cast via CSV
                   </p>
                   <p className="text-center secondary-text">
@@ -269,7 +269,7 @@ const AdminPanel = () => {
                 </div>
               </div>
 
-              <div className="d-flex w-100 gap-4">
+              <div className="d-flex w-100 gap-4 align-items-center">
                 <div className="w-100">
                   <Dropdown
                     icon={CiLocationOn}
@@ -290,7 +290,31 @@ const AdminPanel = () => {
                     title="Choose City"
                     options={["Sead"]}
                   />
-                  
+                </div>
+                <div className="rounded light-background mt-3">
+                  <FaRegTrashAlt size={16} className="primary-red" />
+                </div>
+              </div>
+
+              <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold mt-5 pointer">
+                <FaPlus /> Add Projection
+              </p>
+
+              <div className="d-flex align-items-center justify-content-between mt-5 p-2">
+                <p className="back-button">Back</p>
+                <div className="d-flex gap-3">
+                  <button className="btn flex-grow-1 button-secondary">
+                    Save to Drafts
+                  </button>
+                  <button
+                    className="btn flex-grow-1 button-primary"
+                    onClick={() => {
+                      setCurrentFlow("default");
+                      setMovieCreationStep(1);
+                    }}
+                  >
+                    Add Movie
+                  </button>
                 </div>
               </div>
             </>

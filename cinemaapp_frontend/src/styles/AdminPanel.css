@@ -85,3 +85,12 @@
 .secondary-text {
   color: #667085;
 }
+
+.light-background {
+  background-color: #fde3e3;
+  padding: 10px 12px;
+}
+
+.pointer {
+  cursor: pointer;
+}
