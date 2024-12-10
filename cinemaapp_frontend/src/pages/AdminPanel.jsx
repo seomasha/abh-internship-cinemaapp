@@ -15,6 +15,7 @@ import Dropdown from "../components/Dropdown.jsx";
 import MovieTable from "../components/MovieTable.jsx";
 import Roadmap from "../components/Roadmap.jsx";
 import Papa from "papaparse";
+import ToastService from "../services/toastService.js";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
@@ -72,16 +73,18 @@ const AdminPanel = () => {
   ]);
   const [writersData, setWritersData] = useState(null);
   const [castData, setCastData] = useState(null);
+  const [movieImages, setMovieImages] = useState([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
   const writersFileInputRef = useRef(null);
   const castFileInputRef = useRef(null);
+
+  const placeholderImage = "https://via.placeholder.com/300";
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
       complete: (result) => {
         const parsedData = result.data;
-
-        console.log(parsedData);
 
         if (type === "writers") {
           const writers = parsedData.map((row) => row.firstName);
@@ -116,6 +119,15 @@ const AdminPanel = () => {
     if (type === "cast") {
       setCastData(null);
       castFileInputRef.current.value = "";
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const files = e.target.files;
+    if (files.length + movieImages.length <= 4) {
+      setMovieImages((prevImages) => [...prevImages, ...Array.from(files)]);
+    } else {
+      ToastService.error("You can only upload up to 4 images.");
     }
   };
 
@@ -381,13 +393,76 @@ const AdminPanel = () => {
               <div className="w-100 p-2">
                 <h6>Upload Photos</h6>
                 <div className="border p-5 rounded-3">
-                  <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
-                    <FaPlus /> Upload Photos
-                  </p>
-                  <p className="text-center secondary-text">
-                    or just drag and drop
-                  </p>
-                  <p className="text-center secondary-text">* Add 4 photos</p>
+                  {movieImages.length > 0 ? (
+                    <div className="mt-3 d-flex flex-wrap gap-3 justify-content-center">
+                      {[
+                        ...movieImages,
+                        ...Array(4 - movieImages.length).fill(null),
+                      ].map((image, index) => (
+                        <div key={index}>
+                          <img
+                            src={
+                              image
+                                ? URL.createObjectURL(image)
+                                : placeholderImage
+                            }
+                            alt={`Preview ${index + 1}`}
+                            style={{
+                              width: "300px",
+                              height: "300px",
+                              objectFit: "cover",
+                              marginBottom: "10px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              document
+                                .getElementById(`image-upload-${index}`)
+                                .click()
+                            }
+                          />
+                          <div className="d-flex align-items-center gap-2">
+                            <input
+                              type="radio"
+                              id={`image-${index}`}
+                              name="selected-image"
+                              checked={selectedImageIndex === index}
+                              onChange={() => setSelectedImageIndex(index)}
+                              style={{ accentColor: "#b22222" }}
+                            />
+                            <label
+                              htmlFor={`image-${index}`}
+                              className="fw-bold"
+                            >
+                              Cover Photo
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      <label
+                        htmlFor="upload-image"
+                        className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                      >
+                        <FaPlus /> Upload Image
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: "none" }}
+                        id="upload-image"
+                        multiple
+                      />
+                      <p className="text-center secondary-text">
+                        or just drag and drop
+                      </p>
+                      <p className="text-center secondary-text">
+                        * Add 4 photos
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
 
