@@ -6,9 +6,12 @@ import TabButton from "../components/TabButton";
 import "../styles/AdminPanel.css";
 import { TbMovieOff } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
+import { FaPlus } from "react-icons/fa";
+import { CiLocationOn } from "react-icons/ci";
 import { Button } from "react-bootstrap";
 import Input from "../components/Input";
 import TextArea from "../components/TextArea.jsx";
+import Dropdown from "../components/Dropdown.jsx";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
@@ -189,6 +192,105 @@ const AdminPanel = () => {
                 <div className="mt-4">
                   <div className="circle">3</div>
                   <p className="mt-3">Venues</p>
+                </div>
+              </div>
+
+              <div className="d-flex justify-content-evenly mt-5 w-100 p-2 gap-5">
+                <div className="w-100">
+                  <h6>Writers</h6>
+                  <div className="border p-5 rounded-3">
+                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold">
+                      <FaPlus /> Upload Writes via CSV
+                    </p>
+                  </div>
+                </div>
+                <div className="w-100">
+                  <h6>Cast</h6>
+                  <div className="border p-5 rounded-3">
+                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold">
+                      <FaPlus /> Upload Cast via CSV
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="w-100 p-2">
+                <h6>Upload Photos</h6>
+                <div className="border p-5 rounded-3">
+                  <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold">
+                    <FaPlus /> Upload Cast via CSV
+                  </p>
+                  <p className="text-center secondary-text">
+                    or just drag and drop
+                  </p>
+                  <p className="text-center secondary-text">* Add 4 photos</p>
+                </div>
+              </div>
+
+              <div className="d-flex align-items-center justify-content-between mt-5 p-2">
+                <p className="back-button">Back</p>
+                <div className="d-flex gap-3">
+                  <button className="btn flex-grow-1 button-secondary">
+                    Save to Drafts
+                  </button>
+                  <button
+                    className="btn flex-grow-1 button-primary"
+                    onClick={() => setMovieCreationStep(3)}
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {currentFlow === "addMovie" && movieCreationStep === 3 && (
+            <>
+              <div className="d-flex justify-content-between align-items-center">
+                <h5>Add New Movie</h5>
+                <div className="rounded p-2 primary-border">
+                  <IoMdClose size={24} className="primary-red" />
+                </div>
+              </div>
+
+              <div className="step d-flex align-items-center my-4">
+                <div className="mt-4">
+                  <div className="circle-filled">1</div>
+                  <p className="mt-3">General</p>
+                </div>
+                <div className="line-filled"></div>
+                <div className="mt-4">
+                  <div className="circle-filled">2</div>
+                  <p className="mt-3">Details</p>
+                </div>
+                <div className="line-filled"></div>
+                <div className="mt-4">
+                  <div className="circle-selected">3</div>
+                  <p className="mt-3">Venues</p>
+                </div>
+              </div>
+
+              <div className="d-flex w-100 gap-4">
+                <div className="w-100">
+                  <Dropdown
+                    icon={CiLocationOn}
+                    title="Choose City"
+                    options={["Sead"]}
+                  />
+                </div>
+                <div className="w-100">
+                  <Dropdown
+                    icon={CiLocationOn}
+                    title="Choose City"
+                    options={["Sead"]}
+                  />
+                </div>
+                <div className="w-100">
+                  <Dropdown
+                    icon={CiLocationOn}
+                    title="Choose City"
+                    options={["Sead"]}
+                  />
+                  
                 </div>
               </div>
             </>
