@@ -131,6 +131,22 @@ const AdminPanel = () => {
     }
   };
 
+  const handleDeleteImage = (indexToDelete) => {
+    const updatedImages = movieImages.filter(
+      (image, index) => index !== indexToDelete
+    );
+
+    let newSelectedImageIndex = selectedImageIndex;
+    if (selectedImageIndex === indexToDelete) {
+      newSelectedImageIndex = -1;
+    } else if (selectedImageIndex > indexToDelete) {
+      newSelectedImageIndex--;
+    }
+
+    setMovieImages(updatedImages);
+    setSelectedImageIndex(newSelectedImageIndex);
+  };
+
   return (
     <div>
       <NavBar />
@@ -400,42 +416,83 @@ const AdminPanel = () => {
                         ...Array(4 - movieImages.length).fill(null),
                       ].map((image, index) => (
                         <div key={index}>
-                          <img
-                            src={
-                              image
-                                ? URL.createObjectURL(image)
-                                : placeholderImage
-                            }
-                            alt={`Preview ${index + 1}`}
+                          <div
                             style={{
-                              width: "300px",
-                              height: "300px",
-                              objectFit: "cover",
-                              marginBottom: "10px",
-                              cursor: "pointer",
+                              position: "relative",
+                              display: "inline-block",
                             }}
-                            onClick={() =>
-                              document
-                                .getElementById(`image-upload-${index}`)
-                                .click()
-                            }
-                          />
-                          <div className="d-flex align-items-center gap-2">
-                            <input
-                              type="radio"
-                              id={`image-${index}`}
-                              name="selected-image"
-                              checked={selectedImageIndex === index}
-                              onChange={() => setSelectedImageIndex(index)}
-                              style={{ accentColor: "#b22222" }}
+                          >
+                            <img
+                              src={
+                                image
+                                  ? URL.createObjectURL(image)
+                                  : placeholderImage
+                              }
+                              alt={`Preview ${index + 1}`}
+                              style={{
+                                width: "300px",
+                                height: "300px",
+                                objectFit: "cover",
+                                marginBottom: "10px",
+                                cursor: "pointer",
+                                borderRadius: "24px",
+                              }}
+                              onClick={() =>
+                                document
+                                  .getElementById(`image-upload-${index}`)
+                                  .click()
+                              }
+                              className="border"
                             />
-                            <label
-                              htmlFor={`image-${index}`}
-                              className="fw-bold"
+                            <div
+                              style={{
+                                position: "absolute",
+                                bottom: 10,
+                                left: 0,
+                                width: "100%",
+                                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                color: "white",
+                                textAlign: "center",
+                                padding: "5px",
+                                fontSize: "14px",
+                                borderBottomLeftRadius: "24px",
+                                borderBottomRightRadius: "24px",
+                              }}
                             >
-                              Cover Photo
-                            </label>
+                              Upload Photo
+                            </div>
                           </div>
+
+                          <div className="d-flex justify-content-between mt-3">
+                            <div className="d-flex align-items-center gap-2">
+                              <input
+                                type="radio"
+                                id={`image-${index}`}
+                                name="selected-image"
+                                checked={selectedImageIndex === index}
+                                onChange={() => setSelectedImageIndex(index)}
+                                style={{ accentColor: "#b22222" }}
+                              />
+                              <label
+                                htmlFor={`image-${index}`}
+                                className="fw-bold"
+                              >
+                                Cover Photo
+                              </label>
+                            </div>
+                            <FaTrashAlt
+                              className="primary-red pointer"
+                              onClick={() => handleDeleteImage(index)}
+                            />
+                          </div>
+
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageChange(e, index)}
+                            style={{ display: "none" }}
+                            id={`image-upload-${index}`}
+                          />
                         </div>
                       ))}
                     </div>
