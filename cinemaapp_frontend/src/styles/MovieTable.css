@@ -117,3 +117,25 @@
 .p-datatable .p-datatable-tbody tr td:last-child {
   padding-right: 16px;
 }
+
+.step-one,
+.step-two,
+.step-three {
+  display: inline-block;
+  color: #b54708;
+  background-color: #fef0c7;
+  padding: 8px 10px;
+  border-radius: 10px;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.step-two {
+  color: #00b8d0;
+  background-color: #d6f9ff;
+}
+
+.step-three {
+  color: #027a48;
+  background-color: #d1fadf;
+}

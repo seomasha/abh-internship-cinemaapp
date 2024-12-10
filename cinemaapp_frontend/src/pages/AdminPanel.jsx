@@ -13,6 +13,7 @@ import Input from "../components/Input";
 import TextArea from "../components/TextArea.jsx";
 import Dropdown from "../components/Dropdown.jsx";
 import MovieTable from "../components/MovieTable.jsx";
+import Roadmap from "../components/Roadmap.jsx";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
@@ -25,7 +26,7 @@ const AdminPanel = () => {
       imageUrl: "https://via.placeholder.com/150",
       projectionDate: "2024-12-15",
       venue: "Venue 1",
-      status: "Step 1/3",
+      step: 1,
     },
     {
       id: 2,
@@ -33,7 +34,7 @@ const AdminPanel = () => {
       imageUrl: "https://via.placeholder.com/150",
       projectionDate: "2024-12-20",
       venue: "Venue 2",
-      status: "Step 2/3",
+      step: 2,
     },
     {
       id: 3,
@@ -41,7 +42,7 @@ const AdminPanel = () => {
       imageUrl: "https://via.placeholder.com/150",
       projectionDate: "2024-12-20",
       venue: "Venue 2",
-      status: "Step 3/3",
+      step: 3,
     },
     {
       id: 3,
@@ -49,7 +50,7 @@ const AdminPanel = () => {
       imageUrl: "https://via.placeholder.com/150",
       projectionDate: "2024-12-20",
       venue: "Venue 2",
-      status: "Step 3/3",
+      step: 1,
     },
     {
       id: 3,
@@ -57,7 +58,7 @@ const AdminPanel = () => {
       imageUrl: "https://via.placeholder.com/150",
       projectionDate: "2024-12-20",
       venue: "Venue 2",
-      status: "Step 3/3",
+      step: 1,
     },
     {
       id: 3,
@@ -65,7 +66,7 @@ const AdminPanel = () => {
       imageUrl: "https://via.placeholder.com/150",
       projectionDate: "2024-12-20",
       venue: "Venue 2",
-      status: "Step 3/3",
+      step: 1,
     },
   ]);
 
@@ -91,11 +92,24 @@ const AdminPanel = () => {
         <div className="col-10 primary-background p-4">
           {currentFlow === "default" && (
             <>
-              <h5>Movies</h5>
+              <div className="d-flex justify-content-between">
+                <h5>Movies</h5>
+                {activeTab === "drafts" && movies.length && (
+                  <Button
+                    className="btn button-primary"
+                    variant="danger"
+                    onClick={() => {
+                      setCurrentFlow("addMovie");
+                    }}
+                  >
+                    Add Movie
+                  </Button>
+                )}
+              </div>
 
               <div className="mt-3 border-bottom gap-5 d-flex">
                 <TabButton
-                  label="Drafts (0)"
+                  label={`Drafts (${movies.length})`}
                   isActive={activeTab === "drafts"}
                   onClick={() => setActiveTab("drafts")}
                 />
@@ -156,26 +170,15 @@ const AdminPanel = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h5>Add New Movie</h5>
                 <div className="rounded p-2 primary-border">
-                  <IoMdClose size={24} className="primary-red" />
+                  <IoMdClose
+                    size={24}
+                    className="primary-red"
+                    onClick={() => setCurrentFlow("default")}
+                  />
                 </div>
               </div>
 
-              <div className="step d-flex align-items-center my-4">
-                <div className="mt-4">
-                  <div className="circle-selected">1</div>
-                  <p className="mt-3">General</p>
-                </div>
-                <div className="line"></div>
-                <div className="mt-4">
-                  <div className="circle">2</div>
-                  <p className="mt-3">Details</p>
-                </div>
-                <div className="line"></div>
-                <div className="mt-4">
-                  <div className="circle">3</div>
-                  <p className="mt-3">Venues</p>
-                </div>
-              </div>
+              <Roadmap step={1} />
 
               <div>
                 <div className="d-flex gap-5">
@@ -230,26 +233,15 @@ const AdminPanel = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h5>Add New Movie</h5>
                 <div className="rounded p-2 primary-border">
-                  <IoMdClose size={24} className="primary-red" />
+                  <IoMdClose
+                    size={24}
+                    className="primary-red"
+                    onClick={() => setCurrentFlow("default")}
+                  />
                 </div>
               </div>
 
-              <div className="step d-flex align-items-center my-4">
-                <div className="mt-4">
-                  <div className="circle-filled">1</div>
-                  <p className="mt-3">General</p>
-                </div>
-                <div className="line-filled"></div>
-                <div className="mt-4">
-                  <div className="circle-selected">2</div>
-                  <p className="mt-3">Details</p>
-                </div>
-                <div className="line"></div>
-                <div className="mt-4">
-                  <div className="circle">3</div>
-                  <p className="mt-3">Venues</p>
-                </div>
-              </div>
+              <Roadmap step={2} />
 
               <div className="d-flex justify-content-evenly mt-5 w-100 p-2 gap-5">
                 <div className="w-100">
@@ -304,26 +296,15 @@ const AdminPanel = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h5>Add New Movie</h5>
                 <div className="rounded p-2 primary-border">
-                  <IoMdClose size={24} className="primary-red" />
+                  <IoMdClose
+                    size={24}
+                    className="primary-red"
+                    onClick={() => setCurrentFlow("default")}
+                  />
                 </div>
               </div>
 
-              <div className="step d-flex align-items-center my-4">
-                <div className="mt-4">
-                  <div className="circle-filled">1</div>
-                  <p className="mt-3">General</p>
-                </div>
-                <div className="line-filled"></div>
-                <div className="mt-4">
-                  <div className="circle-filled">2</div>
-                  <p className="mt-3">Details</p>
-                </div>
-                <div className="line-filled"></div>
-                <div className="mt-4">
-                  <div className="circle-selected">3</div>
-                  <p className="mt-3">Venues</p>
-                </div>
-              </div>
+              <Roadmap step={3} />
 
               <div className="d-flex w-100 gap-4 align-items-center">
                 <div className="w-100">

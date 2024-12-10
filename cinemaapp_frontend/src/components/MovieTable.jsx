@@ -20,11 +20,29 @@ const MovieTable = ({ movies }) => {
       <img
         src={rowData.imageUrl}
         alt={rowData.name}
-        style={{ width: "50px", height: "50px", marginRight: "10px", borderRadius: "10px" }}
+        style={{
+          width: "50px",
+          height: "50px",
+          marginRight: "10px",
+          borderRadius: "10px",
+        }}
       />
       {rowData.name}
     </div>
   );
+
+  const stepTemplate = (step) => {
+    if (step === 1) {
+      return <p className="step-one">Step 1/3</p>;
+    }
+    if (step === 2) {
+      return <p className="step-two">Step 2/3</p>;
+    }
+    if (step === 3) {
+      return <p className="step-three">Step 3/3</p>;
+    }
+    return "Sead";
+  };
 
   return (
     <div className="mt-5">
@@ -41,7 +59,13 @@ const MovieTable = ({ movies }) => {
         <Column header="Movie" body={checkboxTemplate} sortable />
         <Column header="Projection Date" field="projectionDate" sortable />
         <Column header="Venue" field="venue" sortable />
-        <Column header="Status" field="status" sortable />
+        <Column
+          header="Status"
+          body={(rowData) => {
+            return stepTemplate(rowData.step);
+          }}
+          sortable
+        />
         <Column header="Action" field="action" body={actionTemplate} />
       </DataTable>
     </div>
