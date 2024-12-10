@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Nav, Navbar, Dropdown } from "react-bootstrap";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
@@ -16,8 +16,16 @@ const NavBar = ({ state }) => {
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
 
-  const { showSignIn, toggleSignIn, handleLogout, isLoggedIn, emailPrefix } =
-    useNavBar();
+  const {
+    showSignIn,
+    toggleSignIn,
+    handleLogout,
+    isLoggedIn,
+    emailPrefix,
+    role,
+  } = useNavBar();
+
+  const navigate = useNavigate();
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
@@ -35,6 +43,10 @@ const NavBar = ({ state }) => {
       document.body.style.overflow = "auto";
     };
   }, [showSignIn]);
+
+  const navigateToAdminPanel = () => {
+    navigate("/admin");
+  };
 
   return (
     <Navbar expand="lg" className="p-4 main-font navbar-background">
@@ -95,6 +107,12 @@ const NavBar = ({ state }) => {
               {emailPrefix} <span className="caret"></span>
             </Dropdown.Toggle>
             <Dropdown.Menu>
+              <Dropdown.Item>Profile</Dropdown.Item>
+              {role === "admin" && (
+                <Dropdown.Item onClick={navigateToAdminPanel}>
+                  Admin
+                </Dropdown.Item>
+              )}
               <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

@@ -17,6 +17,7 @@ import ScrollToTop from "./utils/ScrollToTop";
 import CurrentlyShowing from "./pages/CurrentlyShowing";
 import UpcomingMovies from "./pages/UpcomingMovies";
 import MovieDetails from "./pages/MovieDetails";
+import AdminPanel from "./pages/AdminPanel";
 
 import { NavBarProvider } from "./context/NavBarContext";
 import SeatAndTickets from "./pages/SeatAndTickets";
@@ -36,6 +37,7 @@ function App() {
             <Route path="/upcoming" element={<UpcomingMovies />} />
             <Route path="/movie-details/:id" element={<MovieDetails />} />
             <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </NavBarProvider>

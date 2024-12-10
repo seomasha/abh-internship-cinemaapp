@@ -1,0 +1,9 @@
+.custom-tab {
+  background: none;
+}
+
+.custom-tab.active {
+  color: #b22222;
+  border-bottom: 2px solid #b22222;
+  font-weight: bold;
+}
