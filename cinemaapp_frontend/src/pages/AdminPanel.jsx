@@ -6,7 +6,7 @@ import TabButton from "../components/TabButton";
 import "../styles/AdminPanel.css";
 import { TbMovieOff } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
-import { FaPlus, FaRegTrashAlt, FaTrashAlt } from "react-icons/fa";
+import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
 import { Button } from "react-bootstrap";
 import Input from "../components/Input";
@@ -75,6 +75,9 @@ const AdminPanel = () => {
   const [castData, setCastData] = useState(null);
   const [movieImages, setMovieImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [projections, setProjections] = useState([
+    { id: Date.now(), city: "", venue: "", date: "" },
+  ]);
 
   const writersFileInputRef = useRef(null);
   const castFileInputRef = useRef(null);
@@ -145,6 +148,20 @@ const AdminPanel = () => {
 
     setMovieImages(updatedImages);
     setSelectedImageIndex(newSelectedImageIndex);
+  };
+
+  const handleAddProjection = () => {
+    setProjections((prevProjections) => [
+      ...prevProjections,
+      { id: Date.now(), city: "", venue: "", date: "" }, //Date.now() just used for unique IDs for handling deletion and preventing bugs
+    ]);
+  };
+
+  const handleRemoveProjection = (idToDelete) => {
+    const updatedProjections = projections.filter(
+      (projection) => projection.id !== idToDelete
+    );
+    setProjections(updatedProjections);
   };
 
   return (
@@ -562,34 +579,67 @@ const AdminPanel = () => {
 
               <Roadmap step={3} />
 
-              <div className="d-flex w-100 gap-4 align-items-center">
-                <div className="w-100">
-                  <Dropdown
-                    icon={CiLocationOn}
-                    title="Choose City"
-                    options={["Sead"]}
+              {projections.map((projection, index) => (
+                <div
+                  key={projection.id}
+                  className="d-flex w-100 gap-4 align-items-center"
+                >
+                  <div className="w-100">
+                    <Dropdown
+                      icon={CiLocationOn}
+                      title="Choose City"
+                      options={["Sead", "City 2", "City 3"]}
+                      value={projection.city}
+                      onChange={(e) => {
+                        const updatedProjections = [...projections];
+                        updatedProjections[index].city = e.target.value;
+                        setProjections(updatedProjections);
+                      }}
+                    />
+                  </div>
+                  <div className="w-100">
+                    <Dropdown
+                      icon={CiLocationOn}
+                      title="Choose Venue"
+                      options={["Venue 1", "Venue 2", "Venue 3"]}
+                      value={projection.venue}
+                      onChange={(e) => {
+                        const updatedProjections = [...projections];
+                        updatedProjections[index].venue = e.target.value;
+                        setProjections(updatedProjections);
+                      }}
+                    />
+                  </div>
+                  <div className="w-100">
+                    <Dropdown
+                      icon={CiLocationOn}
+                      title="Choose Date"
+                      options={["2024-12-15", "2024-12-16", "2024-12-17"]}
+                      value={projection.date}
+                      onChange={(e) => {
+                        const updatedProjections = [...projections];
+                        updatedProjections[index].date = e.target.value;
+                        setProjections(updatedProjections);
+                      }}
+                    />
+                  </div>
+                  <FaTrashAlt
+                    size={36}
+                    className={`primary-red pointer mt-3 ${
+                      projections.length === 1 ? "disabled" : ""
+                    }`}
+                    onClick={() =>
+                      projections.length > 1 &&
+                      handleRemoveProjection(projection.id)
+                    }
                   />
                 </div>
-                <div className="w-100">
-                  <Dropdown
-                    icon={CiLocationOn}
-                    title="Choose City"
-                    options={["Sead"]}
-                  />
-                </div>
-                <div className="w-100">
-                  <Dropdown
-                    icon={CiLocationOn}
-                    title="Choose City"
-                    options={["Sead"]}
-                  />
-                </div>
-                <div className="rounded light-background mt-3">
-                  <FaRegTrashAlt size={16} className="primary-red" />
-                </div>
-              </div>
+              ))}
 
-              <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold mt-5 pointer">
+              <p
+                className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold mt-5 pointer"
+                onClick={handleAddProjection}
+              >
                 <FaPlus /> Add Projection
               </p>
 
@@ -617,6 +667,7 @@ const AdminPanel = () => {
               </div>
             </>
           )}
+          {console.log(projections)}
         </div>
       </div>
     </div>
