@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import NavBar from "../components/NavBar";
 import { MdOutlineLocalMovies } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
@@ -70,19 +70,33 @@ const AdminPanel = () => {
       step: 1,
     },
   ]);
-  const [writersData, setWritersData] = useState([]);
-  const [castData, setCastData] = useState([]);
+  const [writersData, setWritersData] = useState(null);
+  const [castData, setCastData] = useState(null);
+
+  const writersFileInputRef = useRef(null);
+  const castFileInputRef = useRef(null);
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
       complete: (result) => {
         const parsedData = result.data;
+
+        console.log(parsedData);
+
         if (type === "writers") {
-          setWritersData(parsedData);
-        } else if (type === "cast") {
-          setCastData(parsedData);
+          const writers = parsedData.map((row) => row.firstName);
+          setWritersData(writers);
+        }
+
+        if (type === "cast") {
+          const cast = parsedData.map((row) => ({
+            realName: row.realName,
+            role: row.role,
+          }));
+          setCastData(cast);
         }
       },
+      header: true,
       skipEmptyLines: true,
     });
   };
@@ -91,6 +105,17 @@ const AdminPanel = () => {
     const file = e.target.files[0];
     if (file) {
       handleCSVUpload(file, type);
+    }
+  };
+
+  const handleClearData = (type) => {
+    if (type === "writers") {
+      setWritersData(null);
+      writersFileInputRef.current.value = "";
+    }
+    if (type === "cast") {
+      setCastData(null);
+      castFileInputRef.current.value = "";
     }
   };
 
@@ -271,17 +296,17 @@ const AdminPanel = () => {
                 <div className="w-100">
                   <div className="d-flex justify-content-between">
                     <h6>Writers</h6>
-                    {writersData.length ? (
+                    {writersData ? (
                       <FaTrashAlt
                         className="primary-red"
-                        onClick={() => setWritersData([])}
+                        onClick={() => handleClearData("writers")}
                       />
                     ) : (
                       ""
                     )}
                   </div>
                   <div className="border p-5 rounded-3">
-                    {!writersData.length ? (
+                    {!writersData ? (
                       <label
                         htmlFor="upload-writers"
                         className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
@@ -289,19 +314,12 @@ const AdminPanel = () => {
                         <FaPlus /> Upload Writers via CSV
                       </label>
                     ) : (
-                      <div>
-                        <h6>Writers List</h6>
-                        <ul>
-                          {writersData.map((writersArray, index) => {
-                            return (
-                              <ul key={index}>
-                                {writersArray.map((writer, subIndex) => (
-                                  <li key={subIndex}>{writer}</li>
-                                ))}
-                              </ul>
-                            );
-                          })}
-                        </ul>
+                      <div className="d-flex justify-content-between">
+                        {writersData.map((writer, index) => (
+                          <p key={index} className="primary-red mx-3">
+                            {writer}
+                          </p>
+                        ))}
                       </div>
                     )}
                     <input
@@ -310,23 +328,24 @@ const AdminPanel = () => {
                       onChange={(e) => handleFileChange(e, "writers")}
                       style={{ display: "none" }}
                       id="upload-writers"
+                      ref={writersFileInputRef}
                     />
                   </div>
                 </div>
                 <div className="w-100">
                   <div className="d-flex justify-content-between">
                     <h6>Cast</h6>
-                    {castData.length ? (
+                    {castData ? (
                       <FaTrashAlt
                         className="primary-red"
-                        onClick={() => setCastData([])}
+                        onClick={() => handleClearData("cast")}
                       />
                     ) : (
                       ""
                     )}
                   </div>
                   <div className="border p-5 rounded-3">
-                    {!castData.length ? (
+                    {!castData ? (
                       <label
                         htmlFor="upload-cast"
                         className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
@@ -334,20 +353,18 @@ const AdminPanel = () => {
                         <FaPlus /> Upload Cast via CSV
                       </label>
                     ) : (
-                      <div>
-                        <h6>Cast List</h6>
-                        {console.log(castData)}
-                        <ul>
-                          {castData.map((castArray, index) => {
-                            return (
-                              <ul key={index}>
-                                {castArray.map((cast, subIndex) => (
-                                  <li key={subIndex}>{cast}</li>
-                                ))}
-                              </ul>
-                            );
-                          })}
-                        </ul>
+                      <div className="d-flex justify-content-between">
+                        {castData.map((cast, index) => (
+                          <div key={index}>
+                            <p>
+                              {cast.realName}
+                              <br />
+                              <span className="cast-role-text">
+                                {cast.role}
+                              </span>
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     )}
                     <input
@@ -356,6 +373,7 @@ const AdminPanel = () => {
                       onChange={(e) => handleFileChange(e, "cast")}
                       style={{ display: "none" }}
                       id="upload-cast"
+                      ref={castFileInputRef}
                     />
                   </div>
                 </div>
