@@ -56,15 +56,14 @@ const MovieTable = ({ movies }) => {
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
       >
-        <Column header="Movie" body={checkboxTemplate} sortable />
-        <Column header="Projection Date" field="projectionDate" sortable />
-        <Column header="Venue" field="venue" sortable />
+        <Column header="Movie" body={checkboxTemplate} />
+        <Column header="Projection Date" field="projectionDate" />
+        <Column header="Venue" field="venue" />
         <Column
           header="Status"
           body={(rowData) => {
             return stepTemplate(rowData.step);
           }}
-          sortable
         />
         <Column header="Action" field="action" body={actionTemplate} />
       </DataTable>
