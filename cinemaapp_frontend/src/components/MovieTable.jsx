@@ -16,7 +16,10 @@ const MovieTable = ({ movies }) => {
 
   const checkboxTemplate = (rowData) => (
     <div className="d-flex justify-content-start align-items-center gap-3">
-      <input type="checkbox" style={{ marginLeft: "12px" }} />
+      <input
+        type="checkbox"
+        style={{ marginLeft: "12px", accentColor: "#b22222" }}
+      />
       <img
         src={rowData.imageUrl}
         alt={rowData.name}

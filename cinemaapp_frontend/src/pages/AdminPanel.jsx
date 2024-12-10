@@ -6,7 +6,7 @@ import TabButton from "../components/TabButton";
 import "../styles/AdminPanel.css";
 import { TbMovieOff } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
-import { FaPlus, FaRegTrashAlt } from "react-icons/fa";
+import { FaPlus, FaRegTrashAlt, FaTrashAlt } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
 import { Button } from "react-bootstrap";
 import Input from "../components/Input";
@@ -14,6 +14,7 @@ import TextArea from "../components/TextArea.jsx";
 import Dropdown from "../components/Dropdown.jsx";
 import MovieTable from "../components/MovieTable.jsx";
 import Roadmap from "../components/Roadmap.jsx";
+import Papa from "papaparse";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
@@ -69,6 +70,29 @@ const AdminPanel = () => {
       step: 1,
     },
   ]);
+  const [writersData, setWritersData] = useState([]);
+  const [castData, setCastData] = useState([]);
+
+  const handleCSVUpload = (file, type) => {
+    Papa.parse(file, {
+      complete: (result) => {
+        const parsedData = result.data;
+        if (type === "writers") {
+          setWritersData(parsedData);
+        } else if (type === "cast") {
+          setCastData(parsedData);
+        }
+      },
+      skipEmptyLines: true,
+    });
+  };
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleCSVUpload(file, type);
+    }
+  };
 
   return (
     <div>
@@ -245,19 +269,94 @@ const AdminPanel = () => {
 
               <div className="d-flex justify-content-evenly mt-5 w-100 p-2 gap-5">
                 <div className="w-100">
-                  <h6>Writers</h6>
+                  <div className="d-flex justify-content-between">
+                    <h6>Writers</h6>
+                    {writersData.length ? (
+                      <FaTrashAlt
+                        className="primary-red"
+                        onClick={() => setWritersData([])}
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </div>
                   <div className="border p-5 rounded-3">
-                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
-                      <FaPlus /> Upload Writes via CSV
-                    </p>
+                    {!writersData.length ? (
+                      <label
+                        htmlFor="upload-writers"
+                        className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                      >
+                        <FaPlus /> Upload Writers via CSV
+                      </label>
+                    ) : (
+                      <div>
+                        <h6>Writers List</h6>
+                        <ul>
+                          {writersData.map((writersArray, index) => {
+                            return (
+                              <ul key={index}>
+                                {writersArray.map((writer, subIndex) => (
+                                  <li key={subIndex}>{writer}</li>
+                                ))}
+                              </ul>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={(e) => handleFileChange(e, "writers")}
+                      style={{ display: "none" }}
+                      id="upload-writers"
+                    />
                   </div>
                 </div>
                 <div className="w-100">
-                  <h6>Cast</h6>
+                  <div className="d-flex justify-content-between">
+                    <h6>Cast</h6>
+                    {castData.length ? (
+                      <FaTrashAlt
+                        className="primary-red"
+                        onClick={() => setCastData([])}
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </div>
                   <div className="border p-5 rounded-3">
-                    <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
-                      <FaPlus /> Upload Cast via CSV
-                    </p>
+                    {!castData.length ? (
+                      <label
+                        htmlFor="upload-cast"
+                        className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                      >
+                        <FaPlus /> Upload Cast via CSV
+                      </label>
+                    ) : (
+                      <div>
+                        <h6>Cast List</h6>
+                        {console.log(castData)}
+                        <ul>
+                          {castData.map((castArray, index) => {
+                            return (
+                              <ul key={index}>
+                                {castArray.map((cast, subIndex) => (
+                                  <li key={subIndex}>{cast}</li>
+                                ))}
+                              </ul>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={(e) => handleFileChange(e, "cast")}
+                      style={{ display: "none" }}
+                      id="upload-cast"
+                    />
                   </div>
                 </div>
               </div>
@@ -265,7 +364,7 @@ const AdminPanel = () => {
                 <h6>Upload Photos</h6>
                 <div className="border p-5 rounded-3">
                   <p className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer">
-                    <FaPlus /> Upload Cast via CSV
+                    <FaPlus /> Upload Photos
                   </p>
                   <p className="text-center secondary-text">
                     or just drag and drop
@@ -275,7 +374,14 @@ const AdminPanel = () => {
               </div>
 
               <div className="d-flex align-items-center justify-content-between mt-5 p-2">
-                <p className="back-button">Back</p>
+                <p
+                  className="back-button-available pointer"
+                  onClick={() => {
+                    setMovieCreationStep(1);
+                  }}
+                >
+                  Back
+                </p>
                 <div className="d-flex gap-3">
                   <button className="btn flex-grow-1 button-secondary">
                     Save to Drafts
@@ -338,7 +444,12 @@ const AdminPanel = () => {
               </p>
 
               <div className="d-flex align-items-center justify-content-between mt-5 p-2">
-                <p className="back-button">Back</p>
+                <p
+                  className="back-button-available pointer"
+                  onClick={() => setMovieCreationStep(2)}
+                >
+                  Back
+                </p>
                 <div className="d-flex gap-3">
                   <button className="btn flex-grow-1 button-secondary">
                     Save to Drafts

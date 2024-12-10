@@ -82,6 +82,11 @@
   cursor: pointer;
 }
 
+.back-button-available {
+  color: #b22222;
+  border-bottom: 1px solid #b22222;
+}
+
 .secondary-text {
   color: #667085;
 }
