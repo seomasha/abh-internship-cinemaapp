@@ -4,14 +4,18 @@ import { MdOutlineLocalMovies } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
 import TabButton from "../components/TabButton";
 import "../styles/AdminPanel.css";
-import { TbMovieOff } from "react-icons/tb";
+import { TbMovieOff, TbMovie } from "react-icons/tb";
 import { IoMdClose } from "react-icons/io";
-import { FaPlus, FaTrashAlt } from "react-icons/fa";
-import { CiLocationOn } from "react-icons/ci";
+import { FaPlus, FaTrashAlt, FaLanguage } from "react-icons/fa";
+import { CiLocationOn, CiClock2, CiCalendar } from "react-icons/ci";
+import { Md18UpRating } from "react-icons/md";
+import { GoPerson } from "react-icons/go";
+import { IoIosLink } from "react-icons/io";
 import { Button } from "react-bootstrap";
 import Input from "../components/Input";
 import TextArea from "../components/TextArea.jsx";
 import Dropdown from "../components/Dropdown.jsx";
+import DatePickerDropdown from "../components/DatePickerDropdown.jsx";
 import MovieTable from "../components/MovieTable.jsx";
 import Roadmap from "../components/Roadmap.jsx";
 import Papa from "papaparse";
@@ -83,6 +87,27 @@ const AdminPanel = () => {
   const castFileInputRef = useRef(null);
 
   const placeholderImage = "https://via.placeholder.com/300";
+
+  const [movieName, setMovieName] = useState("");
+  const [pgRating, setPgRating] = useState("");
+  const [language, setLanguage] = useState("");
+  const [movieDuration, setMovieDuration] = useState("");
+  const [director, setDirector] = useState("");
+  const [trailerLink, setTrailerLink] = useState("");
+  const [synopsis, setSynopsis] = useState("");
+  const [genre, setGenre] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [movieNameError, setMovieNameError] = useState("");
+  const [pgRatingError, setPgRatingError] = useState("");
+  const [languageError, setLanguageError] = useState("");
+  const [movieDurationError, setMovieDurationError] = useState("");
+  const [genreError, setGenreError] = useState("");
+  const [directorError, setDirectorError] = useState("");
+  const [trailerLinkError, setTrailerLinkError] = useState("");
+  const [synopsisError, setSynopsisError] = useState("");
+  const [dateError, setDateError] = useState("");
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
@@ -162,6 +187,89 @@ const AdminPanel = () => {
       (projection) => projection.id !== idToDelete
     );
     setProjections(updatedProjections);
+  };
+
+  const setError = (condition, setter, message) => {
+    if (condition) {
+      setter(message);
+      return true;
+    } else {
+      setter("");
+      return false;
+    }
+  };
+
+  const validateFields = () => {
+    let isValid = true;
+
+    isValid &= !setError(
+      !movieName,
+      setMovieNameError,
+      "You should enter a movie name."
+    );
+    isValid &= !setError(
+      !pgRating,
+      setPgRatingError,
+      "You should enter a PG rating."
+    );
+    isValid &= !setError(
+      !language,
+      setLanguageError,
+      "You should enter a language."
+    );
+    isValid &= !setError(
+      !movieDuration,
+      setMovieDurationError,
+      "You should enter a duration."
+    );
+    isValid &= !setError(
+      !director,
+      setDirectorError,
+      "You should enter a director."
+    );
+    isValid &= !setError(
+      !trailerLink,
+      setTrailerLinkError,
+      "You should enter a trailer link."
+    );
+    isValid &= !setError(
+      !synopsis,
+      setSynopsisError,
+      "You should enter a synopsis."
+    );
+    isValid &= !setError(
+      genre.length === 0,
+      setGenreError,
+      "You should select a genre."
+    );
+    isValid &= !setError(
+      startDate === null || endDate === null,
+      setDateError,
+      "You should select both start and end date."
+    );
+
+    return isValid;
+  };
+
+  const handleContinue = () => {
+    if (validateFields() && movieCreationStep === 1) {
+      setMovieCreationStep(2);
+    }
+
+    if (movieCreationStep === 2) setMovieCreationStep(3);
+    if (movieCreationStep === 3) {
+      setCurrentFlow("default");
+      setMovieCreationStep(1);
+    }
+  };
+
+  const handleGenreChange = (selectedGenres) => {
+    setGenre(selectedGenres);
+  };
+
+  const handleDateChange = ({ startDate, endDate }) => {
+    setStartDate(startDate);
+    setEndDate(endDate);
   };
 
   return (
@@ -276,32 +384,95 @@ const AdminPanel = () => {
 
               <div>
                 <div className="d-flex gap-5">
-                  <Input label="Movie Name" placeholder="Type movie name" />
-                  <Input label="PG Rating" placeholder="Type PG rating" />
+                  <Input
+                    label="Movie Name"
+                    placeholder="Type movie name"
+                    leadingIcon={<TbMovie size={18} />}
+                    value={movieName}
+                    onChange={(e) => setMovieName(e.target.value)}
+                    invalid={!!movieNameError}
+                    invalidMessage={movieNameError}
+                  />
+                  <Input
+                    label="PG Rating"
+                    placeholder="Type PG rating"
+                    leadingIcon={<Md18UpRating size={18} />}
+                    onChange={(e) => setPgRating(e.target.value)}
+                    invalid={!!pgRatingError}
+                    invalidMessage={pgRatingError}
+                  />
                 </div>
                 <div className="d-flex gap-5">
-                  <Input label="Language" placeholder="Type language" />
+                  <Input
+                    label="Language"
+                    placeholder="Type language"
+                    leadingIcon={<FaLanguage size={18} />}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    invalid={!!languageError}
+                    invalidMessage={languageError}
+                  />
                   <Input
                     label="Movie Duration"
                     placeholder="Type movie duration"
+                    leadingIcon={<CiClock2 size={18} />}
+                    onChange={(e) => setMovieDuration(e.target.value)}
+                    invalid={!!movieDurationError}
+                    invalidMessage={movieDurationError}
                   />
                 </div>
                 <div className="d-flex gap-5">
-                  <Input
+                  <DatePickerDropdown
+                    title={
+                      startDate && endDate
+                        ? `${startDate.toDateString().slice(0, 15)} - ${endDate
+                            .toDateString()
+                            .slice(0, 15)}`
+                        : "Date Range"
+                    }
+                    icon={CiCalendar}
+                    fullWidth={true}
                     label="Projection Date"
-                    placeholder="Projection Date"
+                    invalid={!!dateError}
+                    invalidMessage={dateError}
+                    onChange={handleDateChange}
                   />
-                  <Input label="Genre" placeholder="Choose Genre" />
+                  <Dropdown
+                    icon={CiLocationOn}
+                    title="All Genres"
+                    options={["Test", "New genre", "Other genre"]}
+                    fullWidth={true}
+                    label="Genre"
+                    invalid={!!genreError}
+                    invalidMessage={genreError}
+                    onChange={handleGenreChange}
+                  />
                 </div>
-                <div className="d-flex gap-5">
-                  <Input label="Director" placeholder="Add Director" />
-                  <Input label="Trailer" placeholder="Insert trailer link" />
+                <div className="d-flex gap-5 mt-3">
+                  <Input
+                    label="Director"
+                    placeholder="Add Director"
+                    leadingIcon={<GoPerson size={18} />}
+                    onChange={(e) => setDirector(e.target.value)}
+                    invalid={!!directorError}
+                    invalidMessage={directorError}
+                  />
+                  <Input
+                    label="Trailer"
+                    placeholder="Insert trailer link"
+                    leadingIcon={<IoIosLink size={18} />}
+                    onChange={(e) => setTrailerLink(e.target.value)}
+                    invalid={!!trailerLinkError}
+                    invalidMessage="You should enter a trailer link."
+                  />
                 </div>
 
                 <TextArea
                   label="Your Message"
-                  placeholder="Write your message here"
-                  value="Sead"
+                  placeholder="Write synopsis"
+                  value={synopsis}
+                  onChange={(e) => setSynopsis(e.target.value)}
+                  invalid={!!synopsisError}
+                  invalidMessage="You should enter a synopsis."
                 />
               </div>
 
@@ -313,7 +484,7 @@ const AdminPanel = () => {
                   </button>
                   <button
                     className="btn flex-grow-1 button-primary"
-                    onClick={() => setMovieCreationStep(2)}
+                    onClick={handleContinue}
                   >
                     Continue
                   </button>
@@ -555,7 +726,7 @@ const AdminPanel = () => {
                   </button>
                   <button
                     className="btn flex-grow-1 button-primary"
-                    onClick={() => setMovieCreationStep(3)}
+                    onClick={handleContinue}
                   >
                     Continue
                   </button>
@@ -656,10 +827,7 @@ const AdminPanel = () => {
                   </button>
                   <button
                     className="btn flex-grow-1 button-primary"
-                    onClick={() => {
-                      setCurrentFlow("default");
-                      setMovieCreationStep(1);
-                    }}
+                    onClick={handleContinue}
                   >
                     Add Movie
                   </button>
@@ -667,7 +835,6 @@ const AdminPanel = () => {
               </div>
             </>
           )}
-          {console.log(projections)}
         </div>
       </div>
     </div>
