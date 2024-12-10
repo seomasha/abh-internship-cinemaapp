@@ -21,7 +21,6 @@ import AdminPanel from "./pages/AdminPanel";
 import SeatAndTickets from "./pages/SeatAndTickets";
 
 import { NavBarProvider } from "./context/NavBarContext";
-import SeatAndTickets from "./pages/SeatAndTickets";
 import Checkout from "./pages/Checkout";
 
 import { loadStripe } from "@stripe/stripe-js";
