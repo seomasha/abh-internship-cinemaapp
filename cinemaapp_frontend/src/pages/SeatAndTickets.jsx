@@ -23,15 +23,13 @@ const SeatAndTickets = () => {
 
   const { userId } = useNavBar();
 
-  const seatPrices = {
-    regular: 7,
-    vip: 10,
-    love: 24,
-  };
-
   useEffect(() => {
     const fetchReservedSeats = async () => {
-      const seats = await ticketService.getReservedSeats(projection.id);
+      const formattedDate = formatDateToISO(selectedDay.date);
+      const seats = await ticketService.getReservedSeats(
+        projection.id,
+        formattedDate
+      );
       setReservedSeats(seats);
     };
     fetchReservedSeats();
@@ -55,19 +53,23 @@ const SeatAndTickets = () => {
       return;
     }
 
-    const buyResponse = await ticketService.buyTickets({
+    const reserveDetails = {
+      projection: projection,
+      seatNos: selectedSeats.map((seat) => seat.seat),
+      selectedDay: selectedDay,
+    };
+
+    const buyResponse = await ticketService.reserveTickets({
       userId: userId,
       projectionId: projection.id,
       seatNos: selectedSeats.map((seat) => seat.seat),
-      price: totalPrice,
+      date: formatDateToISO(selectedDay.date),
     });
 
-    if (buyResponse) {
-      navigate("/checkout");
-    }
+    if (buyResponse) navigate("/checkout", { state: reserveDetails });
   };
 
-  const handleSeatClick = (seat, seatType) => {
+  const handleSeatClick = (seat) => {
     if (reservedSeats.includes(seat)) {
       return;
     }
@@ -79,18 +81,23 @@ const SeatAndTickets = () => {
       if (seatAlreadySelected) {
         newSeats = prevSeats.filter((item) => item.seat !== seat);
       } else {
-        newSeats = [...prevSeats, { seat, price: seatPrices[seatType] }];
+        newSeats = [...prevSeats, { seat }];
       }
-
-      const newTotalPrice = newSeats.reduce(
-        (total, item) => total + item.price,
-        0
-      );
-      setTotalPrice(newTotalPrice);
 
       return newSeats;
     });
   };
+
+  useEffect(() => {
+    const getPrice = async () => {
+      const response = await ticketService.getSeatPrice(
+        selectedSeats.map((seat) => seat.seat)
+      );
+      setTotalPrice(response);
+    };
+
+    getPrice();
+  }, [selectedSeats]);
 
   const getSeatClass = (seat) => {
     if (reservedSeats.includes(seat)) {
@@ -99,6 +106,22 @@ const SeatAndTickets = () => {
     return selectedSeats.some((s) => s.seat === seat)
       ? "selected"
       : "available";
+  };
+
+  const formatDateToISO = (dateString, year = new Date().getFullYear()) => {
+    const fullDateString = `${dateString} ${year}`;
+
+    const parsedDate = new Date(fullDateString);
+    if (isNaN(parsedDate)) {
+      console.error("Invalid date format");
+      return null;
+    }
+
+    const formattedYear = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+
+    return `${formattedYear}-${month}-${day}`;
   };
 
   const handlePopupClose = () => {
@@ -115,7 +138,7 @@ const SeatAndTickets = () => {
       <NavBar />
       <div>
         <div className="d-flex justify-content-between align-items-center p-3">
-          <h3>Seat Options</h3>
+          <h3 className="px-5">Seat Options</h3>
           <div className="d-flex align-items-center gap-2 position-relative">
             <div className="d-flex">
               <CiCircleInfo size={20} />

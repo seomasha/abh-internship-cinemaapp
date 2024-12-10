@@ -21,16 +21,22 @@ import AdminPanel from "./pages/AdminPanel";
 import SeatAndTickets from "./pages/SeatAndTickets";
 
 import { NavBarProvider } from "./context/NavBarContext";
-import { PrimeReactProvider } from "primereact/api";
+import SeatAndTickets from "./pages/SeatAndTickets";
+import Checkout from "./pages/Checkout";
+
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
 function App() {
   return (
     <div className="main-font primary-background">
       <Router>
         <NavBarProvider>
-          <PrimeReactProvider>
-            <ScrollToTop />
-            <ToastContainer />
+          <ScrollToTop />
+          <ToastContainer />
+          <Elements stripe={stripePromise}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutUs />} />
@@ -40,9 +46,10 @@ function App() {
               <Route path="/movie-details/:id" element={<MovieDetails />} />
               <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
               <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </PrimeReactProvider>
+          </Elements>
         </NavBarProvider>
       </Router>
     </div>

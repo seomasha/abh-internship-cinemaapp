@@ -79,7 +79,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findCurrentlyShowingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().get(0).getName());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findCurrentlyShowingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().get(0).getName());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findUpcomingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().get(0).getName());
     }
 
     @Test
@@ -129,7 +129,7 @@ public class MovieServiceTest {
         final MovieListDTO result = movieService.findUpcomingMovies(filterMovie, 0, 10);
 
         assertEquals(1, result.getMovies().size());
-        assertEquals(TEST_MOVIE_NAME, result.getMovies().getFirst().getName());
+        assertEquals(TEST_MOVIE_NAME, result.getMovies().get(0).getName());
     }
 
     @Test

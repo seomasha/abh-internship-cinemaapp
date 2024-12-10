@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.utils;
 
+import com.stripe.exception.StripeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -57,6 +58,11 @@ public class ErrorHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentials(final BadCredentialsException ex, final WebRequest request) {
         return new ResponseEntity<>(buildErrorResponse("Invalid email or password", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(StripeException.class)
+    public ResponseEntity<Object> handleStripeException(final StripeException ex, final WebRequest request) {
+        return new ResponseEntity<>(buildErrorResponse("Payment processing error: " + ex.getMessage(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 
     private Map<String, Object> buildErrorResponse(final String message, final HttpStatus status) {

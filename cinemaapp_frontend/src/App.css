@@ -64,3 +64,15 @@
   height: 100%;
   background-color: #fafafa;
 }
+
+.line-sat {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, #b22222 50%, #808080 50%);
+}
+
+.line-checkout {
+  width: 100%;
+  height: 2px;
+  background: #b22222;
+}
