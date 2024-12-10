@@ -11,8 +11,20 @@
   background-color: white;
 }
 
+.line-dark {
+  flex-grow: 1;
+  height: 1px;
+  background-color: lightgray;
+}
+
 .separator-text {
   padding: 0 10px;
   color: white;
+  font-size: 18px;
+}
+
+.separator-text-dark {
+  padding: 0 10px;
+  color: #333333;
   font-size: 18px;
 }

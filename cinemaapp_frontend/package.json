@@ -16,6 +16,8 @@
     "@mui/material": "^6.1.8",
     "@mui/x-date-pickers": "^7.22.1",
     "@mui/x-date-pickers-pro": "^7.22.1",
+    "@stripe/react-stripe-js": "^3.0.0",
+    "@stripe/stripe-js": "^5.2.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
