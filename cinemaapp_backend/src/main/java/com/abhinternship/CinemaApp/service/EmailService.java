@@ -42,4 +42,15 @@ public class EmailService {
 
         return generatedOtp;
     }
+
+    @Async
+    public void sendPaymentMail(final String to, final String subject) {
+        final SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(to);
+        message.setFrom(sender);
+        message.setSubject(subject);
+        message.setText("Your payment is successful.");
+        mailSender.send(message);
+    }
 }

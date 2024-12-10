@@ -35,6 +35,7 @@ The following dependencies have been included for the backend part of the Cinema
 ### Prerequisites
 
 Ensure you have the following installed on your system:
+
 - **Java 23** (for the Spring Boot backend)
 - **Node.js** and **npm** or **yarn** (for the React frontend)
 - **PostgreSQL** (for the database)
@@ -42,9 +43,10 @@ Ensure you have the following installed on your system:
 ### Backend (Spring Boot)
 
 1. **Configure the Database**:
+
    - Make sure you have a running PostgreSQL instance.
    - In the `src/main/resources/application.properties` file, update the database connection details:
-   
+
      ```properties
      spring.datasource.url=jdbc:postgresql://localhost:5432/your-database
      spring.datasource.username=your-username
@@ -52,15 +54,16 @@ Ensure you have the following installed on your system:
      ```
 
 2. **Run the Backend**:
+
    - Navigate to the backend directory (root of the Spring Boot project).
    - Compile and package the backend application:
-   
+
      ```bash
      ./mvnw clean package
      ```
 
    - Run the application:
-   
+
      ```bash
      ./mvnw spring-boot:run
      ```
@@ -68,6 +71,7 @@ Ensure you have the following installed on your system:
    The backend should now be running on `http://localhost:8080`.
 
 # Mock application.properties
+
 - spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
 - spring.datasource.username=username
 - spring.datasource.password=password
@@ -77,10 +81,17 @@ Ensure you have the following installed on your system:
 - spring.jpa.hibernate.ddl-auto=update
 - spring.profiles.active=local
 
+# Mock .env (frontend)
+
+- VITE_BACKEND_URL=http://localhost:8080
+- VITE_API_PATH=/api/v1
+- VITE_OMDB_URL=http://www.omdbapi.com/
+- VITE_OMDB_API_KEY=key
 
 ### Frontend (React)
 
 1. **Install Dependencies**:
+
    - Navigate to the frontend directory where the `package.json` file is located (your React project directory).
    - Install all necessary dependencies:
 
@@ -90,11 +101,12 @@ Ensure you have the following installed on your system:
 
    or if you're using Yarn:
 
-     ```bash
-     yarn install
-     ```
+   ```bash
+   yarn install
+   ```
 
 2. **Run the Frontend**:
+
    - Start the development server:
 
      ```bash
@@ -103,13 +115,14 @@ Ensure you have the following installed on your system:
 
    or if you're using Yarn:
 
-     ```bash
-     yarn dev
-     ```
+   ```bash
+   yarn dev
+   ```
 
    The frontend should now be running on `http://localhost:5173` (this is the default port used by Vite).
 
 3. **Database example**:
+
 - Download the db example: https://drive.google.com/file/d/1DfB15AllpLHGAcgoDdYCRL-Qo8DN9TwC/view?usp=drive_link
 
 ### Running the Application Together
