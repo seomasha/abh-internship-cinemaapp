@@ -7,7 +7,12 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "../styles/MovieTable.css";
 
-const MovieTable = ({ movies }) => {
+const MovieTable = ({ movies, onCheckboxChange }) => {
+  const handleCheckboxChange = (event, movieId) => {
+    const isChecked = event.target.checked;
+    onCheckboxChange(movieId, isChecked);
+  };
+
   const actionTemplate = (rowData) => (
     <div>
       <BsThreeDots className="primary-red" />
@@ -19,6 +24,7 @@ const MovieTable = ({ movies }) => {
       <input
         type="checkbox"
         style={{ marginLeft: "12px", accentColor: "#b22222" }}
+        onChange={(e) => handleCheckboxChange(e, rowData.id)}
       />
       <img
         src={rowData.imageUrl}

@@ -75,6 +75,8 @@ const AdminPanel = () => {
       step: 1,
     },
   ]);
+  const [checkedMovies, setCheckedMovies] = useState([]);
+
   const [writersData, setWritersData] = useState(null);
   const [castData, setCastData] = useState(null);
   const [movieImages, setMovieImages] = useState([]);
@@ -272,6 +274,14 @@ const AdminPanel = () => {
     setEndDate(endDate);
   };
 
+  const handleCheckboxChange = (movieId, isChecked) => {
+    if (isChecked) {
+      setCheckedMovies((prev) => [...prev, movieId]);
+    } else {
+      setCheckedMovies((prev) => prev.filter((id) => id !== movieId));
+    }
+  };
+
   return (
     <div>
       <NavBar />
@@ -351,17 +361,34 @@ const AdminPanel = () => {
                 )}
                 {activeTab === "drafts" && movies.length && (
                   <>
-                    <MovieTable movies={movies} />
+                    <div className="d-flex justify-content-end gap-3">
+                      {checkedMovies.length > 0 && (
+                        <>
+                          <Button variant="outline-danger">Archive</Button>
+                          <Button variant="outline-success">Publish</Button>
+                        </>
+                      )}
+                    </div>
+                    <MovieTable
+                      movies={movies}
+                      onCheckboxChange={handleCheckboxChange}
+                    />
                   </>
                 )}
                 {activeTab === "currently-showing" && (
-                  <p>Here are the Currently Showing Movies</p>
+                  <>
+                    <MovieTable movies={movies} />
+                  </>
                 )}
                 {activeTab === "upcoming" && (
-                  <p>Here are the Upcoming Movies</p>
+                  <>
+                    <MovieTable movies={movies} />
+                  </>
                 )}
                 {activeTab === "archived" && (
-                  <p>Here are the Archived Movies</p>
+                  <>
+                    <MovieTable movies={movies} />
+                  </>
                 )}
               </div>
             </>
