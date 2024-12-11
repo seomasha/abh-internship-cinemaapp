@@ -50,7 +50,6 @@ const MovieTable = ({ movies, onCheckboxChange }) => {
     if (step === 3) {
       return <p className="step-three">Step 3/3</p>;
     }
-    return "Sead";
   };
 
   return (

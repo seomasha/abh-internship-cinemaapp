@@ -208,51 +208,62 @@ const AdminPanel = () => {
   const validateMovieCreationStepOne = () => {
     let isValid = true;
 
-    isValid &= !setError(
-      !movieName,
-      setMovieNameError,
-      "You should enter a movie name."
-    );
-    isValid &= !setError(
-      !pgRating,
-      setPgRatingError,
-      "You should enter a PG rating."
-    );
-    isValid &= !setError(
-      !language,
-      setLanguageError,
-      "You should enter a language."
-    );
-    isValid &= !setError(
-      !movieDuration,
-      setMovieDurationError,
-      "You should enter a duration."
-    );
-    isValid &= !setError(
-      !director,
-      setDirectorError,
-      "You should enter a director."
-    );
-    isValid &= !setError(
-      !trailerLink,
-      setTrailerLinkError,
-      "You should enter a trailer link."
-    );
-    isValid &= !setError(
-      !synopsis,
-      setSynopsisError,
-      "You should enter a synopsis."
-    );
-    isValid &= !setError(
-      genre.length === 0,
-      setGenreError,
-      "You should select a genre."
-    );
-    isValid &= !setError(
-      startDate === null || endDate === null,
-      setDateError,
-      "You should select both start and end date."
-    );
+    const validationRules = [
+      {
+        condition: !movieName,
+        setError: setMovieNameError,
+        errorMessage: "You should enter a movie name.",
+      },
+      {
+        condition: !pgRating,
+        setError: setPgRatingError,
+        errorMessage: "You should enter a PG rating.",
+      },
+      {
+        condition: !language,
+        setError: setLanguageError,
+        errorMessage: "You should enter a language.",
+      },
+      {
+        condition: !movieDuration,
+        setError: setMovieDurationError,
+        errorMessage: "You should enter a duration.",
+      },
+      {
+        condition: !director,
+        setError: setDirectorError,
+        errorMessage: "You should enter a director.",
+      },
+      {
+        condition: !trailerLink,
+        setError: setTrailerLinkError,
+        errorMessage: "You should enter a trailer link.",
+      },
+      {
+        condition: !synopsis,
+        setError: setSynopsisError,
+        errorMessage: "You should enter a synopsis.",
+      },
+      {
+        condition: genre.length === 0,
+        setError: setGenreError,
+        errorMessage: "You should select a genre.",
+      },
+      {
+        condition: startDate === null || endDate === null,
+        setError: setDateError,
+        errorMessage: "You should select both start and end date.",
+      },
+    ];
+
+    validationRules.forEach(({ condition, setError, errorMessage }) => {
+      if (condition) {
+        setError(errorMessage);
+        isValid = false;
+      } else {
+        setError("");
+      }
+    });
 
     return isValid;
   };
@@ -260,25 +271,37 @@ const AdminPanel = () => {
   const validateMovieCreationStepTwo = () => {
     let isValid = true;
 
-    isValid &= !setError(
-      !writersData,
-      setWritersError,
-      "You should add writers."
-    );
+    const validationRules = [
+      {
+        condition: !writersData,
+        setError: setWritersError,
+        errorMessage: "You should add writers.",
+      },
+      {
+        condition: !castData,
+        setError: setCastError,
+        errorMessage: "You should add cast.",
+      },
+      {
+        condition: movieImages.length === 0,
+        setError: setImageError,
+        errorMessage: "You should add images.",
+      },
+      {
+        condition: selectedImageIndex === -1,
+        setError: setSelectedCoverPhotoError,
+        errorMessage: "You should select an image as a cover photo.",
+      },
+    ];
 
-    isValid &= !setError(!castData, setCastError, "You should add cast.");
-
-    isValid &= !setError(
-      movieImages.length === 0,
-      setImageError,
-      "You should add images."
-    );
-
-    isValid &= !setError(
-      selectedImageIndex === -1,
-      setSelectedCoverPhotoError,
-      "You should select an image as a cover photo."
-    );
+    validationRules.forEach(({ condition, setError, errorMessage }) => {
+      if (condition) {
+        setError(errorMessage);
+        isValid = false;
+      } else {
+        setError("");
+      }
+    });
 
     return isValid;
   };
@@ -307,11 +330,9 @@ const AdminPanel = () => {
   };
 
   const handleCheckboxChange = (movieId, isChecked) => {
-    if (isChecked) {
-      setCheckedMovies((prev) => [...prev, movieId]);
-    } else {
-      setCheckedMovies((prev) => prev.filter((id) => id !== movieId));
-    }
+    setCheckedMovies((prev) =>
+      isChecked ? [...prev, movieId] : prev.filter((id) => id !== movieId)
+    );
   };
 
   return (
