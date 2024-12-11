@@ -80,7 +80,7 @@ const AdminPanel = () => {
   const [writersData, setWritersData] = useState(null);
   const [castData, setCastData] = useState(null);
   const [movieImages, setMovieImages] = useState([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(-1);
   const [projections, setProjections] = useState([
     { id: Date.now(), city: "", venue: "", date: "" },
   ]);
@@ -110,6 +110,10 @@ const AdminPanel = () => {
   const [trailerLinkError, setTrailerLinkError] = useState("");
   const [synopsisError, setSynopsisError] = useState("");
   const [dateError, setDateError] = useState("");
+  const [writersError, setWritersError] = useState("");
+  const [castError, setCastError] = useState("");
+  const [imageError, setImageError] = useState("");
+  const [selectedCoverPhotoError, setSelectedCoverPhotoError] = useState("");
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
@@ -201,7 +205,7 @@ const AdminPanel = () => {
     }
   };
 
-  const validateFields = () => {
+  const validateMovieCreationStepOne = () => {
     let isValid = true;
 
     isValid &= !setError(
@@ -253,12 +257,40 @@ const AdminPanel = () => {
     return isValid;
   };
 
+  const validateMovieCreationStepTwo = () => {
+    let isValid = true;
+
+    isValid &= !setError(
+      !writersData,
+      setWritersError,
+      "You should add writers."
+    );
+
+    isValid &= !setError(!castData, setCastError, "You should add cast.");
+
+    isValid &= !setError(
+      movieImages.length === 0,
+      setImageError,
+      "You should add images."
+    );
+
+    isValid &= !setError(
+      selectedImageIndex === -1,
+      setSelectedCoverPhotoError,
+      "You should select an image as a cover photo."
+    );
+
+    return isValid;
+  };
+
   const handleContinue = () => {
-    if (validateFields() && movieCreationStep === 1) {
+    if (validateMovieCreationStepOne() && movieCreationStep === 1) {
       setMovieCreationStep(2);
     }
 
-    if (movieCreationStep === 2) setMovieCreationStep(3);
+    if (validateMovieCreationStepTwo() && movieCreationStep === 2) {
+      setMovieCreationStep(3);
+    }
     if (movieCreationStep === 3) {
       setCurrentFlow("default");
       setMovieCreationStep(1);
@@ -465,7 +497,7 @@ const AdminPanel = () => {
                   />
                   <Dropdown
                     icon={CiLocationOn}
-                    title="All Genres"
+                    title={genre.length > 0 ? genre.join(" ,") : "Choose genre"}
                     options={["Test", "New genre", "Other genre"]}
                     fullWidth={true}
                     label="Genre"
@@ -559,7 +591,7 @@ const AdminPanel = () => {
                     ) : (
                       <div className="d-flex justify-content-between">
                         {writersData.map((writer, index) => (
-                          <p key={index} className="primary-red mx-3">
+                          <p key={index} className="mt-1 mx-3">
                             {writer}
                           </p>
                         ))}
@@ -599,7 +631,7 @@ const AdminPanel = () => {
                       <div className="d-flex justify-content-between">
                         {castData.map((cast, index) => (
                           <div key={index}>
-                            <p>
+                            <p className="mx-2">
                               {cast.realName}
                               <br />
                               <span className="cast-role-text">
@@ -621,6 +653,12 @@ const AdminPanel = () => {
                   </div>
                 </div>
               </div>
+              {writersError && (
+                <p className="text-danger text-center mt-2">{writersError}</p>
+              )}
+              {castError && (
+                <p className="text-danger text-center">{castError}</p>
+              )}
               <div className="w-100 p-2">
                 <h6>Upload Photos</h6>
                 <div className="border p-5 rounded-3">
@@ -736,6 +774,14 @@ const AdminPanel = () => {
                     </>
                   )}
                 </div>
+                {imageError && (
+                  <p className="text-danger text-center mt-2">{imageError}</p>
+                )}
+                {selectedCoverPhotoError && (
+                  <p className="text-danger text-center">
+                    {selectedCoverPhotoError}
+                  </p>
+                )}
               </div>
 
               <div className="d-flex align-items-center justify-content-between mt-5 p-2">
