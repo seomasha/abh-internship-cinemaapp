@@ -13,10 +13,12 @@ export const NavBarProvider = ({ children }) => {
   const [emailPrefix, setEmailPrefix] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     const getUserId = async (email) => {
       const response = await userService.findUserByEmail(email);
+      setRole(response?.role);
       return response?.id;
     };
 
@@ -57,6 +59,7 @@ export const NavBarProvider = ({ children }) => {
         isLoggedIn,
         emailPrefix,
         userId,
+        role,
       }}
     >
       {children}

@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use.");
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole("user");
         return userRepository.save(user);
     }
 

@@ -3,7 +3,15 @@ import { IoIosArrowDown } from "react-icons/io";
 import { DateRangePicker } from "rsuite";
 import "../styles/DatePicker.css";
 
-const DatePickerDropdown = ({ icon: Icon, title, onChange }) => {
+const DatePickerDropdown = ({
+  icon: Icon,
+  label,
+  title,
+  onChange,
+  fullWidth = false,
+  invalid,
+  invalidMessage,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [dropdownWidth, setDropdownWidth] = useState("auto");
@@ -36,9 +44,12 @@ const DatePickerDropdown = ({ icon: Icon, title, onChange }) => {
   };
 
   return (
-    <div>
+    <div className={fullWidth ? "w-100" : ""}>
+      <p className={`fs-6 ${invalid ? "text-danger" : ""}`}>{label}</p>
       <div
-        className="dropdown-container"
+        className={`dropdown-container ${
+          invalid ? "border border-2 border-danger" : ""
+        }`}
         ref={dropdownRef}
         onClick={toggleDropdown}
       >
@@ -87,6 +98,7 @@ const DatePickerDropdown = ({ icon: Icon, title, onChange }) => {
           </button>
         </div>
       </div>
+      {invalid && <div className="error-message">{invalidMessage}</div>}
     </div>
   );
 };

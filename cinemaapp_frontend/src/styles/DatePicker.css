@@ -130,3 +130,28 @@
 .in-range {
   background-color: rgba(178, 34, 34, 0.3);
 }
+
+.rs-calendar-table-cell-selected .rs-calendar-table-cell-content {
+  background-color: #b22222 !important;
+}
+
+.rs-btn-primary {
+  background-color: #b22222 !important;
+}
+
+.rs-calendar-table-cell-is-today .rs-calendar-table-cell-content {
+  box-shadow: inset 0 0 0 1px #b22222 !important;
+}
+
+.rs-calendar-table-cell-in-range {
+  background-color: #ff8f8f;
+}
+
+.rs-btn-link {
+  color: #b22222;
+}
+
+.rs-calendar-table-cell-content:hover {
+  background-color: #ff9696 !important;
+  color: #b22222 !important;
+}

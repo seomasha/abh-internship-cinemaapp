@@ -17,13 +17,15 @@ import ScrollToTop from "./utils/ScrollToTop";
 import CurrentlyShowing from "./pages/CurrentlyShowing";
 import UpcomingMovies from "./pages/UpcomingMovies";
 import MovieDetails from "./pages/MovieDetails";
-
-import { NavBarProvider } from "./context/NavBarContext";
+import AdminPanel from "./pages/AdminPanel";
 import SeatAndTickets from "./pages/SeatAndTickets";
+
+import { NavBarProvider, useNavBar } from "./context/NavBarContext";
 import Checkout from "./pages/Checkout";
 
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -43,6 +45,10 @@ function App() {
               <Route path="/upcoming" element={<UpcomingMovies />} />
               <Route path="/movie-details/:id" element={<MovieDetails />} />
               <Route path="/seat-and-tickets" element={<SeatAndTickets />} />
+              <Route
+                path="/admin"
+                element={<ProtectedRoute successComponent={<AdminPanel />} />}
+              />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

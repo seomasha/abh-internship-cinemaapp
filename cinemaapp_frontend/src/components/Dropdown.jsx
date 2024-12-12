@@ -2,7 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import "../styles/Dropdown.css";
 
-const Dropdown = ({ icon: Icon, title, options, onChange }) => {
+const Dropdown = ({
+  icon: Icon,
+  label,
+  title,
+  options,
+  onChange,
+  fullWidth = false,
+  invalid,
+  invalidMessage,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [dropdownWidth, setDropdownWidth] = useState("auto");
@@ -32,9 +41,12 @@ const Dropdown = ({ icon: Icon, title, options, onChange }) => {
   }, [isOpen]);
 
   return (
-    <div>
+    <div className={fullWidth ? "w-100" : ""}>
+      <p className={`fs-6 ${invalid ? "text-danger" : ""}`}>{label}</p>
       <div
-        className="dropdown-container"
+        className={`dropdown-container ${
+          invalid ? "border border-2 border-danger" : ""
+        }`}
         ref={dropdownRef}
         onClick={toggleDropdown}
       >
@@ -64,6 +76,7 @@ const Dropdown = ({ icon: Icon, title, options, onChange }) => {
           </div>
         ))}
       </div>
+      {invalid && <div className="error-message">{invalidMessage}</div>}{" "}
     </div>
   );
 };
