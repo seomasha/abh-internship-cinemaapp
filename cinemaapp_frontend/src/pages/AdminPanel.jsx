@@ -82,7 +82,7 @@ const AdminPanel = () => {
   const [movieImages, setMovieImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(-1);
   const [projections, setProjections] = useState([
-    { id: Date.now(), city: "", venue: "", date: "" },
+    { id: Date.now(), city: [], venue: [], date: [] },
   ]);
 
   const writersFileInputRef = useRef(null);
@@ -114,6 +114,9 @@ const AdminPanel = () => {
   const [castError, setCastError] = useState("");
   const [imageError, setImageError] = useState("");
   const [selectedCoverPhotoError, setSelectedCoverPhotoError] = useState("");
+  const [cityError, setCityError] = useState({});
+  const [venueError, setVenueError] = useState({});
+  const [projectionDateError, setProjectionDateError] = useState({});
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
@@ -306,6 +309,73 @@ const AdminPanel = () => {
     return isValid;
   };
 
+  const validateMovieCreationStepThree = () => {
+    let isValid = true;
+
+    const newCityErrors = {};
+    const newVenueErrors = {};
+    const newDateErrors = {};
+
+    projections.forEach((projection, index) => {
+      if (!projection.city || projection.city.length === 0) {
+        newCityErrors[index] = "You should select a city.";
+        isValid = false;
+      }
+
+      if (!projection.venue || projection.venue.length === 0) {
+        newVenueErrors[index] = "You should select a venue.";
+        isValid = false;
+      }
+
+      if (!projection.date || projection.date.length === 0) {
+        newDateErrors[index] = "You should select a date.";
+        isValid = false;
+      }
+    });
+
+    setCityError(newCityErrors);
+    setVenueError(newVenueErrors);
+    setProjectionDateError(newDateErrors);
+
+    return isValid;
+  };
+
+  const resetFields = () => {
+    setMovieName("");
+    setPgRating("");
+    setLanguage("");
+    setMovieDuration("");
+    setDirector("");
+    setTrailerLink("");
+    setSynopsis("");
+    setGenre([]);
+    setStartDate(null);
+    setEndDate(null);
+
+    setMovieNameError("");
+    setPgRatingError("");
+    setLanguageError("");
+    setMovieDurationError("");
+    setGenreError("");
+    setDirectorError("");
+    setTrailerLinkError("");
+    setSynopsisError("");
+    setDateError("");
+    setWritersError("");
+    setCastError("");
+    setImageError("");
+    setSelectedCoverPhotoError("");
+    setCityError({});
+    setVenueError({});
+    setProjectionDateError({});
+
+    setWritersData(null);
+    setCastData(null);
+    setMovieImages([]);
+    setSelectedImageIndex(-1);
+    setProjections([{ id: Date.now(), city: [], venue: [], date: [] }]);
+  };
+
   const handleContinue = () => {
     if (validateMovieCreationStepOne() && movieCreationStep === 1) {
       setMovieCreationStep(2);
@@ -314,9 +384,10 @@ const AdminPanel = () => {
     if (validateMovieCreationStepTwo() && movieCreationStep === 2) {
       setMovieCreationStep(3);
     }
-    if (movieCreationStep === 3) {
+    if (validateMovieCreationStepThree() && movieCreationStep === 3) {
       setCurrentFlow("default");
       setMovieCreationStep(1);
+      resetFields();
     }
   };
 
@@ -332,6 +403,14 @@ const AdminPanel = () => {
   const handleCheckboxChange = (movieId, isChecked) => {
     setCheckedMovies((prev) =>
       isChecked ? [...prev, movieId] : prev.filter((id) => id !== movieId)
+    );
+  };
+
+  const handleProjectionChange = (index, field, value) => {
+    setProjections((prevProjections) =>
+      prevProjections.map((projection, i) =>
+        i === index ? { ...projection, [field]: value } : projection
+      )
     );
   };
 
@@ -480,6 +559,7 @@ const AdminPanel = () => {
                     onChange={(e) => setPgRating(e.target.value)}
                     invalid={!!pgRatingError}
                     invalidMessage={pgRatingError}
+                    value={pgRating}
                   />
                 </div>
                 <div className="d-flex gap-5">
@@ -490,6 +570,7 @@ const AdminPanel = () => {
                     onChange={(e) => setLanguage(e.target.value)}
                     invalid={!!languageError}
                     invalidMessage={languageError}
+                    value={language}
                   />
                   <Input
                     label="Movie Duration"
@@ -498,6 +579,7 @@ const AdminPanel = () => {
                     onChange={(e) => setMovieDuration(e.target.value)}
                     invalid={!!movieDurationError}
                     invalidMessage={movieDurationError}
+                    value={movieDuration}
                   />
                 </div>
                 <div className="d-flex gap-5">
@@ -535,6 +617,7 @@ const AdminPanel = () => {
                     onChange={(e) => setDirector(e.target.value)}
                     invalid={!!directorError}
                     invalidMessage={directorError}
+                    value={director}
                   />
                   <Input
                     label="Trailer"
@@ -543,6 +626,7 @@ const AdminPanel = () => {
                     onChange={(e) => setTrailerLink(e.target.value)}
                     invalid={!!trailerLinkError}
                     invalidMessage="You should enter a trailer link."
+                    value={trailerLink}
                   />
                 </div>
 
@@ -852,40 +936,52 @@ const AdminPanel = () => {
                   <div className="w-100">
                     <Dropdown
                       icon={CiLocationOn}
-                      title="Choose City"
+                      title={
+                        projection?.city.length > 0
+                          ? projection.city.join(", ")
+                          : "Choose City"
+                      }
                       options={["Sead", "City 2", "City 3"]}
-                      value={projection.city}
-                      onChange={(e) => {
-                        const updatedProjections = [...projections];
-                        updatedProjections[index].city = e.target.value;
-                        setProjections(updatedProjections);
-                      }}
+                      value={projection?.city || ""}
+                      onChange={(city) =>
+                        handleProjectionChange(index, "city", city)
+                      }
+                      invalid={!!cityError[index]}
+                      invalidMessage={cityError[index]}
                     />
                   </div>
                   <div className="w-100">
                     <Dropdown
                       icon={CiLocationOn}
-                      title="Choose Venue"
+                      title={
+                        projection?.venue.length > 0
+                          ? projection.venue.join(", ")
+                          : "Choose Venue"
+                      }
                       options={["Venue 1", "Venue 2", "Venue 3"]}
-                      value={projection.venue}
-                      onChange={(e) => {
-                        const updatedProjections = [...projections];
-                        updatedProjections[index].venue = e.target.value;
-                        setProjections(updatedProjections);
-                      }}
+                      value={projection?.venue || ""}
+                      onChange={(venue) =>
+                        handleProjectionChange(index, "venue", venue)
+                      }
+                      invalid={!!venueError[index]}
+                      invalidMessage={venueError[index]}
                     />
                   </div>
                   <div className="w-100">
                     <Dropdown
                       icon={CiLocationOn}
-                      title="Choose Date"
+                      title={
+                        projection?.date.length > 0
+                          ? projection.date.join(", ")
+                          : "Choose Date"
+                      }
                       options={["2024-12-15", "2024-12-16", "2024-12-17"]}
-                      value={projection.date}
-                      onChange={(e) => {
-                        const updatedProjections = [...projections];
-                        updatedProjections[index].date = e.target.value;
-                        setProjections(updatedProjections);
-                      }}
+                      value={projection?.date || ""}
+                      onChange={(date) =>
+                        handleProjectionChange(index, "date", date)
+                      }
+                      invalid={!!projectionDateError[index]}
+                      invalidMessage={projectionDateError[index]}
                     />
                   </div>
                   <FaTrashAlt
