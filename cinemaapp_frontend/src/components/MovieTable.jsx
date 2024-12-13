@@ -75,30 +75,43 @@ const MovieTable = ({
     </div>
   );
 
-  const checkboxTemplate = (rowData) => (
-    <div className="d-flex justify-content-start align-items-center gap-3">
-      <input
-        type="checkbox"
-        style={{ marginLeft: "12px", accentColor: "#b22222" }}
-        onChange={(e) => handleCheckboxChange(e, rowData.id)}
-      />
-      <img
-        src={
-          rowData.photos.find(
-            (photo) => photo.entityType === "movie" && photo.role === "poster"
-          )?.url
-        }
-        alt={rowData.name}
-        style={{
-          width: "50px",
-          height: "50px",
-          marginRight: "10px",
-          borderRadius: "10px",
-        }}
-      />
-      {rowData.name}
-    </div>
-  );
+  const checkboxTemplate = (rowData) => {
+    const today = new Date();
+    const projectionStart = new Date(rowData.projectionStartDate);
+    const projectionEnd = new Date(rowData.projectionEndDate);
+    const isCurrentlyShowing =
+      today >= projectionStart && today <= projectionEnd;
+
+    return (
+      <div className="d-flex justify-content-start align-items-center gap-3">
+        {["archived", "draft1", "draft2", "draft3"].includes(
+          rowData.status
+        ) && (
+          <input
+            type="checkbox"
+            style={{ marginLeft: "12px", accentColor: "#b22222" }}
+            onChange={(e) => handleCheckboxChange(e, rowData.id)}
+          />
+        )}
+
+        <img
+          src={
+            rowData.photos.find(
+              (photo) => photo.entityType === "movie" && photo.role === "poster"
+            )?.url
+          }
+          alt={rowData.name}
+          style={{
+            width: "50px",
+            height: "50px",
+            marginRight: "10px",
+            borderRadius: "10px",
+          }}
+        />
+        {rowData.name}
+      </div>
+    );
+  };
 
   const stepTemplate = (movie) => {
     const currentDate = new Date();
