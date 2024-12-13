@@ -52,8 +52,8 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<Movie> findAllDraftMovies() {
-        return movieRepository.findAllByStatus();
+    public List<Movie> findMoviesByStatus(final String status) {
+        return movieRepository.findAllByStatus(status);
     }
 
     @Override

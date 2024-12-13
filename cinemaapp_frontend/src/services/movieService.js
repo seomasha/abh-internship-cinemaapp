@@ -23,6 +23,10 @@ export const movieService = {
     const response = await request(`${MOVIE_ENDPOINT}/draft`);
     return response;
   },
+  getArchivedMovies: async () => {
+    const response = await request(`${MOVIE_ENDPOINT}/archived`);
+    return response;
+  },
   updateMovie: async (id, status) => {
     const response = await request(
       `${MOVIE_ENDPOINT}/${id}/status?status=${status}`,

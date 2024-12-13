@@ -31,6 +31,9 @@ const AdminPanel = () => {
   const [currentFlow, setCurrentFlow] = useState("default");
   const [movieCreationStep, setMovieCreationStep] = useState(1);
   const [movies, setMovies] = useState([]);
+  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [archivedMovies, setArchivedMovies] = useState([]);
   const [checkedMovies, setCheckedMovies] = useState([]);
 
   const [writersData, setWritersData] = useState(null);
@@ -84,6 +87,24 @@ const AdminPanel = () => {
       setMovies(response);
     };
 
+    const getArchivedMovies = async () => {
+      const response = await movieService.getArchivedMovies();
+      setArchivedMovies(response);
+    };
+
+    const getCurrentlyShowingMovies = async () => {
+      const response = await movieService.getMovies({ size: 50 });
+      setCurrentlyShowingMovies(response);
+    };
+
+    const getUpcomingMovies = async () => {
+      const response = await movieService.getMovies({
+        type: "upcoming",
+        size: 50,
+      });
+      setUpcomingMovies(response);
+    };
+
     const getCities = async () => {
       const response = await venueService.getAllCities();
       setCities(response);
@@ -97,6 +118,9 @@ const AdminPanel = () => {
     getDraftMovies();
     getCities();
     getGenres();
+    getArchivedMovies();
+    getCurrentlyShowingMovies();
+    getUpcomingMovies();
   }, []);
 
   const getVenuesByCity = async (cityName) => {
@@ -562,17 +586,17 @@ const AdminPanel = () => {
                   onClick={() => setActiveTab("drafts")}
                 />
                 <TabButton
-                  label="Currently Showing (0)"
+                  label={`Currently Showing (${currentlyShowingMovies.totalSize})`}
                   isActive={activeTab === "currently-showing"}
                   onClick={() => setActiveTab("currently-showing")}
                 />
                 <TabButton
-                  label="Upcoming (0)"
+                  label={`Upcoming (${upcomingMovies.totalSize})`}
                   isActive={activeTab === "upcoming"}
                   onClick={() => setActiveTab("upcoming")}
                 />
                 <TabButton
-                  label="Archived (0)"
+                  label={`Archived (${archivedMovies.length})`}
                   isActive={activeTab === "archived"}
                   onClick={() => setActiveTab("archived")}
                 />
@@ -625,17 +649,17 @@ const AdminPanel = () => {
                 )}
                 {activeTab === "currently-showing" && (
                   <>
-                    <MovieTable movies={movies} />
+                    <MovieTable movies={currentlyShowingMovies.movies} />
                   </>
                 )}
                 {activeTab === "upcoming" && (
                   <>
-                    <MovieTable movies={movies} />
+                    <MovieTable movies={upcomingMovies.movies} />
                   </>
                 )}
                 {activeTab === "archived" && (
                   <>
-                    <MovieTable movies={movies} />
+                    <MovieTable movies={archivedMovies} />
                   </>
                 )}
               </div>

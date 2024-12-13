@@ -58,7 +58,13 @@ public class MovieController {
 
     @GetMapping("/draft")
     public ResponseEntity<List<Movie>> getDraftMovies() {
-        final List<Movie> movies = movieService.findAllDraftMovies();
+        final List<Movie> movies = movieService.findMoviesByStatus("draft%");
+        return ResponseEntity.ok(movies);
+    }
+
+    @GetMapping("/archived")
+    public ResponseEntity<List<Movie>> getArchivedMovies() {
+        final List<Movie> movies = movieService.findMoviesByStatus("archived");
         return ResponseEntity.ok(movies);
     }
 

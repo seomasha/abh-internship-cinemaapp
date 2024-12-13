@@ -100,15 +100,42 @@ const MovieTable = ({
     </div>
   );
 
-  const stepTemplate = (step) => {
-    if (step.charAt(5) === "1") {
-      return <p className="step-one">Step 1/3</p>;
-    }
-    if (step.charAt(5) === "2") {
-      return <p className="step-two">Step 2/3</p>;
-    }
-    if (step.charAt(5) === "3") {
-      return <p className="step-three">Step 3/3</p>;
+  const stepTemplate = (movie) => {
+    const currentDate = new Date();
+    const startDate = new Date(movie.projectionStartDate);
+    const endDate = new Date(movie.projectionEndDate);
+
+    if (movie.status === "published") {
+      if (currentDate >= startDate && currentDate <= endDate) {
+        const daysRemaining = Math.ceil(
+          (endDate - currentDate) / (1000 * 60 * 60 * 24)
+        );
+        return (
+          <p className={daysRemaining > 7 ? `step-three` : "step-one"}>
+            Ending in {daysRemaining} days
+          </p>
+        );
+      } else if (currentDate < startDate) {
+        const daysToStart = Math.ceil(
+          (startDate - currentDate) / (1000 * 60 * 60 * 24)
+        );
+        return (
+          <p className={daysToStart > 6 ? "step-three" : "step-one"}>
+            Coming in {daysToStart} days
+          </p>
+        );
+      }
+    } else if (movie.status === "archived") {
+      return <p className="ended">Ended</p>;
+    } else {
+      const step = movie.status.charAt(5);
+      if (step === "1") {
+        return <p className="step-one">Step 1/3</p>;
+      } else if (step === "2") {
+        return <p className="step-two">Step 2/3</p>;
+      } else if (step === "3") {
+        return <p className="step-three">Step 3/3</p>;
+      }
     }
   };
 
@@ -137,7 +164,7 @@ const MovieTable = ({
         <Column
           header="Status"
           body={(rowData) => {
-            return stepTemplate(rowData.status);
+            return stepTemplate(rowData);
           }}
         />
         <Column header="Action" field="action" body={actionTemplate} />

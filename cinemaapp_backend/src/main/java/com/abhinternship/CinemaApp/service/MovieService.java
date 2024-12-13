@@ -17,7 +17,7 @@ public interface MovieService {
     MovieListDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size);
     MovieListDTO findUpcomingMovies(FilterMovie filterMovie, int page, int size);
     MovieWithProjectionsDTO findMovieWithProjectionsById(Long id) throws ResourceNotFoundException;
-    List<Movie> findAllDraftMovies();
+    List<Movie> findMoviesByStatus(String status);
     public void updateMovieStatus(Long id, String status) throws ResourceNotFoundException;
     public void updateMoviesStatus(List<Long> ids, String status) throws ResourceNotFoundException;
 }
