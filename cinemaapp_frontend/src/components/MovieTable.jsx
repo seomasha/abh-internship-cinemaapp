@@ -40,6 +40,10 @@ const MovieTable = ({
       setShowModal(false);
       await movieService.updateMovie(movieId, "published");
     }
+    if (modalAction === "draft") {
+      setShowModal(false);
+      await movieService.updateMovie(movieId, "draft1");
+    }
   };
 
   const cancelAction = () => {
@@ -61,15 +65,32 @@ const MovieTable = ({
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
-          <Dropdown.Item onClick={() => handleActionChange("edit")}>
-            Edit
-          </Dropdown.Item>
-          <Dropdown.Item onClick={() => handleActionChange("publish")}>
-            Publish
-          </Dropdown.Item>
-          <Dropdown.Item onClick={() => handleActionChange("archive")}>
-            Archive
-          </Dropdown.Item>
+          {rowData.status === "archived" ||
+          rowData.status === "published_upcoming" ? (
+            <Dropdown.Item onClick={() => handleActionChange("draft")}>
+              Move to draft
+            </Dropdown.Item>
+          ) : (
+            <>
+              {["draft1", "draft2", "draft3"].includes(rowData.status) && (
+                <>
+                  <Dropdown.Item onClick={() => handleActionChange("edit")}>
+                    Edit
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={() => handleActionChange("publish")}>
+                    Publish
+                  </Dropdown.Item>
+                </>
+              )}
+            </>
+          )}
+          {["draft1", "draft2", "draft3", "published_upcoming"].includes(
+            rowData.status
+          ) && (
+            <Dropdown.Item onClick={() => handleActionChange("archive")}>
+              Archive
+            </Dropdown.Item>
+          )}
         </Dropdown.Menu>
       </Dropdown>
     </div>
@@ -84,9 +105,13 @@ const MovieTable = ({
 
     return (
       <div className="d-flex justify-content-start align-items-center gap-3">
-        {["archived", "draft1", "draft2", "draft3"].includes(
-          rowData.status
-        ) && (
+        {[
+          "archived",
+          "draft1",
+          "draft2",
+          "draft3",
+          "published_upcoming",
+        ].includes(rowData.status) && (
           <input
             type="checkbox"
             style={{ marginLeft: "12px", accentColor: "#b22222" }}

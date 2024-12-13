@@ -81,6 +81,8 @@ const AdminPanel = () => {
   const [cities, setCities] = useState([]);
   const [genres, setGenres] = useState([]);
 
+  const [selectedMovie, setSelectedMovie] = useState(0);
+
   useEffect(() => {
     const getDraftMovies = async () => {
       const response = await movieService.getDraftMovies();
@@ -583,22 +585,34 @@ const AdminPanel = () => {
                 <TabButton
                   label={`Drafts (${movies.length})`}
                   isActive={activeTab === "drafts"}
-                  onClick={() => setActiveTab("drafts")}
+                  onClick={() => {
+                    setActiveTab("drafts");
+                    setCheckedMovies([]);
+                  }}
                 />
                 <TabButton
                   label={`Currently Showing (${currentlyShowingMovies.totalSize})`}
                   isActive={activeTab === "currently-showing"}
-                  onClick={() => setActiveTab("currently-showing")}
+                  onClick={() => {
+                    setActiveTab("currently-showing");
+                    setCheckedMovies([]);
+                  }}
                 />
                 <TabButton
                   label={`Upcoming (${upcomingMovies.totalSize})`}
                   isActive={activeTab === "upcoming"}
-                  onClick={() => setActiveTab("upcoming")}
+                  onClick={() => {
+                    setActiveTab("upcoming");
+                    setCheckedMovies([]);
+                  }}
                 />
                 <TabButton
                   label={`Archived (${archivedMovies.length})`}
                   isActive={activeTab === "archived"}
-                  onClick={() => setActiveTab("archived")}
+                  onClick={() => {
+                    setActiveTab("archived");
+                    setCheckedMovies([]);
+                  }}
                 />
               </div>
 
@@ -654,12 +668,22 @@ const AdminPanel = () => {
                 )}
                 {activeTab === "upcoming" && (
                   <>
-                    <MovieTable movies={upcomingMovies.movies} />
+                    <MovieTable
+                      movies={upcomingMovies.movies}
+                      movieId={movieId}
+                      setMovieId={setMovieId}
+                      onCheckboxChange={handleCheckboxChange}
+                    />
                   </>
                 )}
                 {activeTab === "archived" && (
                   <>
-                    <MovieTable movies={archivedMovies} />
+                    <MovieTable
+                      movies={archivedMovies}
+                      onCheckboxChange={handleCheckboxChange}
+                      movieId={movieId}
+                      setMovieId={setMovieId}
+                    />
                   </>
                 )}
               </div>

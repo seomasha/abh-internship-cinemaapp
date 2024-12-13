@@ -131,7 +131,7 @@ public class MovieServiceImpl implements MovieService {
         final Pageable pageable = PageRequest.of(page, size);
 
         final Page<Movie> moviePage = filterMovie.isEmpty()
-                ? movieRepository.findByProjectionStartDateGreaterThanEqualAndStatus(endDate, pageable, "published")
+                ? movieRepository.findByProjectionStartDateGreaterThanEqualAndStatus(endDate, pageable, "published_upcoming")
                 : filterMovieRepositoryImpl.findMoviesByFilter(filterMovie, pageable, false);
 
         final List<MovieWithProjectionsDTO> moviesWithProjections = moviePage.getContent().stream()
