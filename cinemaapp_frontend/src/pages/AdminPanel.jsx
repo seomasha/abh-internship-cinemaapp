@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import { MdOutlineLocalMovies } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
@@ -20,61 +20,16 @@ import MovieTable from "../components/MovieTable.jsx";
 import Roadmap from "../components/Roadmap.jsx";
 import Papa from "papaparse";
 import ToastService from "../services/toastService.js";
+import { movieService } from "../services/movieService.js";
+import { photoService } from "../services/photoService.js";
+import { venueService } from "../services/venueService.js";
+import { projectionService } from "../services/projectionService.js";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
   const [currentFlow, setCurrentFlow] = useState("default");
   const [movieCreationStep, setMovieCreationStep] = useState(1);
-  const [movies, setMovies] = useState([
-    {
-      id: 1,
-      name: "Movie 1",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-15",
-      venue: "Venue 1",
-      step: 1,
-    },
-    {
-      id: 2,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 2,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 3,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 1,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 1,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 1,
-    },
-  ]);
+  const [movies, setMovies] = useState([]);
   const [checkedMovies, setCheckedMovies] = useState([]);
 
   const [writersData, setWritersData] = useState(null);
@@ -82,7 +37,7 @@ const AdminPanel = () => {
   const [movieImages, setMovieImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(-1);
   const [projections, setProjections] = useState([
-    { id: Date.now(), city: [], venue: [], date: [] },
+    { id: Date.now(), city: "", venue: "", time: "", venues: [] },
   ]);
 
   const writersFileInputRef = useRef(null);
@@ -116,7 +71,30 @@ const AdminPanel = () => {
   const [selectedCoverPhotoError, setSelectedCoverPhotoError] = useState("");
   const [cityError, setCityError] = useState({});
   const [venueError, setVenueError] = useState({});
-  const [projectionDateError, setProjectionDateError] = useState({});
+  const [projectionTimeError, setProjectionTimeError] = useState({});
+
+  const [movieId, setMovieId] = useState(0);
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    const getDraftMovies = async () => {
+      const response = await movieService.getDraftMovies();
+      setMovies(response);
+    };
+
+    const getCities = async () => {
+      const response = await venueService.getAllCities();
+      setCities(response);
+    };
+
+    getDraftMovies();
+    getCities();
+  }, []);
+
+  const getVenuesByCity = async (cityName) => {
+    const response = await venueService.getVenuesByCity(cityName);
+    return response;
+  };
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
@@ -187,7 +165,7 @@ const AdminPanel = () => {
   const handleAddProjection = () => {
     setProjections((prevProjections) => [
       ...prevProjections,
-      { id: Date.now(), city: "", venue: "", date: "" }, //Date.now() just used for unique IDs for handling deletion and preventing bugs
+      { id: Date.now(), city: "", venue: "", time: "", venues: [] }, //Date.now() just used for unique IDs for handling deletion and preventing bugs
     ]);
   };
 
@@ -327,15 +305,15 @@ const AdminPanel = () => {
         isValid = false;
       }
 
-      if (!projection.date || projection.date.length === 0) {
-        newDateErrors[index] = "You should select a date.";
+      if (!projection.time || projection.time.length === 0) {
+        newDateErrors[index] = "You should select a time.";
         isValid = false;
       }
     });
 
     setCityError(newCityErrors);
     setVenueError(newVenueErrors);
-    setProjectionDateError(newDateErrors);
+    setProjectionTimeError(newDateErrors);
 
     return isValid;
   };
@@ -367,27 +345,105 @@ const AdminPanel = () => {
     setSelectedCoverPhotoError("");
     setCityError({});
     setVenueError({});
-    setProjectionDateError({});
+    setProjectionTimeError({});
 
     setWritersData(null);
     setCastData(null);
     setMovieImages([]);
     setSelectedImageIndex(-1);
-    setProjections([{ id: Date.now(), city: [], venue: [], date: [] }]);
+    setProjections([
+      { id: Date.now(), city: "", venue: "", time: "", venues: [] },
+    ]);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (validateMovieCreationStepOne() && movieCreationStep === 1) {
-      setMovieCreationStep(2);
+      const id = await movieService.create({
+        name: movieName,
+        pgRating: pgRating,
+        language: language,
+        movieDuration: movieDuration,
+        projectionEndDate: endDate,
+        projectionStartDate: startDate,
+        director: director,
+        trailerLink: trailerLink,
+        synopsis: synopsis,
+        status: "draft1",
+      });
+
+      if (id) {
+        setMovieId(id);
+        setMovieCreationStep(2);
+      }
     }
 
     if (validateMovieCreationStepTwo() && movieCreationStep === 2) {
-      setMovieCreationStep(3);
+      const update = await movieService.create({
+        id: movieId,
+        name: movieName,
+        pgRating: pgRating,
+        language: language,
+        movieDuration: movieDuration,
+        projectionEndDate: endDate,
+        projectionStartDate: startDate,
+        director: director,
+        trailerLink: trailerLink,
+        synopsis: synopsis,
+        status: "draft2",
+        actors: castData.map((cast) => cast.realName).join(","),
+        writers: writersData.join(","),
+      });
+
+      const formData = new FormData();
+
+      movieImages.forEach((image, index) => {
+        formData.append("files", image);
+      });
+
+      formData.append("entityId", movieId);
+      formData.append("entityType", "movie");
+      formData.append(
+        "role",
+        selectedImageIndex !== null ? "poster" : "showcase"
+      );
+
+      const photo = await photoService.create(formData, "multipart/form-data");
+
+      if (update && photo) {
+        setMovieCreationStep(3);
+      }
     }
     if (validateMovieCreationStepThree() && movieCreationStep === 3) {
-      setCurrentFlow("default");
-      setMovieCreationStep(1);
-      resetFields();
+      const projectionsToSend = projections.map((projection) => ({
+        venue: projection.venue[0],
+        projectionTime: projection.time[0],
+        movieId: movieId,
+        hallId: 13,
+      }));
+
+      const update = await movieService.create({
+        id: movieId,
+        name: movieName,
+        pgRating: pgRating,
+        language: language,
+        movieDuration: movieDuration,
+        projectionEndDate: endDate,
+        projectionStartDate: startDate,
+        director: director,
+        trailerLink: trailerLink,
+        synopsis: synopsis,
+        status: "draft3",
+        actors: castData.map((cast) => cast.realName).join(","),
+        writers: writersData.join(","),
+      });
+
+      const response = await projectionService.create(projectionsToSend);
+
+      if (update && response) {
+        setCurrentFlow("default");
+        setMovieCreationStep(1);
+        resetFields();
+      }
     }
   };
 
@@ -406,12 +462,27 @@ const AdminPanel = () => {
     );
   };
 
-  const handleProjectionChange = (index, field, value) => {
-    setProjections((prevProjections) =>
-      prevProjections.map((projection, i) =>
-        i === index ? { ...projection, [field]: value } : projection
-      )
-    );
+  const handleProjectionChange = async (index, field, value) => {
+    if (field === "city") {
+      const fetchedVenues = await getVenuesByCity(value);
+      setProjections((prevProjections) => {
+        const updatedProjections = [...prevProjections];
+        updatedProjections[index] = {
+          ...updatedProjections[index],
+          city: value,
+          venue: "",
+          venues: fetchedVenues,
+        };
+        return updatedProjections;
+      });
+    } else {
+      setProjections((prevProjections) => {
+        const updatedProjections = prevProjections.map((projection, i) =>
+          i === index ? { ...projection, [field]: value } : projection
+        );
+        return updatedProjections;
+      });
+    }
   };
 
   return (
@@ -551,6 +622,7 @@ const AdminPanel = () => {
                     onChange={(e) => setMovieName(e.target.value)}
                     invalid={!!movieNameError}
                     invalidMessage={movieNameError}
+                    dark={true}
                   />
                   <Input
                     label="PG Rating"
@@ -560,6 +632,7 @@ const AdminPanel = () => {
                     invalid={!!pgRatingError}
                     invalidMessage={pgRatingError}
                     value={pgRating}
+                    dark={true}
                   />
                 </div>
                 <div className="d-flex gap-5">
@@ -571,6 +644,7 @@ const AdminPanel = () => {
                     invalid={!!languageError}
                     invalidMessage={languageError}
                     value={language}
+                    dark={true}
                   />
                   <Input
                     label="Movie Duration"
@@ -580,6 +654,7 @@ const AdminPanel = () => {
                     invalid={!!movieDurationError}
                     invalidMessage={movieDurationError}
                     value={movieDuration}
+                    dark={true}
                   />
                 </div>
                 <div className="d-flex gap-5">
@@ -618,6 +693,7 @@ const AdminPanel = () => {
                     invalid={!!directorError}
                     invalidMessage={directorError}
                     value={director}
+                    dark={true}
                   />
                   <Input
                     label="Trailer"
@@ -627,6 +703,7 @@ const AdminPanel = () => {
                     invalid={!!trailerLinkError}
                     invalidMessage="You should enter a trailer link."
                     value={trailerLink}
+                    dark={true}
                   />
                 </div>
 
@@ -941,7 +1018,7 @@ const AdminPanel = () => {
                           ? projection.city.join(", ")
                           : "Choose City"
                       }
-                      options={["Sead", "City 2", "City 3"]}
+                      options={cities}
                       value={projection?.city || ""}
                       onChange={(city) =>
                         handleProjectionChange(index, "city", city)
@@ -958,7 +1035,7 @@ const AdminPanel = () => {
                           ? projection.venue.join(", ")
                           : "Choose Venue"
                       }
-                      options={["Venue 1", "Venue 2", "Venue 3"]}
+                      options={projection.venues.map((venue) => venue.name)}
                       value={projection?.venue || ""}
                       onChange={(venue) =>
                         handleProjectionChange(index, "venue", venue)
@@ -971,17 +1048,17 @@ const AdminPanel = () => {
                     <Dropdown
                       icon={CiLocationOn}
                       title={
-                        projection?.date.length > 0
-                          ? projection.date.join(", ")
+                        projection?.time.length > 0
+                          ? projection.time.join(", ")
                           : "Choose Date"
                       }
-                      options={["2024-12-15", "2024-12-16", "2024-12-17"]}
-                      value={projection?.date || ""}
-                      onChange={(date) =>
-                        handleProjectionChange(index, "date", date)
+                      options={["12:00:00", "13:00:00", "14:00:00"]}
+                      value={projection?.time || ""}
+                      onChange={(time) =>
+                        handleProjectionChange(index, "time", time)
                       }
-                      invalid={!!projectionDateError[index]}
-                      invalidMessage={projectionDateError[index]}
+                      invalid={!!projectionTimeError[index]}
+                      invalidMessage={projectionTimeError[index]}
                     />
                   </div>
                   <FaTrashAlt

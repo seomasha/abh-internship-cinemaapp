@@ -19,4 +19,8 @@ export const movieService = {
     const response = await request(endpoint, { params });
     return response;
   },
+  getDraftMovies: async () => {
+    const response = await request(`${MOVIE_ENDPOINT}/draft`);
+    return response;
+  },
 };

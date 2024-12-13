@@ -27,7 +27,11 @@ const MovieTable = ({ movies, onCheckboxChange }) => {
         onChange={(e) => handleCheckboxChange(e, rowData.id)}
       />
       <img
-        src={rowData.imageUrl}
+        src={
+          rowData.photos.find(
+            (photo) => photo.entityType === "movie" && photo.role === "poster"
+          )?.url
+        }
         alt={rowData.name}
         style={{
           width: "50px",
@@ -41,13 +45,13 @@ const MovieTable = ({ movies, onCheckboxChange }) => {
   );
 
   const stepTemplate = (step) => {
-    if (step === 1) {
+    if (step.charAt(5) === "1") {
       return <p className="step-one">Step 1/3</p>;
     }
-    if (step === 2) {
+    if (step.charAt(5) === "2") {
       return <p className="step-two">Step 2/3</p>;
     }
-    if (step === 3) {
+    if (step.charAt(5) === "3") {
       return <p className="step-three">Step 3/3</p>;
     }
   };
@@ -65,12 +69,19 @@ const MovieTable = ({ movies, onCheckboxChange }) => {
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
       >
         <Column header="Movie" body={checkboxTemplate} />
-        <Column header="Projection Date" field="projectionDate" />
+        <Column
+          header="Projection Date"
+          body={(movie) => (
+            <p>
+              {movie.projectionEndDate} - {movie.projectionStartDate}
+            </p>
+          )}
+        />
         <Column header="Venue" field="venue" />
         <Column
           header="Status"
           body={(rowData) => {
-            return stepTemplate(rowData.step);
+            return stepTemplate(rowData.status);
           }}
         />
         <Column header="Action" field="action" body={actionTemplate} />

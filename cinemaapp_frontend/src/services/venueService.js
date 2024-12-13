@@ -22,4 +22,10 @@ export const venueService = {
     );
     return response;
   },
+  getVenuesByCity: async (cityName) => {
+    const response = await request(
+      `${VENUE_ENDPOINT}/venues-by-city?cityName=${cityName}`
+    );
+    return response;
+  },
 };

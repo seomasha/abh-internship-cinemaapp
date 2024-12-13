@@ -1,9 +1,14 @@
 package com.abhinternship.CinemaApp.service;
 
+import com.abhinternship.CinemaApp.dto.ProjectionDTO;
+import com.abhinternship.CinemaApp.model.Hall;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.model.Venue;
+import com.abhinternship.CinemaApp.repository.HallRepository;
+import com.abhinternship.CinemaApp.repository.MovieRepository;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
+import com.abhinternship.CinemaApp.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +23,9 @@ import java.util.*;
 public class ProjectionServiceImpl implements ProjectionService {
 
     private final ProjectionRepository projectionRepository;
+    private final VenueRepository venueRepository;
+    private final MovieRepository movieRepository;
+    private final HallRepository hallRepository;
 
     @Override
     public List<Projection> findAllProjections() {
@@ -30,8 +38,25 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     @Override
-    public Projection saveProjection(final Projection projection) {
-        return projectionRepository.save(projection);
+    public void saveProjection(final List<ProjectionDTO> projections) {
+        for (ProjectionDTO projection : projections) {
+            final Venue venue = venueRepository.findByName(projection.getVenue());
+
+            final Movie movie = movieRepository.findById(projection.getMovieId())
+                    .orElseThrow(() -> new RuntimeException("Movie with ID " + projection.getMovieId() + " not found"));
+
+            final Hall hall = hallRepository.findById(projection.getHallId())
+                    .orElseThrow(() -> new RuntimeException("Hall with ID " + projection.getHallId() + " not found"));
+
+
+            final Projection savedProjection = new Projection();
+            savedProjection.setMovieId(movie);
+            savedProjection.setVenueId(venue);
+            savedProjection.setHallId(hall);
+            savedProjection.setProjectionTime(projection.getProjectionTime());
+
+            projectionRepository.save(savedProjection);
+        }
     }
 
     @Override

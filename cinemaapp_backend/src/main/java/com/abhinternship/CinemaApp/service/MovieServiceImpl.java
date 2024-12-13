@@ -48,6 +48,11 @@ public class MovieServiceImpl implements MovieService {
         return MovieWithProjectionsDTO.fromMovie(movie, projections);
     }
 
+    @Override
+    public List<Movie> findAllDraftMovies() {
+        return movieRepository.findAllByStatus();
+    }
+
 
     @Override
     public void saveMovie(final Movie movie) {
@@ -97,4 +102,6 @@ public class MovieServiceImpl implements MovieService {
 
         return MovieListDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
     }
+
+
 }

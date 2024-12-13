@@ -17,4 +17,5 @@ public interface MovieService {
     MovieListDTO findCurrentlyShowingMovies(FilterMovie filterMovie, int page, int size);
     MovieListDTO findUpcomingMovies(FilterMovie filterMovie, int page, int size);
     MovieWithProjectionsDTO findMovieWithProjectionsById(Long id) throws ResourceNotFoundException;
+    List<Movie> findAllDraftMovies();
 }

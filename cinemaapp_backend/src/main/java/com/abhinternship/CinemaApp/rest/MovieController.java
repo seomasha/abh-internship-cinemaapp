@@ -56,6 +56,12 @@ public class MovieController {
         return ResponseEntity.ok(upcomingMovies);
     }
 
+    @GetMapping("/draft")
+    public ResponseEntity<List<Movie>> getDraftMovies() {
+        final List<Movie> movies = movieService.findAllDraftMovies();
+        return ResponseEntity.ok(movies);
+    }
+
     @PostMapping
     public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) {
         movieService.saveMovie(movie);
