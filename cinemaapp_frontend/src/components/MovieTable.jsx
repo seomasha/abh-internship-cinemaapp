@@ -16,6 +16,7 @@ const MovieTable = ({
   onEditClick,
   movieId,
   setMovieId,
+  showAction,
 }) => {
   const [dropdownsOpen, setDropdownsOpen] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -205,7 +206,9 @@ const MovieTable = ({
             return stepTemplate(rowData);
           }}
         />
-        <Column header="Action" field="action" body={actionTemplate} />
+        {showAction && (
+          <Column header="Action" field="action" body={actionTemplate} />
+        )}
       </DataTable>
 
       <Modal show={showModal} onHide={cancelAction}>

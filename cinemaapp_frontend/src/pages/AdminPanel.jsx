@@ -76,6 +76,7 @@ const AdminPanel = () => {
   const [cityError, setCityError] = useState({});
   const [venueError, setVenueError] = useState({});
   const [projectionTimeError, setProjectionTimeError] = useState({});
+  const [duplicateError, setDuplicateError] = useState({});
 
   const [movieId, setMovieId] = useState(0);
   const [cities, setCities] = useState([]);
@@ -197,10 +198,15 @@ const AdminPanel = () => {
   };
 
   const handleAddProjection = () => {
-    setProjections((prevProjections) => [
-      ...prevProjections,
-      { id: Date.now(), city: "", venue: "", time: "", venues: [] }, //Date.now() just used for unique IDs for handling deletion and preventing bugs
-    ]);
+    const newProjection = {
+      id: Date.now(), //Date.now() just used for unique IDs for handling deletion and preventing bugs
+      city: "",
+      venue: "",
+      time: "",
+      venues: [],
+    };
+
+    setProjections((prevProjections) => [...prevProjections, newProjection]);
   };
 
   const handleRemoveProjection = (idToDelete) => {
@@ -321,33 +327,54 @@ const AdminPanel = () => {
     return isValid;
   };
 
+  const isUniqueProjection = (city, venue, time) => {
+    return !projections.some(
+      (proj) => proj.city === city && proj.venue === venue && proj.time === time
+    );
+  };
+
   const validateMovieCreationStepThree = () => {
     let isValid = true;
 
     const newCityErrors = {};
     const newVenueErrors = {};
     const newDateErrors = {};
+    const duplicateErrors = {};
+
+    const seenProjections = new Set();
 
     projections.forEach((projection, index) => {
-      if (!projection.city || projection.city.length === 0) {
+      const { city, venue, time } = projection;
+
+      if (!city || city.length === 0) {
         newCityErrors[index] = "You should select a city.";
         isValid = false;
       }
 
-      if (!projection.venue || projection.venue.length === 0) {
+      if (!venue || venue.length === 0) {
         newVenueErrors[index] = "You should select a venue.";
         isValid = false;
       }
 
-      if (!projection.time || projection.time.length === 0) {
+      if (!time || time.length === 0) {
         newDateErrors[index] = "You should select a time.";
         isValid = false;
+      }
+
+      const key = `${city}-${venue}-${time}`;
+      if (seenProjections.has(key)) {
+        duplicateErrors[index] =
+          "Duplicate projection detected: City, venue, and time must be unique.";
+        isValid = false;
+      } else {
+        seenProjections.add(key);
       }
     });
 
     setCityError(newCityErrors);
     setVenueError(newVenueErrors);
     setProjectionTimeError(newDateErrors);
+    setDuplicateError(duplicateErrors);
 
     return isValid;
   };
@@ -658,6 +685,7 @@ const AdminPanel = () => {
                       onCheckboxChange={handleCheckboxChange}
                       movieId={movieId}
                       setMovieId={setMovieId}
+                      showAction={true}
                     />
                   </>
                 )}
@@ -673,6 +701,7 @@ const AdminPanel = () => {
                       movieId={movieId}
                       setMovieId={setMovieId}
                       onCheckboxChange={handleCheckboxChange}
+                      showAction={true}
                     />
                   </>
                 )}
@@ -683,6 +712,7 @@ const AdminPanel = () => {
                       onCheckboxChange={handleCheckboxChange}
                       movieId={movieId}
                       setMovieId={setMovieId}
+                      showAction={true}
                     />
                   </>
                 )}
@@ -1108,72 +1138,81 @@ const AdminPanel = () => {
               <Roadmap step={3} />
 
               {projections.map((projection, index) => (
-                <div
-                  key={projection.id}
-                  className="d-flex w-100 gap-4 align-items-center"
-                >
-                  <div className="w-100">
-                    <Dropdown
-                      icon={CiLocationOn}
-                      title={
-                        projection?.city.length > 0
-                          ? projection.city.join(", ")
-                          : "Choose City"
+                <>
+                  <div
+                    key={projection.id}
+                    className="d-flex w-100 gap-4 align-items-center"
+                  >
+                    <div className="w-100">
+                      <Dropdown
+                        icon={CiLocationOn}
+                        title={
+                          projection?.city.length > 0
+                            ? projection.city.join(", ")
+                            : "Choose City"
+                        }
+                        options={cities}
+                        value={projection?.city || ""}
+                        onChange={(city) =>
+                          handleProjectionChange(index, "city", city)
+                        }
+                        invalid={!!cityError[index]}
+                        invalidMessage={cityError[index]}
+                      />
+                    </div>
+                    <div className="w-100">
+                      <Dropdown
+                        icon={CiLocationOn}
+                        title={
+                          projection?.venue.length > 0
+                            ? projection.venue.join(", ")
+                            : "Choose Venue"
+                        }
+                        options={projection.venues.map((venue) => venue.name)}
+                        value={projection?.venue || ""}
+                        onChange={(venue) =>
+                          handleProjectionChange(index, "venue", venue)
+                        }
+                        invalid={!!venueError[index]}
+                        invalidMessage={venueError[index]}
+                      />
+                    </div>
+                    <div className="w-100">
+                      <Dropdown
+                        icon={CiLocationOn}
+                        title={
+                          projection?.time.length > 0
+                            ? projection.time.join(", ")
+                            : "Choose Date"
+                        }
+                        options={["12:00:00", "13:00:00", "14:00:00"]}
+                        value={projection?.time || ""}
+                        onChange={(time) =>
+                          handleProjectionChange(index, "time", time)
+                        }
+                        invalid={!!projectionTimeError[index]}
+                        invalidMessage={projectionTimeError[index]}
+                      />
+                    </div>
+                    <FaTrashAlt
+                      size={36}
+                      className={`primary-red pointer mt-3 ${
+                        projections.length === 1 ? "disabled" : ""
+                      }`}
+                      onClick={() =>
+                        projections.length > 1 &&
+                        handleRemoveProjection(projection.id)
                       }
-                      options={cities}
-                      value={projection?.city || ""}
-                      onChange={(city) =>
-                        handleProjectionChange(index, "city", city)
-                      }
-                      invalid={!!cityError[index]}
-                      invalidMessage={cityError[index]}
                     />
                   </div>
-                  <div className="w-100">
-                    <Dropdown
-                      icon={CiLocationOn}
-                      title={
-                        projection?.venue.length > 0
-                          ? projection.venue.join(", ")
-                          : "Choose Venue"
-                      }
-                      options={projection.venues.map((venue) => venue.name)}
-                      value={projection?.venue || ""}
-                      onChange={(venue) =>
-                        handleProjectionChange(index, "venue", venue)
-                      }
-                      invalid={!!venueError[index]}
-                      invalidMessage={venueError[index]}
-                    />
+                  <div>
+                    {!!duplicateError && (
+                      <p className="text-danger text-center mt-2">
+                        {duplicateError[index]}
+                      </p>
+                    )}
                   </div>
-                  <div className="w-100">
-                    <Dropdown
-                      icon={CiLocationOn}
-                      title={
-                        projection?.time.length > 0
-                          ? projection.time.join(", ")
-                          : "Choose Date"
-                      }
-                      options={["12:00:00", "13:00:00", "14:00:00"]}
-                      value={projection?.time || ""}
-                      onChange={(time) =>
-                        handleProjectionChange(index, "time", time)
-                      }
-                      invalid={!!projectionTimeError[index]}
-                      invalidMessage={projectionTimeError[index]}
-                    />
-                  </div>
-                  <FaTrashAlt
-                    size={36}
-                    className={`primary-red pointer mt-3 ${
-                      projections.length === 1 ? "disabled" : ""
-                    }`}
-                    onClick={() =>
-                      projections.length > 1 &&
-                      handleRemoveProjection(projection.id)
-                    }
-                  />
-                </div>
+                </>
               ))}
 
               <p
