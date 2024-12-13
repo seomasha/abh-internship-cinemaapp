@@ -30,4 +30,11 @@ export const movieService = {
     );
     return response;
   },
+  updateMovies: async (ids, status) => {
+    const response = await request(
+      `${MOVIE_ENDPOINT}/status?status=${status}`,
+      { method: "PATCH", data: ids }
+    );
+    return response;
+  },
 };

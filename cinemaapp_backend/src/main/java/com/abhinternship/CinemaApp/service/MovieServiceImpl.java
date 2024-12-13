@@ -75,11 +75,30 @@ public class MovieServiceImpl implements MovieService {
         final Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
-        movie.setStatus(status);
+        if (status.equals("published") && (movie.getStatus().equals("draft1") || movie.getStatus().equals("draft2"))) {
+            throw new IllegalArgumentException("The movie can't be published as it is not completed yet.");
+        } else {
+            movie.setStatus(status);
 
-        movieRepository.save(movie);
+            movieRepository.save(movie);
+        }
     }
 
+    @Override
+    public void updateMoviesStatus(final List<Long> ids, final String status) throws ResourceNotFoundException {
+        for (final Long id : ids) {
+            final Movie movie = movieRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+
+            if (status.equals("published") && (movie.getStatus().equals("draft1") || movie.getStatus().equals("draft2"))) {
+                throw new IllegalArgumentException("The movies can't be published as they are not completed yet.");
+            } else {
+                movie.setStatus(status);
+
+                movieRepository.save(movie);
+            }
+        }
+    }
 
     @Override
     public void deleteMovie(final Long id) {

@@ -75,6 +75,12 @@ public class MovieController {
         return ResponseEntity.ok("Movie status updated successfully.");
     }
 
+    @PatchMapping("/status")
+    public ResponseEntity<String> updateMoviesStatus(@RequestBody List<Long> ids, @RequestParam String status) throws ResourceNotFoundException {
+        movieService.updateMoviesStatus(ids, status);
+        return ResponseEntity.ok("Movies status updated successfully.");
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMovie(final @PathVariable Long id) {

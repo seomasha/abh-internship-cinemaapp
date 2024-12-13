@@ -510,6 +510,14 @@ const AdminPanel = () => {
     }
   };
 
+  const archiveMovies = async () => {
+    await movieService.updateMovies(checkedMovies, "archived");
+  };
+
+  const publishMovies = async () => {
+    await movieService.updateMovies(checkedMovies, "published");
+  };
+
   return (
     <div>
       <NavBar />
@@ -592,8 +600,18 @@ const AdminPanel = () => {
                     <div className="d-flex justify-content-end gap-3">
                       {checkedMovies.length > 0 && (
                         <>
-                          <Button variant="outline-danger">Archive</Button>
-                          <Button variant="outline-success">Publish</Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={archiveMovies}
+                          >
+                            Archive
+                          </Button>
+                          <Button
+                            variant="outline-success"
+                            onClick={publishMovies}
+                          >
+                            Publish
+                          </Button>
                         </>
                       )}
                     </div>
