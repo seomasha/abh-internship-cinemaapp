@@ -13,7 +13,7 @@ export const NavBarProvider = ({ children }) => {
   const [emailPrefix, setEmailPrefix] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
-  ); // Initialize from localStorage
+  );
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [role, setRole] = useState(localStorage.getItem("role"));
 
@@ -21,7 +21,7 @@ export const NavBarProvider = ({ children }) => {
     const getUserId = async (email) => {
       const response = await userService.findUserByEmail(email);
       setRole(response?.role);
-      localStorage.setItem("role", response?.role); // Store role in localStorage
+      localStorage.setItem("role", response?.role);
       return response?.id;
     };
 

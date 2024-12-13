@@ -24,6 +24,7 @@ import { movieService } from "../services/movieService.js";
 import { photoService } from "../services/photoService.js";
 import { venueService } from "../services/venueService.js";
 import { projectionService } from "../services/projectionService.js";
+import { genreService } from "../services/genreService.js";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("drafts");
@@ -75,6 +76,7 @@ const AdminPanel = () => {
 
   const [movieId, setMovieId] = useState(0);
   const [cities, setCities] = useState([]);
+  const [genres, setGenres] = useState([]);
 
   useEffect(() => {
     const getDraftMovies = async () => {
@@ -87,8 +89,14 @@ const AdminPanel = () => {
       setCities(response);
     };
 
+    const getGenres = async () => {
+      const response = await genreService.getAll();
+      setGenres(response);
+    };
+
     getDraftMovies();
     getCities();
+    getGenres();
   }, []);
 
   const getVenuesByCity = async (cityName) => {
@@ -354,6 +362,7 @@ const AdminPanel = () => {
     setProjections([
       { id: Date.now(), city: "", venue: "", time: "", venues: [] },
     ]);
+    setMovieId(0);
   };
 
   const handleContinue = async () => {
@@ -369,6 +378,7 @@ const AdminPanel = () => {
         trailerLink: trailerLink,
         synopsis: synopsis,
         status: "draft1",
+        genres: genre,
       });
 
       if (id) {
@@ -390,6 +400,7 @@ const AdminPanel = () => {
         trailerLink: trailerLink,
         synopsis: synopsis,
         status: "draft2",
+        genres: genre,
         actors: castData.map((cast) => cast.realName).join(","),
         writers: writersData.join(","),
       });
@@ -433,6 +444,7 @@ const AdminPanel = () => {
         trailerLink: trailerLink,
         synopsis: synopsis,
         status: "draft3",
+        genres: genre,
         actors: castData.map((cast) => cast.realName).join(","),
         writers: writersData.join(","),
       });
@@ -448,7 +460,20 @@ const AdminPanel = () => {
   };
 
   const handleGenreChange = (selectedGenres) => {
-    setGenre(selectedGenres);
+    const genresData = selectedGenres
+      .map((genreName) => {
+        const genreObj = genres.find((genre) => genre.name === genreName);
+
+        if (genreObj) {
+          return { id: genreObj.id, name: genreObj.name };
+        } else {
+          console.warn("Genre not found:", genreName);
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    setGenre(genresData);
   };
 
   const handleDateChange = ({ startDate, endDate }) => {
@@ -575,6 +600,8 @@ const AdminPanel = () => {
                     <MovieTable
                       movies={movies}
                       onCheckboxChange={handleCheckboxChange}
+                      movieId={movieId}
+                      setMovieId={setMovieId}
                     />
                   </>
                 )}
@@ -605,7 +632,10 @@ const AdminPanel = () => {
                   <IoMdClose
                     size={24}
                     className="primary-red"
-                    onClick={() => setCurrentFlow("default")}
+                    onClick={() => {
+                      setCurrentFlow("default");
+                      setMovieCreationStep(1);
+                    }}
                   />
                 </div>
               </div>
@@ -675,13 +705,19 @@ const AdminPanel = () => {
                   />
                   <Dropdown
                     icon={CiLocationOn}
-                    title={genre.length > 0 ? genre.join(" ,") : "Choose genre"}
-                    options={["Test", "New genre", "Other genre"]}
+                    title={
+                      genre.length > 0
+                        ? genre.map((g) => g.name).join(", ")
+                        : "Choose genre"
+                    }
+                    options={genres.map((genre) => genre.name)}
                     fullWidth={true}
                     label="Genre"
                     invalid={!!genreError}
                     invalidMessage={genreError}
-                    onChange={handleGenreChange}
+                    onChange={(selectedGenres) =>
+                      handleGenreChange(selectedGenres)
+                    }
                   />
                 </div>
                 <div className="d-flex gap-5 mt-3">

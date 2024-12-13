@@ -63,11 +63,18 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) {
+    public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) throws ResourceNotFoundException {
         movieService.saveMovie(movie);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body(movie.getId());
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateMovieStatus(@PathVariable Long id, @RequestParam String status) throws ResourceNotFoundException {
+        movieService.updateMovieStatus(id, status);
+        return ResponseEntity.ok("Movie status updated successfully.");
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMovie(final @PathVariable Long id) {

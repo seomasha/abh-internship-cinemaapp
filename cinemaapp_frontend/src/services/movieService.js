@@ -23,4 +23,11 @@ export const movieService = {
     const response = await request(`${MOVIE_ENDPOINT}/draft`);
     return response;
   },
+  updateMovie: async (id, status) => {
+    const response = await request(
+      `${MOVIE_ENDPOINT}/${id}/status?status=${status}`,
+      { method: "PATCH" }
+    );
+    return response;
+  },
 };

@@ -2,9 +2,11 @@ package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.MovieListDTO;
 import com.abhinternship.CinemaApp.dto.MovieWithProjectionsDTO;
+import com.abhinternship.CinemaApp.model.Genre;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.repository.FilterMovieRepositoryImpl;
+import com.abhinternship.CinemaApp.repository.GenreRepository;
 import com.abhinternship.CinemaApp.repository.MovieRepository;
 import com.abhinternship.CinemaApp.repository.ProjectionRepository;
 import com.abhinternship.CinemaApp.utils.FilterMovie;
@@ -27,6 +29,7 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final ProjectionRepository projectionRepository;
+    private final GenreRepository genreRepository;
     private final FilterMovieRepositoryImpl filterMovieRepositoryImpl;
 
     @Override
@@ -53,11 +56,30 @@ public class MovieServiceImpl implements MovieService {
         return movieRepository.findAllByStatus();
     }
 
-
     @Override
-    public void saveMovie(final Movie movie) {
+    public void saveMovie(final Movie movie) throws ResourceNotFoundException {
+        final Set<Genre> genres = new HashSet<>();
+        for (final Genre genre : movie.getGenres()) {
+            final Genre existingGenre = genreRepository.findById(genre.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Genre not found for id: " + genre.getId()));
+            genres.add(existingGenre);
+        }
+
+        movie.setGenres(genres);
+
         movieRepository.save(movie);
     }
+
+    @Override
+    public void updateMovieStatus(final Long id, String status) throws ResourceNotFoundException {
+        final Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+
+        movie.setStatus(status);
+
+        movieRepository.save(movie);
+    }
+
 
     @Override
     public void deleteMovie(final Long id) {
@@ -71,7 +93,7 @@ public class MovieServiceImpl implements MovieService {
         final Pageable pageable = PageRequest.of(page, size);
 
         final Page<Movie> moviePage = filterMovie.isEmpty()
-                ? movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfter(endDate, today, pageable)
+                ? movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfterAndStatus(endDate, today, pageable, "published")
                 : filterMovieRepositoryImpl.findMoviesByFilter(filterMovie, pageable, true);
 
         final List<MovieWithProjectionsDTO> moviesWithProjections = moviePage.getContent().stream()
@@ -90,7 +112,7 @@ public class MovieServiceImpl implements MovieService {
         final Pageable pageable = PageRequest.of(page, size);
 
         final Page<Movie> moviePage = filterMovie.isEmpty()
-                ? movieRepository.findByProjectionStartDateGreaterThanEqual(endDate, pageable)
+                ? movieRepository.findByProjectionStartDateGreaterThanEqualAndStatus(endDate, pageable, "published")
                 : filterMovieRepositoryImpl.findMoviesByFilter(filterMovie, pageable, false);
 
         final List<MovieWithProjectionsDTO> moviesWithProjections = moviePage.getContent().stream()
@@ -102,6 +124,5 @@ public class MovieServiceImpl implements MovieService {
 
         return MovieListDTO.fromMoviesWithProjections(moviesWithProjections, moviePage.getTotalElements());
     }
-
 
 }
