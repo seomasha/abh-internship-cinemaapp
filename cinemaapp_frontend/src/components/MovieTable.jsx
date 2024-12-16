@@ -12,11 +12,11 @@ import { movieService } from "../services/movieService";
 const MovieTable = ({
   movies,
   onCheckboxChange,
-  onPublishClick,
-  onEditClick,
   movieId,
   setMovieId,
   showAction,
+  setMovieCreationStep,
+  setCurrentFlow,
 }) => {
   const [dropdownsOpen, setDropdownsOpen] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -75,7 +75,12 @@ const MovieTable = ({
             <>
               {["draft1", "draft2", "draft3"].includes(rowData.status) && (
                 <>
-                  <Dropdown.Item onClick={() => handleActionChange("edit")}>
+                  <Dropdown.Item
+                    onClick={() => {
+                      setCurrentFlow("addMovie");
+                      setMovieCreationStep(1);
+                    }}
+                  >
                     Edit
                   </Dropdown.Item>
                   <Dropdown.Item onClick={() => handleActionChange("publish")}>
@@ -144,7 +149,7 @@ const MovieTable = ({
     const startDate = new Date(movie.projectionStartDate);
     const endDate = new Date(movie.projectionEndDate);
 
-    if (movie.status === "published") {
+    if (movie.status === "published" || movie.status === "published_upcoming") {
       if (currentDate >= startDate && currentDate <= endDate) {
         const daysRemaining = Math.ceil(
           (endDate - currentDate) / (1000 * 60 * 60 * 24)

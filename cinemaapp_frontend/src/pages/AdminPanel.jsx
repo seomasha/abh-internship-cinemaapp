@@ -27,6 +27,7 @@ import { projectionService } from "../services/projectionService.js";
 import { genreService } from "../services/genreService.js";
 
 const AdminPanel = () => {
+  const [selectedMovie, setSelectedMovie] = useState([]);
   const [activeTab, setActiveTab] = useState("drafts");
   const [currentFlow, setCurrentFlow] = useState("default");
   const [movieCreationStep, setMovieCreationStep] = useState(1);
@@ -82,8 +83,6 @@ const AdminPanel = () => {
   const [cities, setCities] = useState([]);
   const [genres, setGenres] = useState([]);
 
-  const [selectedMovie, setSelectedMovie] = useState(0);
-
   useEffect(() => {
     const getDraftMovies = async () => {
       const response = await movieService.getDraftMovies();
@@ -125,6 +124,17 @@ const AdminPanel = () => {
     getCurrentlyShowingMovies();
     getUpcomingMovies();
   }, []);
+
+  useEffect(() => {
+    const getSelectedMovie = async () => {
+      const response = await movieService.get(movieId);
+      setSelectedMovie(response);
+    };
+
+    if (movieId !== 0) {
+      getSelectedMovie();
+    }
+  }, [movieId]);
 
   const getVenuesByCity = async (cityName) => {
     const response = await venueService.getVenuesByCity(cityName);
@@ -327,12 +337,6 @@ const AdminPanel = () => {
     return isValid;
   };
 
-  const isUniqueProjection = (city, venue, time) => {
-    return !projections.some(
-      (proj) => proj.city === city && proj.venue === venue && proj.time === time
-    );
-  };
-
   const validateMovieCreationStepThree = () => {
     let isValid = true;
 
@@ -496,7 +500,7 @@ const AdminPanel = () => {
         director: director,
         trailerLink: trailerLink,
         synopsis: synopsis,
-        status: "draft3",
+        status: "published",
         genres: genre,
         actors: castData.map((cast) => cast.realName).join(","),
         writers: writersData.join(","),
@@ -509,6 +513,40 @@ const AdminPanel = () => {
         setMovieCreationStep(1);
         resetFields();
       }
+    }
+  };
+
+  const handleDraft = async () => {
+    const projectionsToSend = projections.map((projection) => ({
+      venue: projection.venue[0],
+      projectionTime: projection.time[0],
+      movieId: movieId,
+      hallId: 13,
+    }));
+
+    const update = await movieService.create({
+      id: movieId,
+      name: movieName,
+      pgRating: pgRating,
+      language: language,
+      movieDuration: movieDuration,
+      projectionEndDate: endDate,
+      projectionStartDate: startDate,
+      director: director,
+      trailerLink: trailerLink,
+      synopsis: synopsis,
+      status: "draft3",
+      genres: genre,
+      actors: castData.map((cast) => cast.realName).join(","),
+      writers: writersData.join(","),
+    });
+
+    const response = await projectionService.create(projectionsToSend);
+
+    if (update && response) {
+      setCurrentFlow("default");
+      setMovieCreationStep(1);
+      resetFields();
     }
   };
 
@@ -600,6 +638,8 @@ const AdminPanel = () => {
                     className="btn button-primary"
                     variant="danger"
                     onClick={() => {
+                      setMovieId(0);
+                      setSelectedMovie([]);
                       setCurrentFlow("addMovie");
                     }}
                   >
@@ -686,6 +726,8 @@ const AdminPanel = () => {
                       movieId={movieId}
                       setMovieId={setMovieId}
                       showAction={true}
+                      setMovieCreationStep={setMovieCreationStep}
+                      setCurrentFlow={setCurrentFlow}
                     />
                   </>
                 )}
@@ -787,9 +829,15 @@ const AdminPanel = () => {
                   <DatePickerDropdown
                     title={
                       startDate && endDate
-                        ? `${startDate.toDateString().slice(0, 15)} - ${endDate
-                            .toDateString()
-                            .slice(0, 15)}`
+                        ? `${
+                            typeof startDate === "string"
+                              ? startDate
+                              : startDate.toDateString().slice(0, 15)
+                          } - ${
+                            typeof endDate === "string"
+                              ? endDate
+                              : endDate.toDateString().slice(0, 15)
+                          }`
                         : "Date Range"
                     }
                     icon={CiCalendar}
@@ -852,7 +900,13 @@ const AdminPanel = () => {
               <div className="d-flex align-items-center justify-content-between mt-5">
                 <p className="back-button">Back</p>
                 <div className="d-flex gap-3">
-                  <button className="btn flex-grow-1 button-secondary">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={() => {
+                      setCurrentFlow("default");
+                      setMovieCreationStep(1);
+                    }}
+                  >
                     Save to Drafts
                   </button>
                   <button
@@ -1108,7 +1162,13 @@ const AdminPanel = () => {
                   Back
                 </p>
                 <div className="d-flex gap-3">
-                  <button className="btn flex-grow-1 button-secondary">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={() => {
+                      setCurrentFlow("default");
+                      setMovieCreationStep(1);
+                    }}
+                  >
                     Save to Drafts
                   </button>
                   <button
@@ -1230,7 +1290,10 @@ const AdminPanel = () => {
                   Back
                 </p>
                 <div className="d-flex gap-3">
-                  <button className="btn flex-grow-1 button-secondary">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={handleDraft}
+                  >
                     Save to Drafts
                   </button>
                   <button
