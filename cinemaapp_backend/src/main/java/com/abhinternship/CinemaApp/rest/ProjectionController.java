@@ -34,6 +34,12 @@ public class ProjectionController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/movie/{id}")
+    public ResponseEntity<List<Projection>> getProjectionsByMovieID(@PathVariable Long id) {
+        final List<Projection> projections = projectionService.findProjectionByMovieId(id);
+        return ResponseEntity.ok(projections);
+    }
+
     @GetMapping("/times")
     public ResponseEntity<List<LocalTime>> getAllDistinctProjectionTimes() {
         final List<LocalTime> projectionTimes = projectionService.findAllDistinctProjectionTimes();

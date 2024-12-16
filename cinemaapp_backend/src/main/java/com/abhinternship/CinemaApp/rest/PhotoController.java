@@ -23,7 +23,16 @@ public class PhotoController {
             @RequestParam("entityType") String entityType,
             @RequestParam("role") String role
     ) throws IOException {
-        photoService.savePhoto(photos, entityId, entityType, role);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Photo successfully uploaded.");
+        if(!photos.isEmpty()) {
+            photoService.savePhoto(photos, entityId, entityType, role);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Photo successfully uploaded.");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("No images were uploaded");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePhoto(@PathVariable Long id) {
+        photoService.deletePhoto(id);
+        return ResponseEntity.ok("Deleted photo with ID: " + id + ".");
     }
 }

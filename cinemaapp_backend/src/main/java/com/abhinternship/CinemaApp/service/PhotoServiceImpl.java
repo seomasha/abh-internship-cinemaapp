@@ -4,6 +4,7 @@ import com.abhinternship.CinemaApp.model.Photo;
 import com.abhinternship.CinemaApp.repository.PhotoRepository;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,24 @@ public class PhotoServiceImpl implements PhotoService {
 
             photoRepository.save(photo);
         }
+    }
+
+    @Override
+    @SneakyThrows
+    public void deletePhoto(final Long id) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Photo not found with id: " + id));
+
+        String url = photo.getUrl();
+        String fileName = url.substring(url.lastIndexOf("prefix=") + 7, url.lastIndexOf("&version_id"));
+
+        minioClient.removeObject(
+                RemoveObjectArgs.builder()
+                        .bucket(BUCKET_NAME)
+                        .object(fileName)
+                        .build()
+        );
+
+        photoRepository.deleteById(id);
     }
 }

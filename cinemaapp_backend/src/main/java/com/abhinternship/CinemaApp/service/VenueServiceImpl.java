@@ -68,4 +68,9 @@ public class VenueServiceImpl implements VenueService{
     public Venue findVenueByName(final String name) {
         return venueRepository.findByName(name);
     }
+
+    @Override
+    public List<String> findVenueByMovieName(final String name) {
+        return venueRepository.findVenuesByMovieName(name);
+    }
 }

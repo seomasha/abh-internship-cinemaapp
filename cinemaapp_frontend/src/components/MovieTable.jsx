@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { BsThreeDots } from "react-icons/bs";
@@ -21,6 +21,24 @@ const MovieTable = ({
   const [dropdownsOpen, setDropdownsOpen] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalAction, setModalAction] = useState("");
+  const [venues, setVenues] = useState([]);
+
+  useEffect(() => {
+    const fetchVenues = async () => {
+      const newVenues = {};
+
+      for (const movie of movies) {
+        const venueData = await movieService.getVenuesByMovieName(movie.name);
+        newVenues[movie.id] = venueData;
+      }
+
+      setVenues(newVenues);
+    };
+
+    if (movies.length > 0) {
+      fetchVenues();
+    }
+  }, [movies]);
 
   const handleCheckboxChange = (event, movieId) => {
     const isChecked = event.target.checked;
@@ -36,14 +54,17 @@ const MovieTable = ({
     if (modalAction === "archive") {
       setShowModal(false);
       await movieService.updateMovie(movieId, "archived");
+      window.location.reload();
     }
     if (modalAction === "publish") {
       setShowModal(false);
       await movieService.updateMovie(movieId, "published");
+      window.location.reload();
     }
     if (modalAction === "draft") {
       setShowModal(false);
       await movieService.updateMovie(movieId, "draft1");
+      window.location.reload();
     }
   };
 
@@ -53,16 +74,13 @@ const MovieTable = ({
 
   const actionTemplate = (rowData) => (
     <div>
-      <Dropdown>
+      <Dropdown onClick={() => setMovieId(rowData.id)}>
         <Dropdown.Toggle
           variant="light"
           className="background-clear"
           id="dropdown-action"
         >
-          <BsThreeDots
-            className="primary-red pointer"
-            onClick={() => setMovieId(rowData.id)}
-          />
+          <BsThreeDots className="primary-red pointer" />
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
@@ -204,7 +222,13 @@ const MovieTable = ({
             </p>
           )}
         />
-        <Column header="Venue" field="venue" />
+        <Column
+          header="Venue"
+          body={(rowData) => {
+            const venueList = venues[rowData.id];
+            return venueList ? venueList.join(", ") : "- -";
+          }}
+        />
         <Column
           header="Status"
           body={(rowData) => {

@@ -25,6 +25,7 @@ import { photoService } from "../services/photoService.js";
 import { venueService } from "../services/venueService.js";
 import { projectionService } from "../services/projectionService.js";
 import { genreService } from "../services/genreService.js";
+import { TimePicker } from "rsuite";
 
 const AdminPanel = () => {
   const [selectedMovie, setSelectedMovie] = useState([]);
@@ -36,7 +37,6 @@ const AdminPanel = () => {
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [archivedMovies, setArchivedMovies] = useState([]);
   const [checkedMovies, setCheckedMovies] = useState([]);
-
   const [writersData, setWritersData] = useState(null);
   const [castData, setCastData] = useState(null);
   const [movieImages, setMovieImages] = useState([]);
@@ -57,7 +57,7 @@ const AdminPanel = () => {
   const [director, setDirector] = useState("");
   const [trailerLink, setTrailerLink] = useState("");
   const [synopsis, setSynopsis] = useState("");
-  const [genre, setGenre] = useState([]);
+  const [genre, setGenre] = useState([{ id: null, name: "" }]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -136,6 +136,30 @@ const AdminPanel = () => {
     }
   }, [movieId]);
 
+  useEffect(() => {
+    setMovieName(selectedMovie.name);
+    setPgRating(selectedMovie.pgRating);
+    setLanguage(selectedMovie.language);
+    setMovieDuration(selectedMovie.movieDuration);
+    setStartDate(selectedMovie.projectionStartDate);
+    setEndDate(selectedMovie.projectionEndDate);
+    setGenre(selectedMovie.genres);
+    setDirector(selectedMovie.director);
+    setTrailerLink(selectedMovie.trailerLink);
+    setSynopsis(selectedMovie.synopsis);
+
+    if (selectedMovie.actors && selectedMovie.writers && selectedMovie.photos) {
+      setWritersData(selectedMovie.writers.split(","));
+      setCastData(
+        selectedMovie.actors.split(",").map((actor) => ({
+          realName: actor.trim(),
+          role: "",
+        }))
+      );
+      setMovieImages(selectedMovie.photos.map((photo) => ({ url: photo.url })));
+    }
+  }, [selectedMovie]);
+
   const getVenuesByCity = async (cityName) => {
     const response = await venueService.getVenuesByCity(cityName);
     return response;
@@ -182,18 +206,39 @@ const AdminPanel = () => {
     }
   };
 
-  const handleImageChange = (e) => {
-    const files = e.target.files;
-    if (files.length + movieImages.length <= 4) {
-      setMovieImages((prevImages) => [...prevImages, ...Array.from(files)]);
+  const handleImageChange = async (e, index = null) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) return;
+
+    if (index !== null) {
+      setMovieImages((prevImages) => {
+        const updatedImages = [...prevImages];
+        const oldImage = updatedImages[index];
+
+        updatedImages[index] = { file: files[0] };
+        return updatedImages;
+      });
+
+      const oldImage = movieImages[index];
+      if (oldImage?.id) {
+        await photoService.deleteByID(oldImage.id);
+      }
     } else {
-      ToastService.error("You can only upload up to 4 images.");
+      setMovieImages((prevImages) => {
+        if (files.length + prevImages.length <= 4) {
+          return [...prevImages, ...files.map((file) => ({ file }))];
+        } else {
+          ToastService.error("You can only upload up to 4 images.");
+          return prevImages;
+        }
+      });
     }
   };
 
   const handleDeleteImage = (indexToDelete) => {
     const updatedImages = movieImages.filter(
-      (image, index) => index !== indexToDelete
+      (_, index) => index !== indexToDelete
     );
 
     let newSelectedImageIndex = selectedImageIndex;
@@ -424,73 +469,15 @@ const AdminPanel = () => {
 
   const handleContinue = async () => {
     if (validateMovieCreationStepOne() && movieCreationStep === 1) {
-      const id = await movieService.create({
-        name: movieName,
-        pgRating: pgRating,
-        language: language,
-        movieDuration: movieDuration,
-        projectionEndDate: endDate,
-        projectionStartDate: startDate,
-        director: director,
-        trailerLink: trailerLink,
-        synopsis: synopsis,
-        status: "draft1",
-        genres: genre,
-      });
-
-      if (id) {
-        setMovieId(id);
-        setMovieCreationStep(2);
-      }
+      setMovieCreationStep(2);
     }
 
     if (validateMovieCreationStepTwo() && movieCreationStep === 2) {
-      const update = await movieService.create({
-        id: movieId,
-        name: movieName,
-        pgRating: pgRating,
-        language: language,
-        movieDuration: movieDuration,
-        projectionEndDate: endDate,
-        projectionStartDate: startDate,
-        director: director,
-        trailerLink: trailerLink,
-        synopsis: synopsis,
-        status: "draft2",
-        genres: genre,
-        actors: castData.map((cast) => cast.realName).join(","),
-        writers: writersData.join(","),
-      });
-
-      const formData = new FormData();
-
-      movieImages.forEach((image, index) => {
-        formData.append("files", image);
-      });
-
-      formData.append("entityId", movieId);
-      formData.append("entityType", "movie");
-      formData.append(
-        "role",
-        selectedImageIndex !== null ? "poster" : "showcase"
-      );
-
-      const photo = await photoService.create(formData, "multipart/form-data");
-
-      if (update && photo) {
-        setMovieCreationStep(3);
-      }
+      setMovieCreationStep(3);
     }
     if (validateMovieCreationStepThree() && movieCreationStep === 3) {
-      const projectionsToSend = projections.map((projection) => ({
-        venue: projection.venue[0],
-        projectionTime: projection.time[0],
-        movieId: movieId,
-        hallId: 13,
-      }));
-
-      const update = await movieService.create({
-        id: movieId,
+      const id = await movieService.create({
+        ...(movieId && { id: movieId }),
         name: movieName,
         pgRating: pgRating,
         language: language,
@@ -506,9 +493,32 @@ const AdminPanel = () => {
         writers: writersData.join(","),
       });
 
+      const projectionsToSend = projections.map((projection) => ({
+        venue: projection.venue[0],
+        projectionTime: projection.time.toLocaleTimeString(),
+        movieId: id,
+      }));
+
+      const formData = new FormData();
+
+      movieImages.forEach((image) => {
+        if (image.file) {
+          formData.append("files", image.file);
+        }
+      });
+
+      formData.append("entityId", movieId);
+      formData.append("entityType", "movie");
+      formData.append(
+        "role",
+        selectedImageIndex !== null ? "poster" : "showcase"
+      );
+
+      const photo = await photoService.create(formData, "multipart/form-data");
+
       const response = await projectionService.create(projectionsToSend);
 
-      if (update && response) {
+      if (id && response && photo) {
         setCurrentFlow("default");
         setMovieCreationStep(1);
         resetFields();
@@ -516,16 +526,11 @@ const AdminPanel = () => {
     }
   };
 
-  const handleDraft = async () => {
-    const projectionsToSend = projections.map((projection) => ({
-      venue: projection.venue[0],
-      projectionTime: projection.time[0],
-      movieId: movieId,
-      hallId: 13,
-    }));
+  console.log(movieImages);
 
+  const handleDraft = async () => {
     const update = await movieService.create({
-      id: movieId,
+      ...(movieId && { id: movieId }),
       name: movieName,
       pgRating: pgRating,
       language: language,
@@ -535,15 +540,43 @@ const AdminPanel = () => {
       director: director,
       trailerLink: trailerLink,
       synopsis: synopsis,
-      status: "draft3",
+      status: "draft" + movieCreationStep,
       genres: genre,
-      actors: castData.map((cast) => cast.realName).join(","),
-      writers: writersData.join(","),
+      ...(castData &&
+        writersData && {
+          actors: castData.map((cast) => cast.realName).join(","),
+          writers: writersData.join(","),
+        }),
     });
 
-    const response = await projectionService.create(projectionsToSend);
+    const projectionsToSend = projections.map((projection) => ({
+      venue: projection.venue[0],
+      projectionTime: projection.time.toLocaleTimeString(),
+      movieId: movieId,
+    }));
 
-    if (update && response) {
+    if (movieCreationStep === 2 || movieCreationStep === 3) {
+      const formData = new FormData();
+
+      movieImages.forEach((image, index) => {
+        formData.append("files", image.file || image);
+      });
+
+      formData.append("entityId", movieId);
+      formData.append("entityType", "movie");
+      formData.append(
+        "role",
+        selectedImageIndex !== null ? "poster" : "showcase"
+      );
+
+      await photoService.create(formData, "multipart/form-data");
+    }
+
+    if (movieCreationStep === 3) {
+      await projectionService.create(projectionsToSend);
+    }
+
+    if (update) {
       setCurrentFlow("default");
       setMovieCreationStep(1);
       resetFields();
@@ -773,6 +806,7 @@ const AdminPanel = () => {
                     onClick={() => {
                       setCurrentFlow("default");
                       setMovieCreationStep(1);
+                      setMovieId(0);
                     }}
                   />
                 </div>
@@ -850,7 +884,7 @@ const AdminPanel = () => {
                   <Dropdown
                     icon={CiLocationOn}
                     title={
-                      genre.length > 0
+                      genre
                         ? genre.map((g) => g.name).join(", ")
                         : "Choose genre"
                     }
@@ -902,10 +936,7 @@ const AdminPanel = () => {
                 <div className="d-flex gap-3">
                   <button
                     className="btn flex-grow-1 button-secondary"
-                    onClick={() => {
-                      setCurrentFlow("default");
-                      setMovieCreationStep(1);
-                    }}
+                    onClick={handleDraft}
                   >
                     Save to Drafts
                   </button>
@@ -1045,8 +1076,10 @@ const AdminPanel = () => {
                           >
                             <img
                               src={
-                                image
-                                  ? URL.createObjectURL(image)
+                                image?.url
+                                  ? image.url
+                                  : image?.file
+                                  ? URL.createObjectURL(image.file)
                                   : placeholderImage
                               }
                               alt={`Preview ${index + 1}`}
@@ -1164,10 +1197,7 @@ const AdminPanel = () => {
                 <div className="d-flex gap-3">
                   <button
                     className="btn flex-grow-1 button-secondary"
-                    onClick={() => {
-                      setCurrentFlow("default");
-                      setMovieCreationStep(1);
-                    }}
+                    onClick={handleDraft}
                   >
                     Save to Drafts
                   </button>
@@ -1238,20 +1268,12 @@ const AdminPanel = () => {
                       />
                     </div>
                     <div className="w-100">
-                      <Dropdown
-                        icon={CiLocationOn}
-                        title={
-                          projection?.time.length > 0
-                            ? projection.time.join(", ")
-                            : "Choose Date"
-                        }
-                        options={["12:00:00", "13:00:00", "14:00:00"]}
+                      <TimePicker
                         value={projection?.time || ""}
                         onChange={(time) =>
                           handleProjectionChange(index, "time", time)
                         }
-                        invalid={!!projectionTimeError[index]}
-                        invalidMessage={projectionTimeError[index]}
+                        placeholder="Choose Time"
                       />
                     </div>
                     <FaTrashAlt

@@ -28,4 +28,7 @@ export const projectionService = {
     );
     return response;
   },
+  getProjectionsByMovieId: async (movieId) => {
+    const response = await request(`${PROJECTION_ENDPOINT}/movie/${movieId}`)
+  }
 };

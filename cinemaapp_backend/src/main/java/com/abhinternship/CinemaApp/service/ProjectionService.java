@@ -16,4 +16,5 @@ public interface ProjectionService {
     List<LocalTime> findProjectionTimesByMovieAndVenue(
             String movieName, String city, String venueName);
     Optional<Projection> findProjectionByMovieIdAndVenueId(Long movieId, Long venueId);
+    List<Projection> findProjectionByMovieId(Long movieId);
 }

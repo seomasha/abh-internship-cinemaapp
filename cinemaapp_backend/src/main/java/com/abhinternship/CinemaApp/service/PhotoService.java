@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PhotoService {
     void savePhoto(List<MultipartFile> photos, Long entityId, String entityType, String role) throws IOException;
+    void deletePhoto(Long id);
 }

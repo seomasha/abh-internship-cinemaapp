@@ -22,6 +22,12 @@ export const venueService = {
     );
     return response;
   },
+  getVenuesByMovieName: async (movieName) => {
+    const response = await request(
+      `${VENUE_ENDPOINT}/venues-by-movie-name?movieName=${movieName}`
+    );
+    return response;
+  },
   getVenuesByCity: async (cityName) => {
     const response = await request(
       `${VENUE_ENDPOINT}/venues-by-city?cityName=${cityName}`

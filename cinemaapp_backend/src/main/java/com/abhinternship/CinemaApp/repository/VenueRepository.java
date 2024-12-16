@@ -23,4 +23,9 @@ public interface VenueRepository extends JpaRepository<Venue, Long> {
     List<String> findVenuesByCityAndMovieName(String movieName, String cityName);
     List<Venue> findVenueByCity(String city);
     Venue findByName(String name);
+    @Query("SELECT DISTINCT v.name FROM Venue v " +
+            "JOIN Projection p ON p.venueId.id = v.id " +
+            "JOIN Movie m ON m.id = p.movieId.id " +
+            "WHERE m.name LIKE %?1%")
+    List<String> findVenuesByMovieName(String movieName);
 }

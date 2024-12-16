@@ -8,7 +8,6 @@ import java.time.LocalTime;
 public class ProjectionDTO {
     private Long movieId;
     private String venue;
-    private Long hallId;
+    //private Long hallId;
     private LocalTime projectionTime;
-
 }

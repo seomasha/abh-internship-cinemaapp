@@ -29,4 +29,5 @@ public interface ProjectionRepository extends JpaRepository<Projection, Long> {
             String city,
             String venueName);
     Optional<Projection> findProjectionByMovieId_IdAndVenueId_Id(Long movieId, Long venueId);
+    List<Projection> findByMovieId_Id(Long movieId);
 }

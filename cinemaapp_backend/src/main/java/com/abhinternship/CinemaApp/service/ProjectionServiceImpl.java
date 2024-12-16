@@ -45,8 +45,8 @@ public class ProjectionServiceImpl implements ProjectionService {
             final Movie movie = movieRepository.findById(projection.getMovieId())
                     .orElseThrow(() -> new RuntimeException("Movie with ID " + projection.getMovieId() + " not found"));
 
-            final Hall hall = hallRepository.findById(projection.getHallId())
-                    .orElseThrow(() -> new RuntimeException("Hall with ID " + projection.getHallId() + " not found"));
+            final Hall hall = hallRepository.findById(13L) //Just for now.
+                    .orElseThrow(() -> new RuntimeException("Hall with ID not found"));
 
 
             final Projection savedProjection = new Projection();
@@ -78,7 +78,12 @@ public class ProjectionServiceImpl implements ProjectionService {
     }
 
     @Override
-    public Optional<Projection> findProjectionByMovieIdAndVenueId(Long movieId, Long venueId) {
+    public Optional<Projection> findProjectionByMovieIdAndVenueId(final Long movieId, final Long venueId) {
         return projectionRepository.findProjectionByMovieId_IdAndVenueId_Id(movieId, venueId);
+    }
+
+    @Override
+    public List<Projection> findProjectionByMovieId(final Long movieId) {
+        return projectionRepository.findByMovieId_Id(movieId);
     }
 }

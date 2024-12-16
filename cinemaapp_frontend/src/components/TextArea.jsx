@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { BiText } from "react-icons/bi"; // Import BiText icon
+import { BiText } from "react-icons/bi";
 import "../styles/Input.css";
 
 const TextArea = ({
   label,
   placeholder,
-  value,
+  value = "",
   onChange,
   invalid,
   invalidMessage,
@@ -22,7 +22,9 @@ const TextArea = ({
 
   return (
     <div className="d-flex flex-column w-100 mb-4">
-      <label className={`fs-6 ${invalid ? "text-danger" : "text-dark fw-bold"}`}>
+      <label
+        className={`fs-6 ${invalid ? "text-danger" : "text-dark fw-bold"}`}
+      >
         {label}
       </label>
       <div

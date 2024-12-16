@@ -17,4 +17,5 @@ public interface VenueService {
     List<String> findVenuesByCityAndMovieName(String movieName, String cityName);
     List<Venue> findVenuesByCity(String city);
     Venue findVenueByName(String name);
+    List<String> findVenueByMovieName(String name);
 }
