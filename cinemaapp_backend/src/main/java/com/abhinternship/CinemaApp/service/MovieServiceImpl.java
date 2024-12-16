@@ -2,6 +2,7 @@ package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.MovieListDTO;
 import com.abhinternship.CinemaApp.dto.MovieWithProjectionsDTO;
+import com.abhinternship.CinemaApp.enums.MovieStatus;
 import com.abhinternship.CinemaApp.model.Genre;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
@@ -75,30 +76,37 @@ public class MovieServiceImpl implements MovieService {
         final Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
-        if (status.equals("published") && (movie.getStatus().equals("draft1") || movie.getStatus().equals("draft2"))) {
+        MovieStatus movieStatus = MovieStatus.fromString(status);
+
+        if (movieStatus.equals(MovieStatus.PUBLISHED) &&
+                (movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT1))
+                        || movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT2)))) {
             throw new IllegalArgumentException("The movie can't be published as it is not completed yet.");
         } else {
-            movie.setStatus(status);
-
+            movie.setStatus(String.valueOf(movieStatus));
             movieRepository.save(movie);
         }
     }
 
     @Override
     public void updateMoviesStatus(final List<Long> ids, final String status) throws ResourceNotFoundException {
+        MovieStatus movieStatus = MovieStatus.fromString(status);
+
         for (final Long id : ids) {
             final Movie movie = movieRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
-            if (status.equals("published") && (movie.getStatus().equals("draft1") || movie.getStatus().equals("draft2"))) {
+            if (movieStatus.equals(MovieStatus.PUBLISHED) &&
+                    (movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT1)) ||
+                            movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT2)))) {
                 throw new IllegalArgumentException("The movies can't be published as they are not completed yet.");
             } else {
-                movie.setStatus(status);
-
+                movie.setStatus(String.valueOf(movieStatus));
                 movieRepository.save(movie);
             }
         }
     }
+
 
     @Override
     public void deleteMovie(final Long id) {

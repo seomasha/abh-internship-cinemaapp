@@ -23,6 +23,24 @@ const MovieTable = ({
   const [modalAction, setModalAction] = useState("");
   const [venues, setVenues] = useState([]);
 
+  const confirmAction = async () => {
+    if (modalAction === "archive") {
+      setShowModal(false);
+      await movieService.updateMovie(movieId, "archived");
+      window.location.reload();
+    }
+    if (modalAction === "publish") {
+      setShowModal(false);
+      await movieService.updateMovie(movieId, "published");
+      window.location.reload();
+    }
+    if (modalAction === "draft") {
+      setShowModal(false);
+      await movieService.updateMovie(movieId, "draft1");
+      window.location.reload();
+    }
+  };
+
   useEffect(() => {
     const fetchVenues = async () => {
       const newVenues = {};
@@ -48,28 +66,6 @@ const MovieTable = ({
   const handleActionChange = (action) => {
     setModalAction(action);
     setShowModal(true);
-  };
-
-  const confirmAction = async () => {
-    if (modalAction === "archive") {
-      setShowModal(false);
-      await movieService.updateMovie(movieId, "archived");
-      window.location.reload();
-    }
-    if (modalAction === "publish") {
-      setShowModal(false);
-      await movieService.updateMovie(movieId, "published");
-      window.location.reload();
-    }
-    if (modalAction === "draft") {
-      setShowModal(false);
-      await movieService.updateMovie(movieId, "draft1");
-      window.location.reload();
-    }
-  };
-
-  const cancelAction = () => {
-    setShowModal(false);
   };
 
   const actionTemplate = (rowData) => (
@@ -240,7 +236,7 @@ const MovieTable = ({
         )}
       </DataTable>
 
-      <Modal show={showModal} onHide={cancelAction}>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>
             Confirm {modalAction.charAt(0).toUpperCase() + modalAction.slice(1)}
@@ -250,7 +246,7 @@ const MovieTable = ({
           Are you sure you want to {modalAction} this movie?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-danger" onClick={cancelAction}>
+          <Button variant="outline-danger" onClick={() => setShowModal(false)}>
             Cancel
           </Button>
           <Button

@@ -395,17 +395,17 @@ const AdminPanel = () => {
     projections.forEach((projection, index) => {
       const { city, venue, time } = projection;
 
-      if (!city || city.length === 0) {
+      if (!city) {
         newCityErrors[index] = "You should select a city.";
         isValid = false;
       }
 
-      if (!venue || venue.length === 0) {
+      if (!venue) {
         newVenueErrors[index] = "You should select a venue.";
         isValid = false;
       }
 
-      if (!time || time.length === 0) {
+      if (!time) {
         newDateErrors[index] = "You should select a time.";
         isValid = false;
       }
@@ -479,14 +479,14 @@ const AdminPanel = () => {
       const id = await movieService.create({
         ...(movieId && { id: movieId }),
         name: movieName,
-        pgRating: pgRating,
-        language: language,
-        movieDuration: movieDuration,
+        pgRating,
+        language,
+        movieDuration,
         projectionEndDate: endDate,
         projectionStartDate: startDate,
-        director: director,
-        trailerLink: trailerLink,
-        synopsis: synopsis,
+        director,
+        trailerLink,
+        synopsis,
         status: "published",
         genres: genre,
         actors: castData.map((cast) => cast.realName).join(","),
@@ -526,20 +526,18 @@ const AdminPanel = () => {
     }
   };
 
-  console.log(movieImages);
-
   const handleDraft = async () => {
     const update = await movieService.create({
       ...(movieId && { id: movieId }),
       name: movieName,
-      pgRating: pgRating,
-      language: language,
-      movieDuration: movieDuration,
+      pgRating,
+      language,
+      movieDuration,
       projectionEndDate: endDate,
       projectionStartDate: startDate,
-      director: director,
-      trailerLink: trailerLink,
-      synopsis: synopsis,
+      director,
+      trailerLink,
+      synopsis,
       status: "draft" + movieCreationStep,
       genres: genre,
       ...(castData &&
@@ -591,7 +589,7 @@ const AdminPanel = () => {
         if (genreObj) {
           return { id: genreObj.id, name: genreObj.name };
         } else {
-          console.warn("Genre not found:", genreName);
+          ToastService.warning("Genre not found:", genreName);
           return null;
         }
       })

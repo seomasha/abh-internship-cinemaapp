@@ -7,6 +7,7 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,13 +20,18 @@ public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
     private final MinioClient minioClient;
 
+    @Value("${minio.url}")
+    private static String minioURL;
     private static final String BUCKET_NAME = "images";
 
     @SneakyThrows
     @Override
-    public void savePhoto(List<MultipartFile> photos, Long entityId, String entityType, String role) throws IOException {
+    public void savePhoto(final List<MultipartFile> photos,
+                          final Long entityId,
+                          final String entityType,
+                          final String role) throws IOException {
         for (MultipartFile file : photos) {
-            String fileName = file.getOriginalFilename();
+            final String fileName = file.getOriginalFilename();
 
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -37,8 +43,8 @@ public class PhotoServiceImpl implements PhotoService {
             );
 
 
-            Photo photo = new Photo();
-            photo.setUrl("http://127.0.0.1:9001/api/v1/buckets/" +
+            final Photo photo = new Photo();
+            photo.setUrl(minioURL +
                     BUCKET_NAME +
                     "/objects/download?preview=true&prefix=" +
                     fileName + "&version_id=null");
