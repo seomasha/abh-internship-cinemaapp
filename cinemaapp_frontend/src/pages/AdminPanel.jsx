@@ -474,6 +474,23 @@ const AdminPanel = () => {
 
     if (validateMovieCreationStepTwo() && movieCreationStep === 2) {
       setMovieCreationStep(3);
+
+      const response = await projectionService.getProjectionsByMovieId(movieId);
+
+      const mappedProjections = response.map((data) => ({
+        id: data.id,
+        city: data.venueId.city,
+        venue: data.venueId.name,
+        time: data.projectionTime,
+        venues: [{ name: data.venueId.name, city: data.venueId.city }],
+      }));
+
+      console.log(mappedProjections);
+
+      setProjections((prevProjections) => [
+        ...prevProjections,
+        mappedProjections,
+      ]);
     }
     if (validateMovieCreationStepThree() && movieCreationStep === 3) {
       const id = await movieService.create({

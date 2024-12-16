@@ -8,6 +8,7 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "../styles/MovieTable.css";
 import { movieService } from "../services/movieService";
+import { venueService } from "../services/venueService";
 
 const MovieTable = ({
   movies,
@@ -46,7 +47,7 @@ const MovieTable = ({
       const newVenues = {};
 
       for (const movie of movies) {
-        const venueData = await movieService.getVenuesByMovieName(movie.name);
+        const venueData = await venueService.getVenuesByMovieName(movie.name);
         newVenues[movie.id] = venueData;
       }
 
@@ -222,7 +223,9 @@ const MovieTable = ({
           header="Venue"
           body={(rowData) => {
             const venueList = venues[rowData.id];
-            return venueList ? venueList.join(", ") : "- -";
+            return venueList && venueList.length > 0
+              ? venueList.join(", ")
+              : "- -";
           }}
         />
         <Column

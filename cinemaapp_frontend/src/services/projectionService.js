@@ -30,5 +30,6 @@ export const projectionService = {
   },
   getProjectionsByMovieId: async (movieId) => {
     const response = await request(`${PROJECTION_ENDPOINT}/movie/${movieId}`)
+    return response;
   }
 };
