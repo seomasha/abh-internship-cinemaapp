@@ -26,7 +26,6 @@ import { venueService } from "../services/venueService.js";
 import { projectionService } from "../services/projectionService.js";
 import { genreService } from "../services/genreService.js";
 import { TimePicker } from "rsuite";
-import { id } from "date-fns/locale";
 
 const AdminPanel = () => {
   const [selectedMovie, setSelectedMovie] = useState([]);
@@ -157,7 +156,9 @@ const AdminPanel = () => {
           role: "",
         }))
       );
-      setMovieImages(selectedMovie.photos.map((photo) => ({ url: photo.url })));
+      setMovieImages(
+        selectedMovie.photos.map((photo) => ({ url: photo.url, id: photo.id }))
+      );
     }
   }, [selectedMovie]);
 
@@ -237,20 +238,28 @@ const AdminPanel = () => {
     }
   };
 
-  const handleDeleteImage = (indexToDelete) => {
-    const updatedImages = movieImages.filter(
-      (_, index) => index !== indexToDelete
-    );
+  console.log(movieImages);
 
-    let newSelectedImageIndex = selectedImageIndex;
-    if (selectedImageIndex === indexToDelete) {
-      newSelectedImageIndex = -1;
-    } else if (selectedImageIndex > indexToDelete) {
-      newSelectedImageIndex--;
+  const handleDeleteImage = async (indexToDelete) => {
+    const imageToDelete = movieImages[indexToDelete];
+
+    const response = await photoService.deleteByID(imageToDelete.id);
+
+    if (response) {
+      const updatedImages = movieImages.filter(
+        (_, index) => index !== indexToDelete
+      );
+
+      let newSelectedImageIndex = selectedImageIndex;
+      if (selectedImageIndex === indexToDelete) {
+        newSelectedImageIndex = -1;
+      } else if (selectedImageIndex > indexToDelete) {
+        newSelectedImageIndex--;
+      }
+
+      setMovieImages(updatedImages);
+      setSelectedImageIndex(newSelectedImageIndex);
     }
-
-    setMovieImages(updatedImages);
-    setSelectedImageIndex(newSelectedImageIndex);
   };
 
   const handleAddProjection = () => {
@@ -544,6 +553,7 @@ const AdminPanel = () => {
         setCurrentFlow("default");
         setMovieCreationStep(1);
         resetFields();
+        window.location.reload();
       }
     }
   };
@@ -606,6 +616,7 @@ const AdminPanel = () => {
     setCurrentFlow("default");
     setMovieCreationStep(1);
     resetFields();
+    window.location.reload();
   };
 
   const handleGenreChange = (selectedGenres) => {
