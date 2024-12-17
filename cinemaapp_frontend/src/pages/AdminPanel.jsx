@@ -243,23 +243,23 @@ const AdminPanel = () => {
   const handleDeleteImage = async (indexToDelete) => {
     const imageToDelete = movieImages[indexToDelete];
 
-    const response = await photoService.deleteByID(imageToDelete.id);
-
-    if (response) {
-      const updatedImages = movieImages.filter(
-        (_, index) => index !== indexToDelete
-      );
-
-      let newSelectedImageIndex = selectedImageIndex;
-      if (selectedImageIndex === indexToDelete) {
-        newSelectedImageIndex = -1;
-      } else if (selectedImageIndex > indexToDelete) {
-        newSelectedImageIndex--;
-      }
-
-      setMovieImages(updatedImages);
-      setSelectedImageIndex(newSelectedImageIndex);
+    if (imageToDelete.id) {
+      const response = await photoService.deleteByID(imageToDelete.id);
     }
+
+    const updatedImages = movieImages.filter(
+      (_, index) => index !== indexToDelete
+    );
+
+    let newSelectedImageIndex = selectedImageIndex;
+    if (selectedImageIndex === indexToDelete) {
+      newSelectedImageIndex = -1;
+    } else if (selectedImageIndex > indexToDelete) {
+      newSelectedImageIndex--;
+    }
+
+    setMovieImages(updatedImages);
+    setSelectedImageIndex(newSelectedImageIndex);
   };
 
   const handleAddProjection = () => {
@@ -274,10 +274,13 @@ const AdminPanel = () => {
     setProjections((prevProjections) => [...prevProjections, newProjection]);
   };
 
-  const handleRemoveProjection = (idToDelete) => {
+  const handleRemoveProjection = async (idToDelete) => {
     const updatedProjections = projections.filter(
       (projection) => projection.id !== idToDelete
     );
+
+    await projectionService.deleteProjection(idToDelete);
+
     setProjections(updatedProjections);
   };
 
@@ -527,7 +530,6 @@ const AdminPanel = () => {
           : projection.venue,
         projectionTime: new Date(projection.time).toLocaleTimeString("en-GB"),
         movieId: id,
-        id: projection.id,
       }));
 
       const formData = new FormData();
@@ -546,10 +548,7 @@ const AdminPanel = () => {
           selectedImageIndex !== null ? "poster" : "showcase"
         );
 
-        const photo = await photoService.create(
-          formData,
-          "multipart/form-data"
-        );
+        await photoService.create(formData, "multipart/form-data");
       }
 
       const response = await projectionService.create(projectionsToSend);
@@ -593,7 +592,6 @@ const AdminPanel = () => {
           ? new Date(projection.time).toLocaleTimeString("en-GB")
           : projection.time,
         movieId: movieId,
-        id: projection.id,
       };
     });
 
@@ -627,6 +625,8 @@ const AdminPanel = () => {
     resetFields();
     window.location.reload();
   };
+
+  console.log(projections);
 
   const handleGenreChange = (selectedGenres) => {
     const genresData = selectedGenres

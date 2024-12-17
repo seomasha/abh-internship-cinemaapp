@@ -29,7 +29,13 @@ export const projectionService = {
     return response;
   },
   getProjectionsByMovieId: async (movieId) => {
-    const response = await request(`${PROJECTION_ENDPOINT}/movie/${movieId}`)
+    const response = await request(`${PROJECTION_ENDPOINT}/movie/${movieId}`);
     return response;
-  }
+  },
+  deleteProjection: async (projectionId) => {
+    const response = await request(`${PROJECTION_ENDPOINT}/${projectionId}`, {
+      method: "DELETE",
+    });
+    return response;
+  },
 };

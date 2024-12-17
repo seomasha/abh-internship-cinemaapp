@@ -39,25 +39,36 @@ public class ProjectionServiceImpl implements ProjectionService {
 
     @Override
     public void saveProjection(final List<ProjectionDTO> projections) {
-        for (ProjectionDTO projection : projections) {
-            final Venue venue = venueRepository.findByName(projection.getVenue());
+        for (ProjectionDTO projectionDTO : projections) {
+            final Venue venue = venueRepository.findByName(projectionDTO.getVenue());
+            final Movie movie = movieRepository.findById(projectionDTO.getMovieId())
+                    .orElseThrow(() -> new RuntimeException("Movie with ID " + projectionDTO.getMovieId() + " not found"));
 
-            final Movie movie = movieRepository.findById(projection.getMovieId())
-                    .orElseThrow(() -> new RuntimeException("Movie with ID " + projection.getMovieId() + " not found"));
-
-            final Hall hall = hallRepository.findById(13L) //Just for now.
+            final Hall hall = hallRepository.findById(13L)
                     .orElseThrow(() -> new RuntimeException("Hall with ID not found"));
 
+            final Projection existingProjection = projectionRepository.findByMovieId_IdAndVenueId_IdAndProjectionTime(
+                    movie.getId(), venue.getId(), projectionDTO.getProjectionTime());
 
-            final Projection savedProjection = new Projection();
-            savedProjection.setMovieId(movie);
-            savedProjection.setVenueId(venue);
-            savedProjection.setHallId(hall);
-            savedProjection.setProjectionTime(projection.getProjectionTime());
+            if (existingProjection != null) {
+                existingProjection.setMovieId(movie);
+                existingProjection.setVenueId(venue);
+                existingProjection.setHallId(hall);
+                existingProjection.setProjectionTime(projectionDTO.getProjectionTime());
 
-            projectionRepository.save(savedProjection);
+                projectionRepository.save(existingProjection);
+            } else {
+                final Projection newProjection = new Projection();
+                newProjection.setMovieId(movie);
+                newProjection.setVenueId(venue);
+                newProjection.setHallId(hall);
+                newProjection.setProjectionTime(projectionDTO.getProjectionTime());
+
+                projectionRepository.save(newProjection);
+            }
         }
     }
+
 
     @Override
     public void deleteProjection(final Long id) {

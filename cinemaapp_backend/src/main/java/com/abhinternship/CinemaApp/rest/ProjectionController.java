@@ -70,4 +70,10 @@ public class ProjectionController {
         projectionService.saveProjection(projections);
         return ResponseEntity.status(HttpStatus.CREATED).body("The projections have been successfully created");
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProjection(@PathVariable Long id) {
+        projectionService.deleteProjection(id);
+        return ResponseEntity.ok("Projection with ID " + id + " successfully deleted.");
+    }
 }
