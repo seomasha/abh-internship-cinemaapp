@@ -538,18 +538,23 @@ const AdminPanel = () => {
         }
       });
 
-      formData.append("entityId", movieId);
-      formData.append("entityType", "movie");
-      formData.append(
-        "role",
-        selectedImageIndex !== null ? "poster" : "showcase"
-      );
+      if (formData.has("files")) {
+        formData.append("entityId", movieId);
+        formData.append("entityType", "movie");
+        formData.append(
+          "role",
+          selectedImageIndex !== null ? "poster" : "showcase"
+        );
 
-      const photo = await photoService.create(formData, "multipart/form-data");
+        const photo = await photoService.create(
+          formData,
+          "multipart/form-data"
+        );
+      }
 
       const response = await projectionService.create(projectionsToSend);
 
-      if (id && response && photo) {
+      if (id && response) {
         setCurrentFlow("default");
         setMovieCreationStep(1);
         resetFields();
@@ -595,18 +600,22 @@ const AdminPanel = () => {
     if (movieCreationStep === 2 || movieCreationStep === 3) {
       const formData = new FormData();
 
-      movieImages.forEach((image, index) => {
-        formData.append("files", image.file || image);
+      movieImages.forEach((image) => {
+        if (image.file) {
+          formData.append("files", image.file);
+        }
       });
 
-      formData.append("entityId", movieId);
-      formData.append("entityType", "movie");
-      formData.append(
-        "role",
-        selectedImageIndex !== null ? "poster" : "showcase"
-      );
+      if (formData.has("files")) {
+        formData.append("entityId", movieId);
+        formData.append("entityType", "movie");
+        formData.append(
+          "role",
+          selectedImageIndex !== null ? "poster" : "showcase"
+        );
 
-      await photoService.create(formData, "multipart/form-data");
+        await photoService.create(formData, "multipart/form-data");
+      }
     }
 
     if (movieCreationStep === 3) {
