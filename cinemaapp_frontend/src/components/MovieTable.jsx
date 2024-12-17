@@ -25,18 +25,16 @@ const MovieTable = ({
   const [updatedMovies, setUpdatedMovies] = useState(movies);
 
   const confirmAction = async () => {
+    setShowModal(false);
     if (modalAction === "archive") {
-      setShowModal(false);
       await movieService.updateMovie(movieId, "archived");
       window.location.reload();
     }
     if (modalAction === "publish") {
-      setShowModal(false);
       await movieService.updateMovie(movieId, "published");
       window.location.reload();
     }
     if (modalAction === "draft") {
-      setShowModal(false);
       await movieService.updateMovie(movieId, "draft1");
       window.location.reload();
     }

@@ -47,27 +47,22 @@ public class ProjectionServiceImpl implements ProjectionService {
             final Hall hall = hallRepository.findById(13L)
                     .orElseThrow(() -> new RuntimeException("Hall with ID not found"));
 
-            final Projection existingProjection = projectionRepository.findByMovieId_IdAndVenueId_IdAndProjectionTime(
+            Projection projectionsToSave = projectionRepository.findByMovieId_IdAndVenueId_IdAndProjectionTime(
                     movie.getId(), venue.getId(), projectionDTO.getProjectionTime());
 
-            if (existingProjection != null) {
-                existingProjection.setMovieId(movie);
-                existingProjection.setVenueId(venue);
-                existingProjection.setHallId(hall);
-                existingProjection.setProjectionTime(projectionDTO.getProjectionTime());
-
-                projectionRepository.save(existingProjection);
-            } else {
-                final Projection newProjection = new Projection();
-                newProjection.setMovieId(movie);
-                newProjection.setVenueId(venue);
-                newProjection.setHallId(hall);
-                newProjection.setProjectionTime(projectionDTO.getProjectionTime());
-
-                projectionRepository.save(newProjection);
+            if (projectionsToSave == null) {
+                projectionsToSave = new Projection();
             }
+
+            projectionsToSave.setMovieId(movie);
+            projectionsToSave.setVenueId(venue);
+            projectionsToSave.setHallId(hall);
+            projectionsToSave.setProjectionTime(projectionDTO.getProjectionTime());
+
+            projectionRepository.save(projectionsToSave);
         }
     }
+
 
 
     @Override
