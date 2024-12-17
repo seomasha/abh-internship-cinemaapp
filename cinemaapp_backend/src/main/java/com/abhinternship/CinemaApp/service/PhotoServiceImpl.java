@@ -60,11 +60,11 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     @SneakyThrows
     public void deletePhoto(final Long id) {
-        Photo photo = photoRepository.findById(id)
+        final Photo photo = photoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Photo not found with id: " + id));
 
-        String url = photo.getUrl();
-        String fileName = url.substring(url.lastIndexOf("prefix=") + 7, url.lastIndexOf("&version_id"));
+        final String url = photo.getUrl();
+        final String fileName = url.substring(url.lastIndexOf("prefix=") + 7, url.lastIndexOf("&version_id"));
 
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
