@@ -26,6 +26,7 @@ import { venueService } from "../services/venueService.js";
 import { projectionService } from "../services/projectionService.js";
 import { genreService } from "../services/genreService.js";
 import { TimePicker } from "rsuite";
+import { id } from "date-fns/locale";
 
 const AdminPanel = () => {
   const [selectedMovie, setSelectedMovie] = useState([]);
@@ -42,7 +43,7 @@ const AdminPanel = () => {
   const [movieImages, setMovieImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(-1);
   const [projections, setProjections] = useState([
-    { id: Date.now(), city: "", venue: "", time: "", venues: [] },
+    { id: 0, city: "", venue: "", time: "", venues: [] },
   ]);
 
   const writersFileInputRef = useRef(null);
@@ -321,7 +322,7 @@ const AdminPanel = () => {
         errorMessage: "You should enter a synopsis.",
       },
       {
-        condition: genre.length === 0,
+        condition: !genre,
         setError: setGenreError,
         errorMessage: "You should select a genre.",
       },
@@ -461,9 +462,7 @@ const AdminPanel = () => {
     setCastData(null);
     setMovieImages([]);
     setSelectedImageIndex(-1);
-    setProjections([
-      { id: Date.now(), city: "", venue: "", time: "", venues: [] },
-    ]);
+    setProjections([{ id: 0, city: "", venue: "", time: "", venues: [] }]);
     setMovieId(0);
   };
 
@@ -485,14 +484,17 @@ const AdminPanel = () => {
         venues: [{ name: data.venueId.name, city: data.venueId.city }],
       }));
 
-      console.log(mappedProjections);
-
-      setProjections((prevProjections) => [
-        ...prevProjections,
-        mappedProjections,
-      ]);
+      setProjections(mappedProjections);
     }
     if (validateMovieCreationStepThree() && movieCreationStep === 3) {
+      const currentDate = new Date();
+      const projectionStartDateTime = new Date(startDate);
+
+      const status =
+        projectionStartDateTime <= currentDate
+          ? "published"
+          : "published_upcoming";
+
       const id = await movieService.create({
         ...(movieId && { id: movieId }),
         name: movieName,
@@ -504,16 +506,19 @@ const AdminPanel = () => {
         director,
         trailerLink,
         synopsis,
-        status: "published",
+        status,
         genres: genre,
         actors: castData.map((cast) => cast.realName).join(","),
         writers: writersData.join(","),
       });
 
       const projectionsToSend = projections.map((projection) => ({
-        venue: projection.venue[0],
-        projectionTime: projection.time.toLocaleTimeString(),
+        venue: Array.isArray(projection.venue)
+          ? projection.venue[0]
+          : projection.venue,
+        projectionTime: new Date(projection.time).toLocaleTimeString("en-GB"),
         movieId: id,
+        id: projection.id,
       }));
 
       const formData = new FormData();
@@ -564,11 +569,18 @@ const AdminPanel = () => {
         }),
     });
 
-    const projectionsToSend = projections.map((projection) => ({
-      venue: projection.venue[0],
-      projectionTime: projection.time.toLocaleTimeString(),
-      movieId: movieId,
-    }));
+    const projectionsToSend = projections.map((projection) => {
+      return {
+        venue: Array.isArray(projection.venue)
+          ? projection.venue[0]
+          : projection.venue,
+        projectionTime: projection.time.toString().includes("T")
+          ? new Date(projection.time).toLocaleTimeString("en-GB")
+          : projection.time,
+        movieId: movieId,
+        id: projection.id,
+      };
+    });
 
     if (movieCreationStep === 2 || movieCreationStep === 3) {
       const formData = new FormData();
@@ -591,11 +603,9 @@ const AdminPanel = () => {
       await projectionService.create(projectionsToSend);
     }
 
-    if (update) {
-      setCurrentFlow("default");
-      setMovieCreationStep(1);
-      resetFields();
-    }
+    setCurrentFlow("default");
+    setMovieCreationStep(1);
+    resetFields();
   };
 
   const handleGenreChange = (selectedGenres) => {
@@ -1252,9 +1262,7 @@ const AdminPanel = () => {
                       <Dropdown
                         icon={CiLocationOn}
                         title={
-                          projection?.city.length > 0
-                            ? projection.city.join(", ")
-                            : "Choose City"
+                          projection?.city ? projection.city : "Choose City"
                         }
                         options={cities}
                         value={projection?.city || ""}
@@ -1269,9 +1277,7 @@ const AdminPanel = () => {
                       <Dropdown
                         icon={CiLocationOn}
                         title={
-                          projection?.venue.length > 0
-                            ? projection.venue.join(", ")
-                            : "Choose Venue"
+                          projection?.venue ? projection.venue : "Choose Venue"
                         }
                         options={projection.venues.map((venue) => venue.name)}
                         value={projection?.venue || ""}
@@ -1288,7 +1294,11 @@ const AdminPanel = () => {
                         onChange={(time) =>
                           handleProjectionChange(index, "time", time)
                         }
-                        placeholder="Choose Time"
+                        placeholder={
+                          projection?.time
+                            ? projection.time.toString().slice(0, 5)
+                            : "Choose Time"
+                        }
                       />
                     </div>
                     <FaTrashAlt

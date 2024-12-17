@@ -19,7 +19,6 @@ const MovieTable = ({
   setMovieCreationStep,
   setCurrentFlow,
 }) => {
-  const [dropdownsOpen, setDropdownsOpen] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalAction, setModalAction] = useState("");
   const [venues, setVenues] = useState([]);
@@ -28,17 +27,14 @@ const MovieTable = ({
     if (modalAction === "archive") {
       setShowModal(false);
       await movieService.updateMovie(movieId, "archived");
-      window.location.reload();
     }
     if (modalAction === "publish") {
       setShowModal(false);
       await movieService.updateMovie(movieId, "published");
-      window.location.reload();
     }
     if (modalAction === "draft") {
       setShowModal(false);
       await movieService.updateMovie(movieId, "draft1");
-      window.location.reload();
     }
   };
 
@@ -215,7 +211,7 @@ const MovieTable = ({
           header="Projection Date"
           body={(movie) => (
             <p>
-              {movie.projectionEndDate} - {movie.projectionStartDate}
+              {movie.projectionStartDate} - {movie.projectionEndDate}
             </p>
           )}
         />

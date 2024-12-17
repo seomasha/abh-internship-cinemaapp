@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,34 +77,38 @@ public class MovieServiceImpl implements MovieService {
         final Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
-        MovieStatus movieStatus = MovieStatus.fromString(status);
-
-        if (movieStatus.equals(MovieStatus.PUBLISHED) &&
-                (movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT1))
-                        || movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT2)))) {
-            throw new IllegalArgumentException("The movie can't be published as it is not completed yet.");
-        } else {
-            movie.setStatus(String.valueOf(movieStatus));
-            movieRepository.save(movie);
+        if (status.equalsIgnoreCase(MovieStatus.PUBLISHED.toString())
+                && (movie.getStatus().equalsIgnoreCase(MovieStatus.DRAFT1.toString())
+                || movie.getStatus().equalsIgnoreCase(MovieStatus.DRAFT2.toString()))) {
+            throw new IllegalArgumentException("The movie cannot be published as it is not completed yet.");
         }
+
+        if (status.equalsIgnoreCase(MovieStatus.PUBLISHED.toString())) {
+            final LocalDateTime now = LocalDateTime.now();
+
+            if (movie.getProjectionStartDate() != null && movie.getProjectionEndDate() != null) {
+                final LocalDate startDate = movie.getProjectionStartDate();
+                final LocalDate endDate = movie.getProjectionEndDate();
+
+                if (now.isAfter(startDate.atStartOfDay()) &&
+                        now.isBefore(endDate.plusDays(1).atStartOfDay())) {
+                    status = MovieStatus.PUBLISHED.toString().toLowerCase();
+                } else if (now.isBefore(startDate.atStartOfDay())) {
+                    status = MovieStatus.PUBLISHED_UPCOMING.toString().toLowerCase();
+                }
+            } else {
+                throw new IllegalArgumentException("Projection dates must be set to publish the movie.");
+            }
+        }
+
+        movie.setStatus(status.toLowerCase());
+        movieRepository.save(movie);
     }
 
     @Override
     public void updateMoviesStatus(final List<Long> ids, final String status) throws ResourceNotFoundException {
-        MovieStatus movieStatus = MovieStatus.fromString(status);
-
         for (final Long id : ids) {
-            final Movie movie = movieRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
-
-            if (movieStatus.equals(MovieStatus.PUBLISHED) &&
-                    (movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT1)) ||
-                            movie.getStatus().equals(String.valueOf(MovieStatus.DRAFT2)))) {
-                throw new IllegalArgumentException("The movies can't be published as they are not completed yet.");
-            } else {
-                movie.setStatus(String.valueOf(movieStatus));
-                movieRepository.save(movie);
-            }
+            updateMovieStatus(id, status);
         }
     }
 

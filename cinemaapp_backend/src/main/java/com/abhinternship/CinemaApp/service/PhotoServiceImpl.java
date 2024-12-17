@@ -21,7 +21,7 @@ public class PhotoServiceImpl implements PhotoService {
     private final MinioClient minioClient;
 
     @Value("${minio.url}")
-    private static String minioURL;
+    private String minioURL;
     private static final String BUCKET_NAME = "images";
 
     @SneakyThrows
@@ -44,7 +44,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 
             final Photo photo = new Photo();
-            photo.setUrl(minioURL +
+            photo.setUrl(minioURL + "/" +
                     BUCKET_NAME +
                     "/objects/download?preview=true&prefix=" +
                     fileName + "&version_id=null");

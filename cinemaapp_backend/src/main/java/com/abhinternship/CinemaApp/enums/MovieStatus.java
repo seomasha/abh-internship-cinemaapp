@@ -10,6 +10,7 @@ public enum MovieStatus {
     DRAFT2("draft2"),
     DRAFT3("draft3"),
     PUBLISHED("published"),
+    ARCHIVED("archived"),
     PUBLISHED_UPCOMING("published_upcoming");
 
     private final String status;
