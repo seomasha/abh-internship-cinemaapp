@@ -6,7 +6,7 @@ const ProtectedRoute = ({ successComponent, allowedRoles = ["admin"] }) => {
   const { role, isLoggedIn } = useNavBar();
 
   if (!isLoggedIn || !allowedRoles.includes(role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" />;
   }
 
   return successComponent;

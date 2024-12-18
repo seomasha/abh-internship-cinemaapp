@@ -31,6 +31,7 @@ public class MovieWithProjectionsDTO {
     private LocalDate projectionEndDate;
     private List<Photo> photos;
     private Set<Genre> genres;
+    private String status;
     private Set<LocalTime> projectionTimes;
 
     public static MovieWithProjectionsDTO fromMovie(final Movie movie, final Set<Projection> projections) {
@@ -49,6 +50,7 @@ public class MovieWithProjectionsDTO {
                 movie.getProjectionEndDate(),
                 movie.getPhotos(),
                 movie.getGenres(),
+                movie.getStatus(),
                 projections.stream()
                         .map(Projection::getProjectionTime)
                         .sorted()

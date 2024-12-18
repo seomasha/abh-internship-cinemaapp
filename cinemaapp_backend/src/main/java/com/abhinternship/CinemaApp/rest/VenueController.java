@@ -50,6 +50,18 @@ public class VenueController {
         return ResponseEntity.ok(venues);
     }
 
+    @GetMapping("/venues-by-movie-name")
+    public ResponseEntity<List<String>> getVenuesByMovieName(@RequestParam String movieName) {
+        final List<String> venues = venueService.findVenueByMovieName(movieName);
+        return ResponseEntity.ok(venues);
+    }
+
+    @GetMapping("/venues-by-city")
+    public ResponseEntity<List<Venue>> getVenuesByCity(@RequestParam String cityName) {
+        final List<Venue> venues = venueService.findVenuesByCity(cityName);
+        return ResponseEntity.ok(venues);
+    }
+
     @PostMapping
     public ResponseEntity<Venue> createVenue(@RequestBody Venue venue) {
         final Venue savedVenue = venueService.saveVenue(venue);

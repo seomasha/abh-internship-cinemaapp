@@ -21,10 +21,10 @@ export const apiService = (endpoint) => {
       request(endpoint, {
         params: { page, size },
       }),
-    create: (data) =>
+    create: (data, contentType = "application/json") =>
       request(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": contentType },
         data: data,
       }),
     update: (data) =>

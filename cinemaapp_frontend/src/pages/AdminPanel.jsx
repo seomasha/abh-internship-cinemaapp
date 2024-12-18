@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import { MdOutlineLocalMovies } from "react-icons/md";
 import { FaBuilding } from "react-icons/fa";
@@ -20,69 +20,29 @@ import MovieTable from "../components/MovieTable.jsx";
 import Roadmap from "../components/Roadmap.jsx";
 import Papa from "papaparse";
 import ToastService from "../services/toastService.js";
+import { movieService } from "../services/movieService.js";
+import { photoService } from "../services/photoService.js";
+import { venueService } from "../services/venueService.js";
+import { projectionService } from "../services/projectionService.js";
+import { genreService } from "../services/genreService.js";
+import { TimePicker } from "rsuite";
 
 const AdminPanel = () => {
+  const [selectedMovie, setSelectedMovie] = useState([]);
   const [activeTab, setActiveTab] = useState("drafts");
   const [currentFlow, setCurrentFlow] = useState("default");
   const [movieCreationStep, setMovieCreationStep] = useState(1);
-  const [movies, setMovies] = useState([
-    {
-      id: 1,
-      name: "Movie 1",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-15",
-      venue: "Venue 1",
-      step: 1,
-    },
-    {
-      id: 2,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 2,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 3,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 1,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 1,
-    },
-    {
-      id: 3,
-      name: "Movie 2",
-      imageUrl: "https://via.placeholder.com/150",
-      projectionDate: "2024-12-20",
-      venue: "Venue 2",
-      step: 1,
-    },
-  ]);
+  const [movies, setMovies] = useState([]);
+  const [currentlyShowingMovies, setCurrentlyShowingMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [archivedMovies, setArchivedMovies] = useState([]);
   const [checkedMovies, setCheckedMovies] = useState([]);
-
   const [writersData, setWritersData] = useState(null);
   const [castData, setCastData] = useState(null);
   const [movieImages, setMovieImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(-1);
   const [projections, setProjections] = useState([
-    { id: Date.now(), city: [], venue: [], date: [] },
+    { id: 0, city: "", venue: "", time: "", venues: [] },
   ]);
 
   const writersFileInputRef = useRef(null);
@@ -97,7 +57,7 @@ const AdminPanel = () => {
   const [director, setDirector] = useState("");
   const [trailerLink, setTrailerLink] = useState("");
   const [synopsis, setSynopsis] = useState("");
-  const [genre, setGenre] = useState([]);
+  const [genre, setGenre] = useState([{ id: null, name: "" }]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -116,7 +76,96 @@ const AdminPanel = () => {
   const [selectedCoverPhotoError, setSelectedCoverPhotoError] = useState("");
   const [cityError, setCityError] = useState({});
   const [venueError, setVenueError] = useState({});
-  const [projectionDateError, setProjectionDateError] = useState({});
+  const [projectionTimeError, setProjectionTimeError] = useState({});
+  const [duplicateError, setDuplicateError] = useState({});
+
+  const [movieId, setMovieId] = useState(0);
+  const [cities, setCities] = useState([]);
+  const [genres, setGenres] = useState([]);
+
+  useEffect(() => {
+    const getDraftMovies = async () => {
+      const response = await movieService.getDraftMovies();
+      setMovies(response);
+    };
+
+    const getArchivedMovies = async () => {
+      const response = await movieService.getArchivedMovies();
+      setArchivedMovies(response);
+    };
+
+    const getCurrentlyShowingMovies = async () => {
+      const response = await movieService.getMovies({ size: 50 });
+      setCurrentlyShowingMovies(response);
+    };
+
+    const getUpcomingMovies = async () => {
+      const response = await movieService.getMovies({
+        type: "upcoming",
+        size: 50,
+      });
+      setUpcomingMovies(response);
+    };
+
+    const getCities = async () => {
+      const response = await venueService.getAllCities();
+      setCities(response);
+    };
+
+    const getGenres = async () => {
+      const response = await genreService.getAll();
+      setGenres(response);
+    };
+
+    getDraftMovies();
+    getCities();
+    getGenres();
+    getArchivedMovies();
+    getCurrentlyShowingMovies();
+    getUpcomingMovies();
+  }, []);
+
+  useEffect(() => {
+    const getSelectedMovie = async () => {
+      const response = await movieService.get(movieId);
+      setSelectedMovie(response);
+    };
+
+    if (movieId !== 0) {
+      getSelectedMovie();
+    }
+  }, [movieId]);
+
+  useEffect(() => {
+    setMovieName(selectedMovie.name);
+    setPgRating(selectedMovie.pgRating);
+    setLanguage(selectedMovie.language);
+    setMovieDuration(selectedMovie.movieDuration);
+    setStartDate(selectedMovie.projectionStartDate);
+    setEndDate(selectedMovie.projectionEndDate);
+    setGenre(selectedMovie.genres);
+    setDirector(selectedMovie.director);
+    setTrailerLink(selectedMovie.trailerLink);
+    setSynopsis(selectedMovie.synopsis);
+
+    if (selectedMovie.actors && selectedMovie.writers && selectedMovie.photos) {
+      setWritersData(selectedMovie.writers.split(","));
+      setCastData(
+        selectedMovie.actors.split(",").map((actor) => ({
+          realName: actor.trim(),
+          role: "",
+        }))
+      );
+      setMovieImages(
+        selectedMovie.photos.map((photo) => ({ url: photo.url, id: photo.id }))
+      );
+    }
+  }, [selectedMovie]);
+
+  const getVenuesByCity = async (cityName) => {
+    const response = await venueService.getVenuesByCity(cityName);
+    return response;
+  };
 
   const handleCSVUpload = (file, type) => {
     Papa.parse(file, {
@@ -159,18 +208,47 @@ const AdminPanel = () => {
     }
   };
 
-  const handleImageChange = (e) => {
-    const files = e.target.files;
-    if (files.length + movieImages.length <= 4) {
-      setMovieImages((prevImages) => [...prevImages, ...Array.from(files)]);
+  const handleImageChange = async (e, index = null) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) return;
+
+    if (index !== null) {
+      setMovieImages((prevImages) => {
+        const updatedImages = [...prevImages];
+        const oldImage = updatedImages[index];
+
+        updatedImages[index] = { file: files[0] };
+        return updatedImages;
+      });
+
+      const oldImage = movieImages[index];
+      if (oldImage?.id) {
+        await photoService.deleteByID(oldImage.id);
+      }
     } else {
-      ToastService.error("You can only upload up to 4 images.");
+      setMovieImages((prevImages) => {
+        if (files.length + prevImages.length <= 4) {
+          return [...prevImages, ...files.map((file) => ({ file }))];
+        } else {
+          ToastService.error("You can only upload up to 4 images.");
+          return prevImages;
+        }
+      });
     }
   };
 
-  const handleDeleteImage = (indexToDelete) => {
+  console.log(movieImages);
+
+  const handleDeleteImage = async (indexToDelete) => {
+    const imageToDelete = movieImages[indexToDelete];
+
+    if (imageToDelete.id) {
+      const response = await photoService.deleteByID(imageToDelete.id);
+    }
+
     const updatedImages = movieImages.filter(
-      (image, index) => index !== indexToDelete
+      (_, index) => index !== indexToDelete
     );
 
     let newSelectedImageIndex = selectedImageIndex;
@@ -185,16 +263,24 @@ const AdminPanel = () => {
   };
 
   const handleAddProjection = () => {
-    setProjections((prevProjections) => [
-      ...prevProjections,
-      { id: Date.now(), city: "", venue: "", date: "" }, //Date.now() just used for unique IDs for handling deletion and preventing bugs
-    ]);
+    const newProjection = {
+      id: Date.now(), //Date.now() just used for unique IDs for handling deletion and preventing bugs
+      city: "",
+      venue: "",
+      time: "",
+      venues: [],
+    };
+
+    setProjections((prevProjections) => [...prevProjections, newProjection]);
   };
 
-  const handleRemoveProjection = (idToDelete) => {
+  const handleRemoveProjection = async (idToDelete) => {
     const updatedProjections = projections.filter(
       (projection) => projection.id !== idToDelete
     );
+
+    await projectionService.deleteProjection(idToDelete);
+
     setProjections(updatedProjections);
   };
 
@@ -248,7 +334,7 @@ const AdminPanel = () => {
         errorMessage: "You should enter a synopsis.",
       },
       {
-        condition: genre.length === 0,
+        condition: !genre,
         setError: setGenreError,
         errorMessage: "You should select a genre.",
       },
@@ -315,27 +401,42 @@ const AdminPanel = () => {
     const newCityErrors = {};
     const newVenueErrors = {};
     const newDateErrors = {};
+    const duplicateErrors = {};
+
+    const seenProjections = new Set();
 
     projections.forEach((projection, index) => {
-      if (!projection.city || projection.city.length === 0) {
+      const { city, venue, time } = projection;
+
+      if (!city) {
         newCityErrors[index] = "You should select a city.";
         isValid = false;
       }
 
-      if (!projection.venue || projection.venue.length === 0) {
+      if (!venue) {
         newVenueErrors[index] = "You should select a venue.";
         isValid = false;
       }
 
-      if (!projection.date || projection.date.length === 0) {
-        newDateErrors[index] = "You should select a date.";
+      if (!time) {
+        newDateErrors[index] = "You should select a time.";
         isValid = false;
+      }
+
+      const key = `${city}-${venue}-${time}`;
+      if (seenProjections.has(key)) {
+        duplicateErrors[index] =
+          "Duplicate projection detected: City, venue, and time must be unique.";
+        isValid = false;
+      } else {
+        seenProjections.add(key);
       }
     });
 
     setCityError(newCityErrors);
     setVenueError(newVenueErrors);
-    setProjectionDateError(newDateErrors);
+    setProjectionTimeError(newDateErrors);
+    setDuplicateError(duplicateErrors);
 
     return isValid;
   };
@@ -367,32 +468,181 @@ const AdminPanel = () => {
     setSelectedCoverPhotoError("");
     setCityError({});
     setVenueError({});
-    setProjectionDateError({});
+    setProjectionTimeError({});
 
     setWritersData(null);
     setCastData(null);
     setMovieImages([]);
     setSelectedImageIndex(-1);
-    setProjections([{ id: Date.now(), city: [], venue: [], date: [] }]);
+    setProjections([{ id: 0, city: "", venue: "", time: "", venues: [] }]);
+    setMovieId(0);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (validateMovieCreationStepOne() && movieCreationStep === 1) {
       setMovieCreationStep(2);
     }
 
     if (validateMovieCreationStepTwo() && movieCreationStep === 2) {
       setMovieCreationStep(3);
+
+      const response = await projectionService.getProjectionsByMovieId(movieId);
+
+      const mappedProjections = response.map((data) => ({
+        id: data.id,
+        city: data.venueId.city,
+        venue: data.venueId.name,
+        time: data.projectionTime,
+        venues: [{ name: data.venueId.name, city: data.venueId.city }],
+      }));
+
+      setProjections(mappedProjections);
     }
     if (validateMovieCreationStepThree() && movieCreationStep === 3) {
-      setCurrentFlow("default");
-      setMovieCreationStep(1);
-      resetFields();
+      const currentDate = new Date();
+      const projectionStartDateTime = new Date(startDate);
+
+      const status =
+        projectionStartDateTime <= currentDate
+          ? "published"
+          : "published_upcoming";
+
+      const id = await movieService.create({
+        ...(movieId && { id: movieId }),
+        name: movieName,
+        pgRating,
+        language,
+        movieDuration,
+        projectionEndDate: endDate,
+        projectionStartDate: startDate,
+        director,
+        trailerLink,
+        synopsis,
+        status,
+        genres: genre,
+        actors: castData.map((cast) => cast.realName).join(","),
+        writers: writersData.join(","),
+      });
+
+      const projectionsToSend = projections.map((projection) => ({
+        venue: Array.isArray(projection.venue)
+          ? projection.venue[0]
+          : projection.venue,
+        projectionTime: new Date(projection.time).toLocaleTimeString("en-GB"),
+        movieId: id,
+      }));
+
+      const formData = new FormData();
+
+      movieImages.forEach((image) => {
+        if (image.file) {
+          formData.append("files", image.file);
+        }
+      });
+
+      if (formData.has("files")) {
+        formData.append("entityId", movieId);
+        formData.append("entityType", "movie");
+        formData.append(
+          "role",
+          selectedImageIndex !== null ? "poster" : "showcase"
+        );
+
+        await photoService.create(formData, "multipart/form-data");
+      }
+
+      const response = await projectionService.create(projectionsToSend);
+
+      if (id && response) {
+        setCurrentFlow("default");
+        setMovieCreationStep(1);
+        resetFields();
+        window.location.reload();
+      }
     }
   };
 
+  const handleDraft = async () => {
+    const update = await movieService.create({
+      ...(movieId && { id: movieId }),
+      name: movieName,
+      pgRating,
+      language,
+      movieDuration,
+      projectionEndDate: endDate,
+      projectionStartDate: startDate,
+      director,
+      trailerLink,
+      synopsis,
+      status: "draft" + movieCreationStep,
+      genres: genre,
+      ...(castData &&
+        writersData && {
+          actors: castData.map((cast) => cast.realName).join(","),
+          writers: writersData.join(","),
+        }),
+    });
+
+    const projectionsToSend = projections.map((projection) => {
+      return {
+        venue: Array.isArray(projection.venue)
+          ? projection.venue[0]
+          : projection.venue,
+        projectionTime: projection.time.toString().includes("T")
+          ? new Date(projection.time).toLocaleTimeString("en-GB")
+          : projection.time,
+        movieId: movieId,
+      };
+    });
+
+    if (movieCreationStep === 2 || movieCreationStep === 3) {
+      const formData = new FormData();
+
+      movieImages.forEach((image) => {
+        if (image.file) {
+          formData.append("files", image.file);
+        }
+      });
+
+      if (formData.has("files")) {
+        formData.append("entityId", movieId);
+        formData.append("entityType", "movie");
+        formData.append(
+          "role",
+          selectedImageIndex !== null ? "poster" : "showcase"
+        );
+
+        await photoService.create(formData, "multipart/form-data");
+      }
+    }
+
+    if (movieCreationStep === 3) {
+      await projectionService.create(projectionsToSend);
+    }
+
+    setCurrentFlow("default");
+    setMovieCreationStep(1);
+    resetFields();
+    window.location.reload();
+  };
+
+  console.log(projections);
+
   const handleGenreChange = (selectedGenres) => {
-    setGenre(selectedGenres);
+    const genresData = selectedGenres
+      .map((genreName) => {
+        const genreObj = genres.find((genre) => genre.name === genreName);
+
+        if (genreObj) {
+          return { id: genreObj.id, name: genreObj.name };
+        } else {
+          ToastService.warning("Genre not found:", genreName);
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    setGenre(genresData);
   };
 
   const handleDateChange = ({ startDate, endDate }) => {
@@ -406,12 +656,35 @@ const AdminPanel = () => {
     );
   };
 
-  const handleProjectionChange = (index, field, value) => {
-    setProjections((prevProjections) =>
-      prevProjections.map((projection, i) =>
-        i === index ? { ...projection, [field]: value } : projection
-      )
-    );
+  const handleProjectionChange = async (index, field, value) => {
+    if (field === "city") {
+      const fetchedVenues = await getVenuesByCity(value);
+      setProjections((prevProjections) => {
+        const updatedProjections = [...prevProjections];
+        updatedProjections[index] = {
+          ...updatedProjections[index],
+          city: value,
+          venue: "",
+          venues: fetchedVenues,
+        };
+        return updatedProjections;
+      });
+    } else {
+      setProjections((prevProjections) => {
+        const updatedProjections = prevProjections.map((projection, i) =>
+          i === index ? { ...projection, [field]: value } : projection
+        );
+        return updatedProjections;
+      });
+    }
+  };
+
+  const archiveMovies = async () => {
+    await movieService.updateMovies(checkedMovies, "archived");
+  };
+
+  const publishMovies = async () => {
+    await movieService.updateMovies(checkedMovies, "published");
   };
 
   return (
@@ -443,6 +716,8 @@ const AdminPanel = () => {
                     className="btn button-primary"
                     variant="danger"
                     onClick={() => {
+                      setMovieId(0);
+                      setSelectedMovie([]);
                       setCurrentFlow("addMovie");
                     }}
                   >
@@ -455,22 +730,34 @@ const AdminPanel = () => {
                 <TabButton
                   label={`Drafts (${movies.length})`}
                   isActive={activeTab === "drafts"}
-                  onClick={() => setActiveTab("drafts")}
+                  onClick={() => {
+                    setActiveTab("drafts");
+                    setCheckedMovies([]);
+                  }}
                 />
                 <TabButton
-                  label="Currently Showing (0)"
+                  label={`Currently Showing (${currentlyShowingMovies.totalSize})`}
                   isActive={activeTab === "currently-showing"}
-                  onClick={() => setActiveTab("currently-showing")}
+                  onClick={() => {
+                    setActiveTab("currently-showing");
+                    setCheckedMovies([]);
+                  }}
                 />
                 <TabButton
-                  label="Upcoming (0)"
+                  label={`Upcoming (${upcomingMovies.totalSize})`}
                   isActive={activeTab === "upcoming"}
-                  onClick={() => setActiveTab("upcoming")}
+                  onClick={() => {
+                    setActiveTab("upcoming");
+                    setCheckedMovies([]);
+                  }}
                 />
                 <TabButton
-                  label="Archived (0)"
+                  label={`Archived (${archivedMovies.length})`}
                   isActive={activeTab === "archived"}
-                  onClick={() => setActiveTab("archived")}
+                  onClick={() => {
+                    setActiveTab("archived");
+                    setCheckedMovies([]);
+                  }}
                 />
               </div>
 
@@ -496,30 +783,57 @@ const AdminPanel = () => {
                     <div className="d-flex justify-content-end gap-3">
                       {checkedMovies.length > 0 && (
                         <>
-                          <Button variant="outline-danger">Archive</Button>
-                          <Button variant="outline-success">Publish</Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={archiveMovies}
+                          >
+                            Archive
+                          </Button>
+                          <Button
+                            variant="outline-success"
+                            onClick={publishMovies}
+                          >
+                            Publish
+                          </Button>
                         </>
                       )}
                     </div>
                     <MovieTable
                       movies={movies}
                       onCheckboxChange={handleCheckboxChange}
+                      movieId={movieId}
+                      setMovieId={setMovieId}
+                      showAction={true}
+                      setMovieCreationStep={setMovieCreationStep}
+                      setCurrentFlow={setCurrentFlow}
                     />
                   </>
                 )}
                 {activeTab === "currently-showing" && (
                   <>
-                    <MovieTable movies={movies} />
+                    <MovieTable movies={currentlyShowingMovies.movies} />
                   </>
                 )}
                 {activeTab === "upcoming" && (
                   <>
-                    <MovieTable movies={movies} />
+                    <MovieTable
+                      movies={upcomingMovies.movies}
+                      movieId={movieId}
+                      setMovieId={setMovieId}
+                      onCheckboxChange={handleCheckboxChange}
+                      showAction={true}
+                    />
                   </>
                 )}
                 {activeTab === "archived" && (
                   <>
-                    <MovieTable movies={movies} />
+                    <MovieTable
+                      movies={archivedMovies}
+                      onCheckboxChange={handleCheckboxChange}
+                      movieId={movieId}
+                      setMovieId={setMovieId}
+                      showAction={true}
+                    />
                   </>
                 )}
               </div>
@@ -534,7 +848,11 @@ const AdminPanel = () => {
                   <IoMdClose
                     size={24}
                     className="primary-red"
-                    onClick={() => setCurrentFlow("default")}
+                    onClick={() => {
+                      setCurrentFlow("default");
+                      setMovieCreationStep(1);
+                      setMovieId(0);
+                    }}
                   />
                 </div>
               </div>
@@ -551,6 +869,7 @@ const AdminPanel = () => {
                     onChange={(e) => setMovieName(e.target.value)}
                     invalid={!!movieNameError}
                     invalidMessage={movieNameError}
+                    dark={true}
                   />
                   <Input
                     label="PG Rating"
@@ -560,6 +879,7 @@ const AdminPanel = () => {
                     invalid={!!pgRatingError}
                     invalidMessage={pgRatingError}
                     value={pgRating}
+                    dark={true}
                   />
                 </div>
                 <div className="d-flex gap-5">
@@ -571,6 +891,7 @@ const AdminPanel = () => {
                     invalid={!!languageError}
                     invalidMessage={languageError}
                     value={language}
+                    dark={true}
                   />
                   <Input
                     label="Movie Duration"
@@ -580,15 +901,22 @@ const AdminPanel = () => {
                     invalid={!!movieDurationError}
                     invalidMessage={movieDurationError}
                     value={movieDuration}
+                    dark={true}
                   />
                 </div>
                 <div className="d-flex gap-5">
                   <DatePickerDropdown
                     title={
                       startDate && endDate
-                        ? `${startDate.toDateString().slice(0, 15)} - ${endDate
-                            .toDateString()
-                            .slice(0, 15)}`
+                        ? `${
+                            typeof startDate === "string"
+                              ? startDate
+                              : startDate.toDateString().slice(0, 15)
+                          } - ${
+                            typeof endDate === "string"
+                              ? endDate
+                              : endDate.toDateString().slice(0, 15)
+                          }`
                         : "Date Range"
                     }
                     icon={CiCalendar}
@@ -600,13 +928,19 @@ const AdminPanel = () => {
                   />
                   <Dropdown
                     icon={CiLocationOn}
-                    title={genre.length > 0 ? genre.join(" ,") : "Choose genre"}
-                    options={["Test", "New genre", "Other genre"]}
+                    title={
+                      genre
+                        ? genre.map((g) => g.name).join(", ")
+                        : "Choose genre"
+                    }
+                    options={genres.map((genre) => genre.name)}
                     fullWidth={true}
                     label="Genre"
                     invalid={!!genreError}
                     invalidMessage={genreError}
-                    onChange={handleGenreChange}
+                    onChange={(selectedGenres) =>
+                      handleGenreChange(selectedGenres)
+                    }
                   />
                 </div>
                 <div className="d-flex gap-5 mt-3">
@@ -618,6 +952,7 @@ const AdminPanel = () => {
                     invalid={!!directorError}
                     invalidMessage={directorError}
                     value={director}
+                    dark={true}
                   />
                   <Input
                     label="Trailer"
@@ -627,6 +962,7 @@ const AdminPanel = () => {
                     invalid={!!trailerLinkError}
                     invalidMessage="You should enter a trailer link."
                     value={trailerLink}
+                    dark={true}
                   />
                 </div>
 
@@ -643,7 +979,10 @@ const AdminPanel = () => {
               <div className="d-flex align-items-center justify-content-between mt-5">
                 <p className="back-button">Back</p>
                 <div className="d-flex gap-3">
-                  <button className="btn flex-grow-1 button-secondary">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={handleDraft}
+                  >
                     Save to Drafts
                   </button>
                   <button
@@ -782,8 +1121,10 @@ const AdminPanel = () => {
                           >
                             <img
                               src={
-                                image
-                                  ? URL.createObjectURL(image)
+                                image?.url
+                                  ? image.url
+                                  : image?.file
+                                  ? URL.createObjectURL(image.file)
                                   : placeholderImage
                               }
                               alt={`Preview ${index + 1}`}
@@ -899,7 +1240,10 @@ const AdminPanel = () => {
                   Back
                 </p>
                 <div className="d-flex gap-3">
-                  <button className="btn flex-grow-1 button-secondary">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={handleDraft}
+                  >
                     Save to Drafts
                   </button>
                   <button
@@ -929,72 +1273,73 @@ const AdminPanel = () => {
               <Roadmap step={3} />
 
               {projections.map((projection, index) => (
-                <div
-                  key={projection.id}
-                  className="d-flex w-100 gap-4 align-items-center"
-                >
-                  <div className="w-100">
-                    <Dropdown
-                      icon={CiLocationOn}
-                      title={
-                        projection?.city.length > 0
-                          ? projection.city.join(", ")
-                          : "Choose City"
+                <>
+                  <div
+                    key={projection.id}
+                    className="d-flex w-100 gap-4 align-items-center"
+                  >
+                    <div className="w-100">
+                      <Dropdown
+                        icon={CiLocationOn}
+                        title={
+                          projection?.city ? projection.city : "Choose City"
+                        }
+                        options={cities}
+                        value={projection?.city || ""}
+                        onChange={(city) =>
+                          handleProjectionChange(index, "city", city)
+                        }
+                        invalid={!!cityError[index]}
+                        invalidMessage={cityError[index]}
+                      />
+                    </div>
+                    <div className="w-100">
+                      <Dropdown
+                        icon={CiLocationOn}
+                        title={
+                          projection?.venue ? projection.venue : "Choose Venue"
+                        }
+                        options={projection.venues.map((venue) => venue.name)}
+                        value={projection?.venue || ""}
+                        onChange={(venue) =>
+                          handleProjectionChange(index, "venue", venue)
+                        }
+                        invalid={!!venueError[index]}
+                        invalidMessage={venueError[index]}
+                      />
+                    </div>
+                    <div className="w-100">
+                      <TimePicker
+                        value={projection?.time || ""}
+                        onChange={(time) =>
+                          handleProjectionChange(index, "time", time)
+                        }
+                        placeholder={
+                          projection?.time
+                            ? projection.time.toString().slice(0, 5)
+                            : "Choose Time"
+                        }
+                      />
+                    </div>
+                    <FaTrashAlt
+                      size={36}
+                      className={`primary-red pointer mt-3 ${
+                        projections.length === 1 ? "disabled" : ""
+                      }`}
+                      onClick={() =>
+                        projections.length > 1 &&
+                        handleRemoveProjection(projection.id)
                       }
-                      options={["Sead", "City 2", "City 3"]}
-                      value={projection?.city || ""}
-                      onChange={(city) =>
-                        handleProjectionChange(index, "city", city)
-                      }
-                      invalid={!!cityError[index]}
-                      invalidMessage={cityError[index]}
                     />
                   </div>
-                  <div className="w-100">
-                    <Dropdown
-                      icon={CiLocationOn}
-                      title={
-                        projection?.venue.length > 0
-                          ? projection.venue.join(", ")
-                          : "Choose Venue"
-                      }
-                      options={["Venue 1", "Venue 2", "Venue 3"]}
-                      value={projection?.venue || ""}
-                      onChange={(venue) =>
-                        handleProjectionChange(index, "venue", venue)
-                      }
-                      invalid={!!venueError[index]}
-                      invalidMessage={venueError[index]}
-                    />
+                  <div>
+                    {!!duplicateError && (
+                      <p className="text-danger text-center mt-2">
+                        {duplicateError[index]}
+                      </p>
+                    )}
                   </div>
-                  <div className="w-100">
-                    <Dropdown
-                      icon={CiLocationOn}
-                      title={
-                        projection?.date.length > 0
-                          ? projection.date.join(", ")
-                          : "Choose Date"
-                      }
-                      options={["2024-12-15", "2024-12-16", "2024-12-17"]}
-                      value={projection?.date || ""}
-                      onChange={(date) =>
-                        handleProjectionChange(index, "date", date)
-                      }
-                      invalid={!!projectionDateError[index]}
-                      invalidMessage={projectionDateError[index]}
-                    />
-                  </div>
-                  <FaTrashAlt
-                    size={36}
-                    className={`primary-red pointer mt-3 ${
-                      projections.length === 1 ? "disabled" : ""
-                    }`}
-                    onClick={() =>
-                      projections.length > 1 &&
-                      handleRemoveProjection(projection.id)
-                    }
-                  />
-                </div>
+                </>
               ))}
 
               <p
@@ -1012,7 +1357,10 @@ const AdminPanel = () => {
                   Back
                 </p>
                 <div className="d-flex gap-3">
-                  <button className="btn flex-grow-1 button-secondary">
+                  <button
+                    className="btn flex-grow-1 button-secondary"
+                    onClick={handleDraft}
+                  >
                     Save to Drafts
                   </button>
                   <button
