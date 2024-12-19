@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import { MdOutlineLocalMovies } from "react-icons/md";
-import { FaBuilding } from "react-icons/fa";
+import { FaBuilding, FaPhoneAlt, FaRegBuilding } from "react-icons/fa";
 import TabButton from "../components/TabButton";
 import "../styles/AdminPanel.css";
 import { TbMovieOff, TbMovie } from "react-icons/tb";
@@ -9,7 +9,7 @@ import { IoMdClose } from "react-icons/io";
 import { FaPlus, FaTrashAlt, FaLanguage } from "react-icons/fa";
 import { CiLocationOn, CiClock2, CiCalendar } from "react-icons/ci";
 import { Md18UpRating } from "react-icons/md";
-import { GoPerson } from "react-icons/go";
+import { GoHash, GoPerson } from "react-icons/go";
 import { IoIosLink } from "react-icons/io";
 import { Button } from "react-bootstrap";
 import Input from "../components/Input";
@@ -27,6 +27,7 @@ import { venueService } from "../services/venueService.js";
 import { projectionService } from "../services/projectionService.js";
 import { genreService } from "../services/genreService.js";
 import { TimePicker } from "rsuite";
+import { FiPhone } from "react-icons/fi";
 
 const AdminPanel = () => {
   const [selectedOption, setSelectedOption] = useState("movie");
@@ -88,6 +89,7 @@ const AdminPanel = () => {
   // Venues
 
   const [venues, setVenues] = useState([]);
+  const [selectedVenue, setSelectedVenue] = useState(0);
 
   useEffect(() => {
     const getDraftMovies = async () => {
@@ -140,8 +142,6 @@ const AdminPanel = () => {
     getAllVenues();
   }, []);
 
-  console.log(venues);
-
   useEffect(() => {
     const getSelectedMovie = async () => {
       const response = await movieService.get(movieId);
@@ -152,6 +152,15 @@ const AdminPanel = () => {
       getSelectedMovie();
     }
   }, [movieId]);
+
+  useEffect(() => {
+    const getSelectedVenue = async () => {
+      const response = await venueService.get(selectedVenue.id);
+      setSelectedVenue(response);
+    };
+
+    if (selectedVenue !== 0) getSelectedVenue();
+  }, []);
 
   useEffect(() => {
     setMovieName(selectedMovie.name);
@@ -699,6 +708,8 @@ const AdminPanel = () => {
   const publishMovies = async () => {
     await movieService.updateMovies(checkedMovies, "published");
   };
+
+  console.log(selectedVenue);
 
   return (
     <div>
@@ -1418,11 +1429,14 @@ const AdminPanel = () => {
               <>
                 <div className="d-flex justify-content-between border-bottom pb-4">
                   <h5>Venues ({venues.totalSize})</h5>
-                  {activeTab === "drafts" && movies.length && (
-                    <Button className="btn button-primary" variant="danger">
-                      Add Venue
-                    </Button>
-                  )}
+
+                  <Button
+                    className="btn button-primary"
+                    variant="danger"
+                    onClick={() => setCurrentFlow("addVenue")}
+                  >
+                    Add Venue
+                  </Button>
                 </div>
                 <div className="mt-4 grid-container">
                   {venues.venues.map((venue) => (
@@ -1431,12 +1445,304 @@ const AdminPanel = () => {
                       title={venue.name}
                       subtitle={`${venue.street} ${venue.streetNo}, ${venue.city}`}
                       imageUrl={venue.photoImageId.url}
+                      onClick={() => {
+                        setSelectedVenue(venue);
+                        setCurrentFlow("seeVenue");
+                      }}
                     />
                   ))}
                 </div>
                 <p className="text-center primary-red my-4 fw-bold text-decoration-underline fs-6">
                   Load more
                 </p>
+              </>
+            )}
+            {currentFlow === "addVenue" && (
+              <>
+                <div className="d-flex border-bottom pb-4">
+                  <h5>New Venue</h5>
+                </div>
+                <div className="text-center mt-4 pb-4 border-bottom">
+                  <div
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
+                  >
+                    <img
+                      src={placeholderImage}
+                      style={{
+                        width: "300px",
+                        height: "300px",
+                        objectFit: "cover",
+                        marginBottom: "10px",
+                        cursor: "pointer",
+                        borderRadius: "24px",
+                      }}
+                      className="border"
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 10,
+                        left: 0,
+                        width: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        color: "white",
+                        textAlign: "center",
+                        padding: "5px",
+                        fontSize: "14px",
+                        borderBottomLeftRadius: "24px",
+                        borderBottomRightRadius: "24px",
+                      }}
+                    >
+                      Upload Photo
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="d-flex gap-4">
+                    <Input
+                      label="Venue Name"
+                      placeholder="Venue"
+                      leadingIcon={<FaRegBuilding size={18} />}
+                      dark={true}
+                    />
+                    <Input
+                      label="Phone"
+                      placeholder="Phone"
+                      leadingIcon={<FiPhone size={18} />}
+                      dark={true}
+                    />
+                  </div>
+                  <div className="d-flex gap-4">
+                    <Input
+                      label="Street"
+                      placeholder="VeStreetnue"
+                      leadingIcon={<CiLocationOn size={18} />}
+                      dark={true}
+                    />
+                    <Input
+                      label="Street Number"
+                      placeholder="Street Number"
+                      leadingIcon={<GoHash size={18} />}
+                      dark={true}
+                    />
+                  </div>
+                  <Input
+                    label="City"
+                    placeholder="City"
+                    leadingIcon={<CiLocationOn size={18} />}
+                    dark={true}
+                  />
+                  <div className="d-flex justify-content-end gap-3">
+                    <button
+                      className="btn button-secondary"
+                      onClick={() => setCurrentFlow("default_venue")}
+                    >
+                      Cancel
+                    </button>
+                    <button className="btn button-primary">Add Venue</button>
+                  </div>
+                </div>
+              </>
+            )}
+            {currentFlow === "seeVenue" && (
+              <>
+                <div className="d-flex justify-content-between border-bottom pb-4">
+                  <h5>{selectedVenue.name}</h5>
+
+                  {currentFlow === "seeVenue" && (
+                    <Button
+                      className="btn button-primary"
+                      variant="danger"
+                      onClick={() => setCurrentFlow("editVenue")}
+                    >
+                      Edit Venue
+                    </Button>
+                  )}
+                </div>
+                <div className="text-center mt-4 pb-4 border-bottom">
+                  <div
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
+                  >
+                    <img
+                      src={selectedVenue.photoImageId.url}
+                      style={{
+                        width: "300px",
+                        height: "300px",
+                        objectFit: "cover",
+                        marginBottom: "10px",
+                        cursor: "pointer",
+                        borderRadius: "24px",
+                      }}
+                      className="border"
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 10,
+                        left: 0,
+                        width: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        color: "white",
+                        textAlign: "center",
+                        padding: "5px",
+                        fontSize: "14px",
+                        borderBottomLeftRadius: "24px",
+                        borderBottomRightRadius: "24px",
+                      }}
+                    >
+                      Upload Photo
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="d-flex gap-4">
+                    <Input
+                      label="Venue Name"
+                      placeholder="Venue"
+                      leadingIcon={<FaRegBuilding size={18} />}
+                      dark={true}
+                      value={selectedVenue.name}
+                    />
+                    <Input
+                      label="Phone"
+                      placeholder="Phone"
+                      leadingIcon={<FiPhone size={18} />}
+                      dark={true}
+                      value={selectedVenue.phoneNo}
+                    />
+                  </div>
+                  <div className="d-flex gap-4">
+                    <Input
+                      label="Street"
+                      placeholder="Street"
+                      leadingIcon={<CiLocationOn size={18} />}
+                      dark={true}
+                      value={selectedVenue.street}
+                    />
+                    <Input
+                      label="Street Number"
+                      placeholder="Street Number"
+                      leadingIcon={<GoHash size={18} />}
+                      dark={true}
+                      value={selectedVenue.streetNo}
+                    />
+                  </div>
+                  <Input
+                    label="City"
+                    placeholder="City"
+                    leadingIcon={<CiLocationOn size={18} />}
+                    dark={true}
+                    value={selectedVenue.city}
+                  />
+                </div>
+              </>
+            )}
+            {currentFlow === "editVenue" && (
+              <>
+                <div className="d-flex justify-content-between border-bottom pb-4">
+                  <h5>{selectedVenue.name}</h5>
+
+                  <p
+                    className="primary-red fs-6 text-decoration-underline pointer"
+                    onClick={() => setCurrentFlow("editVenue")}
+                  >
+                    Delete Venue
+                  </p>
+                </div>
+                <div className="text-center mt-4 pb-4 border-bottom">
+                  <div
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                    }}
+                  >
+                    <img
+                      src={selectedVenue.photoImageId.url}
+                      style={{
+                        width: "300px",
+                        height: "300px",
+                        objectFit: "cover",
+                        marginBottom: "10px",
+                        cursor: "pointer",
+                        borderRadius: "24px",
+                      }}
+                      className="border"
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 10,
+                        left: 0,
+                        width: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        color: "white",
+                        textAlign: "center",
+                        padding: "5px",
+                        fontSize: "14px",
+                        borderBottomLeftRadius: "24px",
+                        borderBottomRightRadius: "24px",
+                      }}
+                    >
+                      Upload Photo
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="d-flex gap-4">
+                    <Input
+                      label="Venue Name"
+                      placeholder="Venue"
+                      leadingIcon={<FaRegBuilding size={18} />}
+                      dark={true}
+                      value={selectedVenue.name}
+                    />
+                    <Input
+                      label="Phone"
+                      placeholder="Phone"
+                      leadingIcon={<FiPhone size={18} />}
+                      dark={true}
+                      value={selectedVenue.phoneNo}
+                    />
+                  </div>
+                  <div className="d-flex gap-4">
+                    <Input
+                      label="Street"
+                      placeholder="Street"
+                      leadingIcon={<CiLocationOn size={18} />}
+                      dark={true}
+                      value={selectedVenue.street}
+                    />
+                    <Input
+                      label="Street Number"
+                      placeholder="Street Number"
+                      leadingIcon={<GoHash size={18} />}
+                      dark={true}
+                      value={selectedVenue.streetNo}
+                    />
+                  </div>
+                  <Input
+                    label="City"
+                    placeholder="City"
+                    leadingIcon={<CiLocationOn size={18} />}
+                    dark={true}
+                    value={selectedVenue.city}
+                  />
+                  <div className="d-flex justify-content-end gap-3">
+                    <button
+                      className="btn button-secondary"
+                      onClick={() => setCurrentFlow("default_venue")}
+                    >
+                      Cancel
+                    </button>
+                    <button className="btn button-primary">Save Changes</button>
+                  </div>
+                </div>
               </>
             )}
           </div>

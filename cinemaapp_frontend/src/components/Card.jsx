@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/Card.css";
 
-const Card = ({ title, subtitle, genre, imageUrl, showDateLabel }) => {
+const Card = ({ title, subtitle, genre, imageUrl, showDateLabel, onClick }) => {
   const formatUpcomingDate = (dateString) => {
     const date = new Date(dateString);
 
@@ -20,6 +20,7 @@ const Card = ({ title, subtitle, genre, imageUrl, showDateLabel }) => {
       className={`rounded-5 p-3 bg-white border shadow text-black ${
         showDateLabel ? "card-container-upcoming" : "card-container"
       } position-relative`}
+      onClick={onClick}
     >
       {showDateLabel && (
         <div className="upcoming-label position-absolute top-5 end-0 m-2 p-1 bg-danger text-white rounded">
