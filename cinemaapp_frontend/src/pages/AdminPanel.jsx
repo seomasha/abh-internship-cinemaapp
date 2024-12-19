@@ -18,6 +18,7 @@ import Dropdown from "../components/Dropdown.jsx";
 import DatePickerDropdown from "../components/DatePickerDropdown.jsx";
 import MovieTable from "../components/MovieTable.jsx";
 import Roadmap from "../components/Roadmap.jsx";
+import Card from "../components/Card.jsx";
 import Papa from "papaparse";
 import ToastService from "../services/toastService.js";
 import { movieService } from "../services/movieService.js";
@@ -28,6 +29,7 @@ import { genreService } from "../services/genreService.js";
 import { TimePicker } from "rsuite";
 
 const AdminPanel = () => {
+  const [selectedOption, setSelectedOption] = useState("movie");
   const [selectedMovie, setSelectedMovie] = useState([]);
   const [activeTab, setActiveTab] = useState("drafts");
   const [currentFlow, setCurrentFlow] = useState("default");
@@ -83,6 +85,10 @@ const AdminPanel = () => {
   const [cities, setCities] = useState([]);
   const [genres, setGenres] = useState([]);
 
+  // Venues
+
+  const [venues, setVenues] = useState([]);
+
   useEffect(() => {
     const getDraftMovies = async () => {
       const response = await movieService.getDraftMovies();
@@ -124,6 +130,17 @@ const AdminPanel = () => {
     getCurrentlyShowingMovies();
     getUpcomingMovies();
   }, []);
+
+  useEffect(() => {
+    const getAllVenues = async () => {
+      const response = await venueService.getAll(0, 6);
+      setVenues({ venues: response.venues, totalSize: response.totalSize });
+    };
+
+    getAllVenues();
+  }, []);
+
+  console.log(venues);
 
   useEffect(() => {
     const getSelectedMovie = async () => {
@@ -237,8 +254,6 @@ const AdminPanel = () => {
       });
     }
   };
-
-  console.log(movieImages);
 
   const handleDeleteImage = async (indexToDelete) => {
     const imageToDelete = movieImages[indexToDelete];
@@ -626,8 +641,6 @@ const AdminPanel = () => {
     window.location.reload();
   };
 
-  console.log(projections);
-
   const handleGenreChange = (selectedGenres) => {
     const genresData = selectedGenres
       .map((genreName) => {
@@ -698,682 +711,736 @@ const AdminPanel = () => {
           <h4 className="text-white bottom-border pb-4">Admin</h4>
           <p className="text-white mt-4">
             <MdOutlineLocalMovies />
-            <span className="mx-2 pt-1">Movies</span>
+            <span
+              className={`mx-2 pt-1 pointer ${
+                selectedOption === "movie" &&
+                "fw-bold text-decoration-underline"
+              }`}
+              onClick={() => {
+                setSelectedOption("movie");
+                setCurrentFlow("default");
+              }}
+            >
+              Movies
+            </span>
           </p>
           <p className="text-white mt-4">
             <FaBuilding />
-            <span className="mx-2 pt-1">Venues</span>
+            <span
+              className={`mx-2 pt-1 pointer ${
+                selectedOption === "venue" &&
+                "fw-bold text-decoration-underline"
+              }`}
+              onClick={() => {
+                setSelectedOption("venue");
+                setCurrentFlow("default_venue");
+              }}
+            >
+              Venues
+            </span>
           </p>
         </div>
-
-        <div className="col-10 primary-background p-4">
-          {currentFlow === "default" && (
-            <>
-              <div className="d-flex justify-content-between">
-                <h5>Movies</h5>
-                {activeTab === "drafts" && movies.length && (
-                  <Button
-                    className="btn button-primary"
-                    variant="danger"
-                    onClick={() => {
-                      setMovieId(0);
-                      setSelectedMovie([]);
-                      setCurrentFlow("addMovie");
-                    }}
-                  >
-                    Add Movie
-                  </Button>
-                )}
-              </div>
-
-              <div className="mt-3 border-bottom gap-5 d-flex">
-                <TabButton
-                  label={`Drafts (${movies.length})`}
-                  isActive={activeTab === "drafts"}
-                  onClick={() => {
-                    setActiveTab("drafts");
-                    setCheckedMovies([]);
-                  }}
-                />
-                <TabButton
-                  label={`Currently Showing (${currentlyShowingMovies.totalSize})`}
-                  isActive={activeTab === "currently-showing"}
-                  onClick={() => {
-                    setActiveTab("currently-showing");
-                    setCheckedMovies([]);
-                  }}
-                />
-                <TabButton
-                  label={`Upcoming (${upcomingMovies.totalSize})`}
-                  isActive={activeTab === "upcoming"}
-                  onClick={() => {
-                    setActiveTab("upcoming");
-                    setCheckedMovies([]);
-                  }}
-                />
-                <TabButton
-                  label={`Archived (${archivedMovies.length})`}
-                  isActive={activeTab === "archived"}
-                  onClick={() => {
-                    setActiveTab("archived");
-                    setCheckedMovies([]);
-                  }}
-                />
-              </div>
-
-              <div className="mt-4">
-                {activeTab === "drafts" && !movies.length && (
-                  <div className="text-center">
-                    <TbMovieOff size={64} className="mt-5" />
-                    <h5 className="fw-bold mt-3">No movies added</h5>
-                    <p className="mt-3">
-                      You can add movie via Add Movie button
-                    </p>
+        {selectedOption === "movie" && (
+          <div className="col-10 primary-background p-4">
+            {currentFlow === "default" && (
+              <>
+                <div className="d-flex justify-content-between">
+                  <h5>Movies</h5>
+                  {activeTab === "drafts" && movies.length && (
                     <Button
+                      className="btn button-primary"
                       variant="danger"
-                      className="mt-3 primary-red-background"
-                      onClick={() => setCurrentFlow("addMovie")}
+                      onClick={() => {
+                        setMovieId(0);
+                        setSelectedMovie([]);
+                        setCurrentFlow("addMovie");
+                      }}
                     >
                       Add Movie
                     </Button>
-                  </div>
-                )}
-                {activeTab === "drafts" && movies.length && (
-                  <>
-                    <div className="d-flex justify-content-end gap-3">
-                      {checkedMovies.length > 0 && (
-                        <>
-                          <Button
-                            variant="outline-danger"
-                            onClick={archiveMovies}
-                          >
-                            Archive
-                          </Button>
-                          <Button
-                            variant="outline-success"
-                            onClick={publishMovies}
-                          >
-                            Publish
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                    <MovieTable
-                      movies={movies}
-                      onCheckboxChange={handleCheckboxChange}
-                      movieId={movieId}
-                      setMovieId={setMovieId}
-                      showAction={true}
-                      setMovieCreationStep={setMovieCreationStep}
-                      setCurrentFlow={setCurrentFlow}
-                    />
-                  </>
-                )}
-                {activeTab === "currently-showing" && (
-                  <>
-                    <MovieTable movies={currentlyShowingMovies.movies} />
-                  </>
-                )}
-                {activeTab === "upcoming" && (
-                  <>
-                    <MovieTable
-                      movies={upcomingMovies.movies}
-                      movieId={movieId}
-                      setMovieId={setMovieId}
-                      onCheckboxChange={handleCheckboxChange}
-                      showAction={true}
-                    />
-                  </>
-                )}
-                {activeTab === "archived" && (
-                  <>
-                    <MovieTable
-                      movies={archivedMovies}
-                      onCheckboxChange={handleCheckboxChange}
-                      movieId={movieId}
-                      setMovieId={setMovieId}
-                      showAction={true}
-                    />
-                  </>
-                )}
-              </div>
-            </>
-          )}
+                  )}
+                </div>
 
-          {currentFlow === "addMovie" && movieCreationStep === 1 && (
-            <>
-              <div className="d-flex justify-content-between align-items-center">
-                <h5>Add New Movie</h5>
-                <div className="rounded p-2 primary-border">
-                  <IoMdClose
-                    size={24}
-                    className="primary-red"
+                <div className="mt-3 border-bottom gap-5 d-flex">
+                  <TabButton
+                    label={`Drafts (${movies.length})`}
+                    isActive={activeTab === "drafts"}
                     onClick={() => {
-                      setCurrentFlow("default");
-                      setMovieCreationStep(1);
-                      setMovieId(0);
+                      setActiveTab("drafts");
+                      setCheckedMovies([]);
+                    }}
+                  />
+                  <TabButton
+                    label={`Currently Showing (${currentlyShowingMovies.totalSize})`}
+                    isActive={activeTab === "currently-showing"}
+                    onClick={() => {
+                      setActiveTab("currently-showing");
+                      setCheckedMovies([]);
+                    }}
+                  />
+                  <TabButton
+                    label={`Upcoming (${upcomingMovies.totalSize})`}
+                    isActive={activeTab === "upcoming"}
+                    onClick={() => {
+                      setActiveTab("upcoming");
+                      setCheckedMovies([]);
+                    }}
+                  />
+                  <TabButton
+                    label={`Archived (${archivedMovies.length})`}
+                    isActive={activeTab === "archived"}
+                    onClick={() => {
+                      setActiveTab("archived");
+                      setCheckedMovies([]);
                     }}
                   />
                 </div>
-              </div>
 
-              <Roadmap step={1} />
-
-              <div>
-                <div className="d-flex gap-5">
-                  <Input
-                    label="Movie Name"
-                    placeholder="Type movie name"
-                    leadingIcon={<TbMovie size={18} />}
-                    value={movieName}
-                    onChange={(e) => setMovieName(e.target.value)}
-                    invalid={!!movieNameError}
-                    invalidMessage={movieNameError}
-                    dark={true}
-                  />
-                  <Input
-                    label="PG Rating"
-                    placeholder="Type PG rating"
-                    leadingIcon={<Md18UpRating size={18} />}
-                    onChange={(e) => setPgRating(e.target.value)}
-                    invalid={!!pgRatingError}
-                    invalidMessage={pgRatingError}
-                    value={pgRating}
-                    dark={true}
-                  />
-                </div>
-                <div className="d-flex gap-5">
-                  <Input
-                    label="Language"
-                    placeholder="Type language"
-                    leadingIcon={<FaLanguage size={18} />}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    invalid={!!languageError}
-                    invalidMessage={languageError}
-                    value={language}
-                    dark={true}
-                  />
-                  <Input
-                    label="Movie Duration"
-                    placeholder="Type movie duration"
-                    leadingIcon={<CiClock2 size={18} />}
-                    onChange={(e) => setMovieDuration(e.target.value)}
-                    invalid={!!movieDurationError}
-                    invalidMessage={movieDurationError}
-                    value={movieDuration}
-                    dark={true}
-                  />
-                </div>
-                <div className="d-flex gap-5">
-                  <DatePickerDropdown
-                    title={
-                      startDate && endDate
-                        ? `${
-                            typeof startDate === "string"
-                              ? startDate
-                              : startDate.toDateString().slice(0, 15)
-                          } - ${
-                            typeof endDate === "string"
-                              ? endDate
-                              : endDate.toDateString().slice(0, 15)
-                          }`
-                        : "Date Range"
-                    }
-                    icon={CiCalendar}
-                    fullWidth={true}
-                    label="Projection Date"
-                    invalid={!!dateError}
-                    invalidMessage={dateError}
-                    onChange={handleDateChange}
-                  />
-                  <Dropdown
-                    icon={CiLocationOn}
-                    title={
-                      genre
-                        ? genre.map((g) => g.name).join(", ")
-                        : "Choose genre"
-                    }
-                    options={genres.map((genre) => genre.name)}
-                    fullWidth={true}
-                    label="Genre"
-                    invalid={!!genreError}
-                    invalidMessage={genreError}
-                    onChange={(selectedGenres) =>
-                      handleGenreChange(selectedGenres)
-                    }
-                  />
-                </div>
-                <div className="d-flex gap-5 mt-3">
-                  <Input
-                    label="Director"
-                    placeholder="Add Director"
-                    leadingIcon={<GoPerson size={18} />}
-                    onChange={(e) => setDirector(e.target.value)}
-                    invalid={!!directorError}
-                    invalidMessage={directorError}
-                    value={director}
-                    dark={true}
-                  />
-                  <Input
-                    label="Trailer"
-                    placeholder="Insert trailer link"
-                    leadingIcon={<IoIosLink size={18} />}
-                    onChange={(e) => setTrailerLink(e.target.value)}
-                    invalid={!!trailerLinkError}
-                    invalidMessage="You should enter a trailer link."
-                    value={trailerLink}
-                    dark={true}
-                  />
-                </div>
-
-                <TextArea
-                  label="Your Message"
-                  placeholder="Write synopsis"
-                  value={synopsis}
-                  onChange={(e) => setSynopsis(e.target.value)}
-                  invalid={!!synopsisError}
-                  invalidMessage="You should enter a synopsis."
-                />
-              </div>
-
-              <div className="d-flex align-items-center justify-content-between mt-5">
-                <p className="back-button">Back</p>
-                <div className="d-flex gap-3">
-                  <button
-                    className="btn flex-grow-1 button-secondary"
-                    onClick={handleDraft}
-                  >
-                    Save to Drafts
-                  </button>
-                  <button
-                    className="btn flex-grow-1 button-primary"
-                    onClick={handleContinue}
-                  >
-                    Continue
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {currentFlow === "addMovie" && movieCreationStep === 2 && (
-            <>
-              <div className="d-flex justify-content-between align-items-center">
-                <h5>Add New Movie</h5>
-                <div className="rounded p-2 primary-border">
-                  <IoMdClose
-                    size={24}
-                    className="primary-red"
-                    onClick={() => setCurrentFlow("default")}
-                  />
-                </div>
-              </div>
-
-              <Roadmap step={2} />
-
-              <div className="d-flex justify-content-evenly mt-5 w-100 p-2 gap-5">
-                <div className="w-100">
-                  <div className="d-flex justify-content-between">
-                    <h6>Writers</h6>
-                    {writersData ? (
-                      <FaTrashAlt
-                        className="primary-red"
-                        onClick={() => handleClearData("writers")}
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                  <div className="border p-5 rounded-3">
-                    {!writersData ? (
-                      <label
-                        htmlFor="upload-writers"
-                        className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                <div className="mt-4">
+                  {activeTab === "drafts" && !movies.length && (
+                    <div className="text-center">
+                      <TbMovieOff size={64} className="mt-5" />
+                      <h5 className="fw-bold mt-3">No movies added</h5>
+                      <p className="mt-3">
+                        You can add movie via Add Movie button
+                      </p>
+                      <Button
+                        variant="danger"
+                        className="mt-3 primary-red-background"
+                        onClick={() => setCurrentFlow("addMovie")}
                       >
-                        <FaPlus /> Upload Writers via CSV
-                      </label>
-                    ) : (
-                      <div className="d-flex justify-content-between">
-                        {writersData.map((writer, index) => (
-                          <p key={index} className="mt-1 mx-3">
-                            {writer}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={(e) => handleFileChange(e, "writers")}
-                      style={{ display: "none" }}
-                      id="upload-writers"
-                      ref={writersFileInputRef}
-                    />
-                  </div>
-                </div>
-                <div className="w-100">
-                  <div className="d-flex justify-content-between">
-                    <h6>Cast</h6>
-                    {castData ? (
-                      <FaTrashAlt
-                        className="primary-red"
-                        onClick={() => handleClearData("cast")}
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                  <div className="border p-5 rounded-3">
-                    {!castData ? (
-                      <label
-                        htmlFor="upload-cast"
-                        className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
-                      >
-                        <FaPlus /> Upload Cast via CSV
-                      </label>
-                    ) : (
-                      <div className="d-flex justify-content-between">
-                        {castData.map((cast, index) => (
-                          <div key={index}>
-                            <p className="mx-2">
-                              {cast.realName}
-                              <br />
-                              <span className="cast-role-text">
-                                {cast.role}
-                              </span>
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={(e) => handleFileChange(e, "cast")}
-                      style={{ display: "none" }}
-                      id="upload-cast"
-                      ref={castFileInputRef}
-                    />
-                  </div>
-                </div>
-              </div>
-              {writersError && (
-                <p className="text-danger text-center mt-2">{writersError}</p>
-              )}
-              {castError && (
-                <p className="text-danger text-center">{castError}</p>
-              )}
-              <div className="w-100 p-2">
-                <h6>Upload Photos</h6>
-                <div className="border p-5 rounded-3">
-                  {movieImages.length > 0 ? (
-                    <div className="mt-3 d-flex flex-wrap gap-3 justify-content-center">
-                      {[
-                        ...movieImages,
-                        ...Array(4 - movieImages.length).fill(null),
-                      ].map((image, index) => (
-                        <div key={index}>
-                          <div
-                            style={{
-                              position: "relative",
-                              display: "inline-block",
-                            }}
-                          >
-                            <img
-                              src={
-                                image?.url
-                                  ? image.url
-                                  : image?.file
-                                  ? URL.createObjectURL(image.file)
-                                  : placeholderImage
-                              }
-                              alt={`Preview ${index + 1}`}
-                              style={{
-                                width: "300px",
-                                height: "300px",
-                                objectFit: "cover",
-                                marginBottom: "10px",
-                                cursor: "pointer",
-                                borderRadius: "24px",
-                              }}
-                              onClick={() =>
-                                document
-                                  .getElementById(`image-upload-${index}`)
-                                  .click()
-                              }
-                              className="border"
-                            />
-                            <div
-                              style={{
-                                position: "absolute",
-                                bottom: 10,
-                                left: 0,
-                                width: "100%",
-                                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                                color: "white",
-                                textAlign: "center",
-                                padding: "5px",
-                                fontSize: "14px",
-                                borderBottomLeftRadius: "24px",
-                                borderBottomRightRadius: "24px",
-                              }}
-                            >
-                              Upload Photo
-                            </div>
-                          </div>
-
-                          <div className="d-flex justify-content-between mt-3">
-                            <div className="d-flex align-items-center gap-2">
-                              <input
-                                type="radio"
-                                id={`image-${index}`}
-                                name="selected-image"
-                                checked={selectedImageIndex === index}
-                                onChange={() => setSelectedImageIndex(index)}
-                                style={{ accentColor: "#b22222" }}
-                              />
-                              <label
-                                htmlFor={`image-${index}`}
-                                className="fw-bold"
-                              >
-                                Cover Photo
-                              </label>
-                            </div>
-                            <FaTrashAlt
-                              className="primary-red pointer"
-                              onClick={() => handleDeleteImage(index)}
-                            />
-                          </div>
-
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageChange(e, index)}
-                            style={{ display: "none" }}
-                            id={`image-upload-${index}`}
-                          />
-                        </div>
-                      ))}
+                        Add Movie
+                      </Button>
                     </div>
-                  ) : (
+                  )}
+                  {activeTab === "drafts" && movies.length && (
                     <>
-                      <label
-                        htmlFor="upload-image"
-                        className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
-                      >
-                        <FaPlus /> Upload Image
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        style={{ display: "none" }}
-                        id="upload-image"
-                        multiple
+                      <div className="d-flex justify-content-end gap-3">
+                        {checkedMovies.length > 0 && (
+                          <>
+                            <Button
+                              variant="outline-danger"
+                              onClick={archiveMovies}
+                            >
+                              Archive
+                            </Button>
+                            <Button
+                              variant="outline-success"
+                              onClick={publishMovies}
+                            >
+                              Publish
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                      <MovieTable
+                        movies={movies}
+                        onCheckboxChange={handleCheckboxChange}
+                        movieId={movieId}
+                        setMovieId={setMovieId}
+                        showAction={true}
+                        setMovieCreationStep={setMovieCreationStep}
+                        setCurrentFlow={setCurrentFlow}
                       />
-                      <p className="text-center secondary-text">
-                        or just drag and drop
-                      </p>
-                      <p className="text-center secondary-text">
-                        * Add 4 photos
-                      </p>
+                    </>
+                  )}
+                  {activeTab === "currently-showing" && (
+                    <>
+                      <MovieTable movies={currentlyShowingMovies.movies} />
+                    </>
+                  )}
+                  {activeTab === "upcoming" && (
+                    <>
+                      <MovieTable
+                        movies={upcomingMovies.movies}
+                        movieId={movieId}
+                        setMovieId={setMovieId}
+                        onCheckboxChange={handleCheckboxChange}
+                        showAction={true}
+                      />
+                    </>
+                  )}
+                  {activeTab === "archived" && (
+                    <>
+                      <MovieTable
+                        movies={archivedMovies}
+                        onCheckboxChange={handleCheckboxChange}
+                        movieId={movieId}
+                        setMovieId={setMovieId}
+                        showAction={true}
+                      />
                     </>
                   )}
                 </div>
-                {imageError && (
-                  <p className="text-danger text-center mt-2">{imageError}</p>
-                )}
-                {selectedCoverPhotoError && (
-                  <p className="text-danger text-center">
-                    {selectedCoverPhotoError}
-                  </p>
-                )}
-              </div>
+              </>
+            )}
 
-              <div className="d-flex align-items-center justify-content-between mt-5 p-2">
-                <p
-                  className="back-button-available pointer"
-                  onClick={() => {
-                    setMovieCreationStep(1);
-                  }}
-                >
-                  Back
-                </p>
-                <div className="d-flex gap-3">
-                  <button
-                    className="btn flex-grow-1 button-secondary"
-                    onClick={handleDraft}
-                  >
-                    Save to Drafts
-                  </button>
-                  <button
-                    className="btn flex-grow-1 button-primary"
-                    onClick={handleContinue}
-                  >
-                    Continue
-                  </button>
+            {currentFlow === "addMovie" && movieCreationStep === 1 && (
+              <>
+                <div className="d-flex justify-content-between align-items-center">
+                  <h5>Add New Movie</h5>
+                  <div className="rounded p-2 primary-border">
+                    <IoMdClose
+                      size={24}
+                      className="primary-red"
+                      onClick={() => {
+                        setCurrentFlow("default");
+                        setMovieCreationStep(1);
+                        setMovieId(0);
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
 
-          {currentFlow === "addMovie" && movieCreationStep === 3 && (
-            <>
-              <div className="d-flex justify-content-between align-items-center">
-                <h5>Add New Movie</h5>
-                <div className="rounded p-2 primary-border">
-                  <IoMdClose
-                    size={24}
-                    className="primary-red"
-                    onClick={() => setCurrentFlow("default")}
-                  />
-                </div>
-              </div>
+                <Roadmap step={1} />
 
-              <Roadmap step={3} />
-
-              {projections.map((projection, index) => (
-                <>
-                  <div
-                    key={projection.id}
-                    className="d-flex w-100 gap-4 align-items-center"
-                  >
-                    <div className="w-100">
-                      <Dropdown
-                        icon={CiLocationOn}
-                        title={
-                          projection?.city ? projection.city : "Choose City"
-                        }
-                        options={cities}
-                        value={projection?.city || ""}
-                        onChange={(city) =>
-                          handleProjectionChange(index, "city", city)
-                        }
-                        invalid={!!cityError[index]}
-                        invalidMessage={cityError[index]}
-                      />
-                    </div>
-                    <div className="w-100">
-                      <Dropdown
-                        icon={CiLocationOn}
-                        title={
-                          projection?.venue ? projection.venue : "Choose Venue"
-                        }
-                        options={projection.venues.map((venue) => venue.name)}
-                        value={projection?.venue || ""}
-                        onChange={(venue) =>
-                          handleProjectionChange(index, "venue", venue)
-                        }
-                        invalid={!!venueError[index]}
-                        invalidMessage={venueError[index]}
-                      />
-                    </div>
-                    <div className="w-100">
-                      <TimePicker
-                        value={projection?.time || ""}
-                        onChange={(time) =>
-                          handleProjectionChange(index, "time", time)
-                        }
-                        placeholder={
-                          projection?.time
-                            ? projection.time.toString().slice(0, 5)
-                            : "Choose Time"
-                        }
-                      />
-                    </div>
-                    <FaTrashAlt
-                      size={36}
-                      className={`primary-red pointer mt-3 ${
-                        projections.length === 1 ? "disabled" : ""
-                      }`}
-                      onClick={() =>
-                        projections.length > 1 &&
-                        handleRemoveProjection(projection.id)
+                <div>
+                  <div className="d-flex gap-5">
+                    <Input
+                      label="Movie Name"
+                      placeholder="Type movie name"
+                      leadingIcon={<TbMovie size={18} />}
+                      value={movieName}
+                      onChange={(e) => setMovieName(e.target.value)}
+                      invalid={!!movieNameError}
+                      invalidMessage={movieNameError}
+                      dark={true}
+                    />
+                    <Input
+                      label="PG Rating"
+                      placeholder="Type PG rating"
+                      leadingIcon={<Md18UpRating size={18} />}
+                      onChange={(e) => setPgRating(e.target.value)}
+                      invalid={!!pgRatingError}
+                      invalidMessage={pgRatingError}
+                      value={pgRating}
+                      dark={true}
+                    />
+                  </div>
+                  <div className="d-flex gap-5">
+                    <Input
+                      label="Language"
+                      placeholder="Type language"
+                      leadingIcon={<FaLanguage size={18} />}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      invalid={!!languageError}
+                      invalidMessage={languageError}
+                      value={language}
+                      dark={true}
+                    />
+                    <Input
+                      label="Movie Duration"
+                      placeholder="Type movie duration"
+                      leadingIcon={<CiClock2 size={18} />}
+                      onChange={(e) => setMovieDuration(e.target.value)}
+                      invalid={!!movieDurationError}
+                      invalidMessage={movieDurationError}
+                      value={movieDuration}
+                      dark={true}
+                    />
+                  </div>
+                  <div className="d-flex gap-5">
+                    <DatePickerDropdown
+                      title={
+                        startDate && endDate
+                          ? `${
+                              typeof startDate === "string"
+                                ? startDate
+                                : startDate.toDateString().slice(0, 15)
+                            } - ${
+                              typeof endDate === "string"
+                                ? endDate
+                                : endDate.toDateString().slice(0, 15)
+                            }`
+                          : "Date Range"
+                      }
+                      icon={CiCalendar}
+                      fullWidth={true}
+                      label="Projection Date"
+                      invalid={!!dateError}
+                      invalidMessage={dateError}
+                      onChange={handleDateChange}
+                    />
+                    <Dropdown
+                      icon={CiLocationOn}
+                      title={
+                        genre
+                          ? genre.map((g) => g.name).join(", ")
+                          : "Choose genre"
+                      }
+                      options={genres.map((genre) => genre.name)}
+                      fullWidth={true}
+                      label="Genre"
+                      invalid={!!genreError}
+                      invalidMessage={genreError}
+                      onChange={(selectedGenres) =>
+                        handleGenreChange(selectedGenres)
                       }
                     />
                   </div>
-                  <div>
-                    {!!duplicateError && (
-                      <p className="text-danger text-center mt-2">
-                        {duplicateError[index]}
-                      </p>
+                  <div className="d-flex gap-5 mt-3">
+                    <Input
+                      label="Director"
+                      placeholder="Add Director"
+                      leadingIcon={<GoPerson size={18} />}
+                      onChange={(e) => setDirector(e.target.value)}
+                      invalid={!!directorError}
+                      invalidMessage={directorError}
+                      value={director}
+                      dark={true}
+                    />
+                    <Input
+                      label="Trailer"
+                      placeholder="Insert trailer link"
+                      leadingIcon={<IoIosLink size={18} />}
+                      onChange={(e) => setTrailerLink(e.target.value)}
+                      invalid={!!trailerLinkError}
+                      invalidMessage="You should enter a trailer link."
+                      value={trailerLink}
+                      dark={true}
+                    />
+                  </div>
+
+                  <TextArea
+                    label="Your Message"
+                    placeholder="Write synopsis"
+                    value={synopsis}
+                    onChange={(e) => setSynopsis(e.target.value)}
+                    invalid={!!synopsisError}
+                    invalidMessage="You should enter a synopsis."
+                  />
+                </div>
+
+                <div className="d-flex align-items-center justify-content-between mt-5">
+                  <p className="back-button">Back</p>
+                  <div className="d-flex gap-3">
+                    <button
+                      className="btn flex-grow-1 button-secondary"
+                      onClick={handleDraft}
+                    >
+                      Save to Drafts
+                    </button>
+                    <button
+                      className="btn flex-grow-1 button-primary"
+                      onClick={handleContinue}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {currentFlow === "addMovie" && movieCreationStep === 2 && (
+              <>
+                <div className="d-flex justify-content-between align-items-center">
+                  <h5>Add New Movie</h5>
+                  <div className="rounded p-2 primary-border">
+                    <IoMdClose
+                      size={24}
+                      className="primary-red"
+                      onClick={() => setCurrentFlow("default")}
+                    />
+                  </div>
+                </div>
+
+                <Roadmap step={2} />
+
+                <div className="d-flex justify-content-evenly mt-5 w-100 p-2 gap-5">
+                  <div className="w-100">
+                    <div className="d-flex justify-content-between">
+                      <h6>Writers</h6>
+                      {writersData ? (
+                        <FaTrashAlt
+                          className="primary-red"
+                          onClick={() => handleClearData("writers")}
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    <div className="border p-5 rounded-3">
+                      {!writersData ? (
+                        <label
+                          htmlFor="upload-writers"
+                          className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                        >
+                          <FaPlus /> Upload Writers via CSV
+                        </label>
+                      ) : (
+                        <div className="d-flex justify-content-between">
+                          {writersData.map((writer, index) => (
+                            <p key={index} className="mt-1 mx-3">
+                              {writer}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => handleFileChange(e, "writers")}
+                        style={{ display: "none" }}
+                        id="upload-writers"
+                        ref={writersFileInputRef}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-100">
+                    <div className="d-flex justify-content-between">
+                      <h6>Cast</h6>
+                      {castData ? (
+                        <FaTrashAlt
+                          className="primary-red"
+                          onClick={() => handleClearData("cast")}
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    <div className="border p-5 rounded-3">
+                      {!castData ? (
+                        <label
+                          htmlFor="upload-cast"
+                          className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                        >
+                          <FaPlus /> Upload Cast via CSV
+                        </label>
+                      ) : (
+                        <div className="d-flex justify-content-between">
+                          {castData.map((cast, index) => (
+                            <div key={index}>
+                              <p className="mx-2">
+                                {cast.realName}
+                                <br />
+                                <span className="cast-role-text">
+                                  {cast.role}
+                                </span>
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => handleFileChange(e, "cast")}
+                        style={{ display: "none" }}
+                        id="upload-cast"
+                        ref={castFileInputRef}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {writersError && (
+                  <p className="text-danger text-center mt-2">{writersError}</p>
+                )}
+                {castError && (
+                  <p className="text-danger text-center">{castError}</p>
+                )}
+                <div className="w-100 p-2">
+                  <h6>Upload Photos</h6>
+                  <div className="border p-5 rounded-3">
+                    {movieImages.length > 0 ? (
+                      <div className="mt-3 d-flex flex-wrap gap-3 justify-content-center">
+                        {[
+                          ...movieImages,
+                          ...Array(4 - movieImages.length).fill(null),
+                        ].map((image, index) => (
+                          <div key={index}>
+                            <div
+                              style={{
+                                position: "relative",
+                                display: "inline-block",
+                              }}
+                            >
+                              <img
+                                src={
+                                  image?.url
+                                    ? image.url
+                                    : image?.file
+                                    ? URL.createObjectURL(image.file)
+                                    : placeholderImage
+                                }
+                                alt={`Preview ${index + 1}`}
+                                style={{
+                                  width: "300px",
+                                  height: "300px",
+                                  objectFit: "cover",
+                                  marginBottom: "10px",
+                                  cursor: "pointer",
+                                  borderRadius: "24px",
+                                }}
+                                onClick={() =>
+                                  document
+                                    .getElementById(`image-upload-${index}`)
+                                    .click()
+                                }
+                                className="border"
+                              />
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  bottom: 10,
+                                  left: 0,
+                                  width: "100%",
+                                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                  color: "white",
+                                  textAlign: "center",
+                                  padding: "5px",
+                                  fontSize: "14px",
+                                  borderBottomLeftRadius: "24px",
+                                  borderBottomRightRadius: "24px",
+                                }}
+                              >
+                                Upload Photo
+                              </div>
+                            </div>
+
+                            <div className="d-flex justify-content-between mt-3">
+                              <div className="d-flex align-items-center gap-2">
+                                <input
+                                  type="radio"
+                                  id={`image-${index}`}
+                                  name="selected-image"
+                                  checked={selectedImageIndex === index}
+                                  onChange={() => setSelectedImageIndex(index)}
+                                  style={{ accentColor: "#b22222" }}
+                                />
+                                <label
+                                  htmlFor={`image-${index}`}
+                                  className="fw-bold"
+                                >
+                                  Cover Photo
+                                </label>
+                              </div>
+                              <FaTrashAlt
+                                className="primary-red pointer"
+                                onClick={() => handleDeleteImage(index)}
+                              />
+                            </div>
+
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageChange(e, index)}
+                              style={{ display: "none" }}
+                              id={`image-upload-${index}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <>
+                        <label
+                          htmlFor="upload-image"
+                          className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold pointer"
+                        >
+                          <FaPlus /> Upload Image
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          style={{ display: "none" }}
+                          id="upload-image"
+                          multiple
+                        />
+                        <p className="text-center secondary-text">
+                          or just drag and drop
+                        </p>
+                        <p className="text-center secondary-text">
+                          * Add 4 photos
+                        </p>
+                      </>
                     )}
                   </div>
-                </>
-              ))}
-
-              <p
-                className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold mt-5 pointer"
-                onClick={handleAddProjection}
-              >
-                <FaPlus /> Add Projection
-              </p>
-
-              <div className="d-flex align-items-center justify-content-between mt-5 p-2">
-                <p
-                  className="back-button-available pointer"
-                  onClick={() => setMovieCreationStep(2)}
-                >
-                  Back
-                </p>
-                <div className="d-flex gap-3">
-                  <button
-                    className="btn flex-grow-1 button-secondary"
-                    onClick={handleDraft}
-                  >
-                    Save to Drafts
-                  </button>
-                  <button
-                    className="btn flex-grow-1 button-primary"
-                    onClick={handleContinue}
-                  >
-                    Add Movie
-                  </button>
+                  {imageError && (
+                    <p className="text-danger text-center mt-2">{imageError}</p>
+                  )}
+                  {selectedCoverPhotoError && (
+                    <p className="text-danger text-center">
+                      {selectedCoverPhotoError}
+                    </p>
+                  )}
                 </div>
-              </div>
-            </>
-          )}
-        </div>
+
+                <div className="d-flex align-items-center justify-content-between mt-5 p-2">
+                  <p
+                    className="back-button-available pointer"
+                    onClick={() => {
+                      setMovieCreationStep(1);
+                    }}
+                  >
+                    Back
+                  </p>
+                  <div className="d-flex gap-3">
+                    <button
+                      className="btn flex-grow-1 button-secondary"
+                      onClick={handleDraft}
+                    >
+                      Save to Drafts
+                    </button>
+                    <button
+                      className="btn flex-grow-1 button-primary"
+                      onClick={handleContinue}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {currentFlow === "addMovie" && movieCreationStep === 3 && (
+              <>
+                <div className="d-flex justify-content-between align-items-center">
+                  <h5>Add New Movie</h5>
+                  <div className="rounded p-2 primary-border">
+                    <IoMdClose
+                      size={24}
+                      className="primary-red"
+                      onClick={() => setCurrentFlow("default")}
+                    />
+                  </div>
+                </div>
+
+                <Roadmap step={3} />
+
+                {projections.map((projection, index) => (
+                  <>
+                    <div
+                      key={projection.id}
+                      className="d-flex w-100 gap-4 align-items-center"
+                    >
+                      <div className="w-100">
+                        <Dropdown
+                          icon={CiLocationOn}
+                          title={
+                            projection?.city ? projection.city : "Choose City"
+                          }
+                          options={cities}
+                          value={projection?.city || ""}
+                          onChange={(city) =>
+                            handleProjectionChange(index, "city", city)
+                          }
+                          invalid={!!cityError[index]}
+                          invalidMessage={cityError[index]}
+                        />
+                      </div>
+                      <div className="w-100">
+                        <Dropdown
+                          icon={CiLocationOn}
+                          title={
+                            projection?.venue
+                              ? projection.venue
+                              : "Choose Venue"
+                          }
+                          options={projection.venues.map((venue) => venue.name)}
+                          value={projection?.venue || ""}
+                          onChange={(venue) =>
+                            handleProjectionChange(index, "venue", venue)
+                          }
+                          invalid={!!venueError[index]}
+                          invalidMessage={venueError[index]}
+                        />
+                      </div>
+                      <div className="w-100">
+                        <TimePicker
+                          value={projection?.time || ""}
+                          onChange={(time) =>
+                            handleProjectionChange(index, "time", time)
+                          }
+                          placeholder={
+                            projection?.time
+                              ? projection.time.toString().slice(0, 5)
+                              : "Choose Time"
+                          }
+                        />
+                      </div>
+                      <FaTrashAlt
+                        size={36}
+                        className={`primary-red pointer mt-3 ${
+                          projections.length === 1 ? "disabled" : ""
+                        }`}
+                        onClick={() =>
+                          projections.length > 1 &&
+                          handleRemoveProjection(projection.id)
+                        }
+                      />
+                    </div>
+                    <div>
+                      {!!duplicateError && (
+                        <p className="text-danger text-center mt-2">
+                          {duplicateError[index]}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                ))}
+
+                <p
+                  className="d-flex align-items-center justify-content-center primary-red text-decoration-underline gap-1 fw-bold mt-5 pointer"
+                  onClick={handleAddProjection}
+                >
+                  <FaPlus /> Add Projection
+                </p>
+
+                <div className="d-flex align-items-center justify-content-between mt-5 p-2">
+                  <p
+                    className="back-button-available pointer"
+                    onClick={() => setMovieCreationStep(2)}
+                  >
+                    Back
+                  </p>
+                  <div className="d-flex gap-3">
+                    <button
+                      className="btn flex-grow-1 button-secondary"
+                      onClick={handleDraft}
+                    >
+                      Save to Drafts
+                    </button>
+                    <button
+                      className="btn flex-grow-1 button-primary"
+                      onClick={handleContinue}
+                    >
+                      Add Movie
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        {selectedOption === "venue" && (
+          <div className="col-10 primary-background p-4">
+            {currentFlow === "default_venue" && (
+              <>
+                <div className="d-flex justify-content-between border-bottom pb-4">
+                  <h5>Venues ({venues.totalSize})</h5>
+                  {activeTab === "drafts" && movies.length && (
+                    <Button className="btn button-primary" variant="danger">
+                      Add Venue
+                    </Button>
+                  )}
+                </div>
+                <div className="mt-4 grid-container">
+                  {venues.venues.map((venue) => (
+                    <Card
+                      key={venue.id}
+                      title={venue.name}
+                      subtitle={`${venue.street} ${venue.streetNo}, ${venue.city}`}
+                      imageUrl={venue.photoImageId.url}
+                    />
+                  ))}
+                </div>
+                <p className="text-center primary-red my-4 fw-bold text-decoration-underline fs-6">
+                  Load more
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
