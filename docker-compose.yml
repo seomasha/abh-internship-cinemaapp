@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: cinema_app
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/cinema_app.sql:/docker-entrypoint-initdb.d/cinema_app.sql
+      - ./db/:/docker-entrypoint-initdb.d/
     healthcheck: 
       test: ["CMD-SHELL", "pg_isready -U postgres"] 
       interval: 10s 
