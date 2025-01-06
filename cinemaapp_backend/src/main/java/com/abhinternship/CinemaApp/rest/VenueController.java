@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.rest;
 
 import com.abhinternship.CinemaApp.dto.VenueDTO;
+import com.abhinternship.CinemaApp.dto.VenueUpdateDTO;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.service.VenueService;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
@@ -75,8 +76,9 @@ public class VenueController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Venue> updateVenue(@PathVariable Long id, @RequestParam Long photoImageId) {
-        final Venue venue = venueService.updateVenueImage(id, photoImageId);
-        return ResponseEntity.ok(venue);
+    public ResponseEntity<Venue> updateVenue(@PathVariable Long id, @RequestBody VenueUpdateDTO venueUpdateDTO) {
+        final Venue updatedVenue = venueService.updateVenue(id, venueUpdateDTO);
+        return ResponseEntity.ok(updatedVenue);
     }
+
 }

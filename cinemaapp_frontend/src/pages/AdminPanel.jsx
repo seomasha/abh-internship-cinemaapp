@@ -508,7 +508,7 @@ const AdminPanel = () => {
     return isValid;
   };
 
-  const validateVenueCreation = () => {
+  const validateVenueFields = () => {
     let isValid = true;
 
     const validationRules = [
@@ -742,7 +742,7 @@ const AdminPanel = () => {
   };
 
   const handleAddVenue = async () => {
-    if (!validateVenueCreation()) return;
+    if (!validateVenueFields()) return;
 
     setVenueLoading(true);
 
@@ -765,8 +765,20 @@ const AdminPanel = () => {
       "multipart/form-data"
     );
 
-    if (photoImageId && venue.id)
-      await venueService.updateVenueImage(venue.id, photoImageId);
+    const updatedData = {
+      venue: {
+        name: venueName,
+        phoneNo: venuePhone,
+        street: venueStreet,
+        streetNo: venueStreetNumber,
+        city: venueCity,
+      },
+      photoImageId: photoImageId,
+    };
+
+    if (photoImageId && venue.id) {
+      await venueService.updateVenue(venue.id, updatedData);
+    }
 
     window.location.reload();
   };
@@ -836,6 +848,36 @@ const AdminPanel = () => {
     const response = await venueService.deleteByID(selectedVenue.id);
 
     if (response) window.location.reload();
+  };
+
+  const handleEditVenue = async () => {
+    if (!validateVenueFields()) return;
+
+    const formData = new FormData();
+    formData.append("files", venueImageFile);
+    formData.append("entityId", selectedVenue.id);
+    formData.append("entityType", "venue");
+    formData.append("role", "poster");
+
+    const photoImageId = await photoService.create(
+      formData,
+      "multipart/form-data"
+    );
+
+    const updatedData = {
+      venue: {
+        name: venueName,
+        phoneNo: venuePhone,
+        street: venueStreet,
+        streetNo: venueStreetNumber,
+        city: venueCity,
+      },
+      photoImageId: photoImageId,
+    };
+
+    await venueService.updateVenue(selectedVenue.id, updatedData);
+
+    window.location.reload();
   };
 
   return (
@@ -1734,6 +1776,7 @@ const AdminPanel = () => {
                 )}
               </>
             )}
+            {console.log(selectedVenue)}
             {currentFlow === "seeVenue" && (
               <>
                 <div className="d-flex justify-content-between border-bottom pb-4">
@@ -1743,7 +1786,15 @@ const AdminPanel = () => {
                     <Button
                       className="btn button-primary"
                       variant="danger"
-                      onClick={() => setCurrentFlow("editVenue")}
+                      onClick={() => {
+                        setVenueName(selectedVenue.name);
+                        setVenuePhone(selectedVenue.phoneNo);
+                        setVenueStreet(selectedVenue.street);
+                        setVenueStreetNumber(selectedVenue.streetNo);
+                        setVenueCity(selectedVenue.city);
+                        setVenueImage(selectedVenue.photoImageId.url);
+                        setCurrentFlow("editVenue");
+                      }}
                     >
                       Edit Venue
                     </Button>
@@ -1849,36 +1900,51 @@ const AdminPanel = () => {
                       display: "inline-block",
                     }}
                   >
-                    <img
-                      src={selectedVenue.photoImageId.url}
-                      style={{
-                        width: "300px",
-                        height: "300px",
-                        objectFit: "cover",
-                        marginBottom: "10px",
-                        cursor: "pointer",
-                        borderRadius: "24px",
-                      }}
-                      className="border"
+                    <label htmlFor="image-upload" style={{ cursor: "pointer" }}>
+                      <img
+                        src={venueImage || placeholderImage}
+                        alt="Uploaded Preview"
+                        style={{
+                          width: "300px",
+                          height: "300px",
+                          objectFit: "cover",
+                          marginBottom: "10px",
+                          cursor: "pointer",
+                          borderRadius: "24px",
+                        }}
+                        className="border"
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 10,
+                          left: 0,
+                          width: "100%",
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          color: "white",
+                          textAlign: "center",
+                          padding: "5px",
+                          fontSize: "14px",
+                          borderBottomLeftRadius: "24px",
+                          borderBottomRightRadius: "24px",
+                        }}
+                      >
+                        Upload Photo
+                      </div>
+                    </label>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={handleVenueImage}
                     />
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 10,
-                        left: 0,
-                        width: "100%",
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        color: "white",
-                        textAlign: "center",
-                        padding: "5px",
-                        fontSize: "14px",
-                        borderBottomLeftRadius: "24px",
-                        borderBottomRightRadius: "24px",
-                      }}
-                    >
-                      Upload Photo
-                    </div>
                   </div>
+                  {!!venueImageError && (
+                    <p className="text-danger text-center">
+                      You should add an image.
+                    </p>
+                  )}
                 </div>
                 <div className="mt-4">
                   <div className="d-flex gap-4">
@@ -1887,14 +1953,20 @@ const AdminPanel = () => {
                       placeholder="Venue"
                       leadingIcon={<FaRegBuilding size={18} />}
                       dark={true}
-                      value={selectedVenue.name}
+                      value={venueName}
+                      onChange={(e) => setVenueName(e.target.value)}
+                      invalid={!!venueNameError}
+                      invalidMessage={venueNameError}
                     />
                     <Input
                       label="Phone"
                       placeholder="Phone"
                       leadingIcon={<FiPhone size={18} />}
                       dark={true}
-                      value={selectedVenue.phoneNo}
+                      value={venuePhone}
+                      onChange={(e) => setVenuePhone(e.target.value)}
+                      invalid={!!venuePhoneError}
+                      invalidMessage={venuePhoneError}
                     />
                   </div>
                   <div className="d-flex gap-4">
@@ -1903,14 +1975,20 @@ const AdminPanel = () => {
                       placeholder="Street"
                       leadingIcon={<CiLocationOn size={18} />}
                       dark={true}
-                      value={selectedVenue.street}
+                      value={venueStreet}
+                      onChange={(e) => setVenueStreet(e.target.value)}
+                      invalid={!!venueStreetError}
+                      invalidMessage={venueStreetError}
                     />
                     <Input
                       label="Street Number"
                       placeholder="Street Number"
                       leadingIcon={<GoHash size={18} />}
                       dark={true}
-                      value={selectedVenue.streetNo}
+                      value={venueStreetNumber}
+                      onChange={(e) => setVenueStreetNumber(e.target.value)}
+                      invalid={!!venueStreetNumberError}
+                      invalidMessage={venueStreetNumberError}
                     />
                   </div>
                   <Input
@@ -1918,7 +1996,10 @@ const AdminPanel = () => {
                     placeholder="City"
                     leadingIcon={<CiLocationOn size={18} />}
                     dark={true}
-                    value={selectedVenue.city}
+                    value={venueCity}
+                    onChange={(e) => setVenueCity(e.target.value)}
+                    invalid={!!venueCityError}
+                    invalidMessage={venueCityError}
                   />
                   <div className="d-flex justify-content-end gap-3">
                     <button
@@ -1927,7 +2008,12 @@ const AdminPanel = () => {
                     >
                       Cancel
                     </button>
-                    <button className="btn button-primary">Save Changes</button>
+                    <button
+                      className="btn button-primary"
+                      onClick={handleEditVenue}
+                    >
+                      Save Changes
+                    </button>
                   </div>
                 </div>
               </>

@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.VenueDTO;
+import com.abhinternship.CinemaApp.dto.VenueUpdateDTO;
 import com.abhinternship.CinemaApp.model.Venue;
 import org.springframework.data.domain.Page;
 
@@ -18,5 +19,5 @@ public interface VenueService {
     List<Venue> findVenuesByCity(String city);
     Venue findVenueByName(String name);
     List<String> findVenueByMovieName(String name);
-    Venue updateVenueImage(Long id, Long photoId);
+    Venue updateVenue(Long id, VenueUpdateDTO venueUpdateDTO);
 }

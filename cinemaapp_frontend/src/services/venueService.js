@@ -34,20 +34,18 @@ export const venueService = {
     );
     return response;
   },
-  updateVenueImage: async (id, image) => {
-    const response = await request(
-      `${VENUE_ENDPOINT}/${id}?photoImageId=${image}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+  updateVenue: async (id, data) => {
+    const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: data,
+    });
     return response;
   },
-    deleteByID: async (id) => {
-      const response = await request(`${VENUE_ENDPOINT}/${id}`, {
-        method: "DELETE",
-      });
-      return response;
-    },
+  deleteByID: async (id) => {
+    const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+      method: "DELETE",
+    });
+    return response;
+  },
 };

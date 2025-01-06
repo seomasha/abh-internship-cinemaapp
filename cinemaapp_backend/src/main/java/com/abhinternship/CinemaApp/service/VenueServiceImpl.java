@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.VenueDTO;
+import com.abhinternship.CinemaApp.dto.VenueUpdateDTO;
 import com.abhinternship.CinemaApp.model.Photo;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.repository.PhotoRepository;
@@ -78,11 +79,36 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public Venue updateVenueImage(final Long id, final Long photoId) {
+    public Venue updateVenue(final Long id, final VenueUpdateDTO venueUpdateDTO) {
+        final Venue updatedVenue = venueUpdateDTO.getVenue();
+        final long photoImageId = venueUpdateDTO.getPhotoImageId();
+
         return venueRepository.findById(id).map(existingVenue -> {
-            final Photo photo = photoRepository.findById(photoId)
-                    .orElseThrow(() -> new IllegalArgumentException("Photo not found with id: " + photoId));
-            existingVenue.setPhotoImageId(photo);
+            if (updatedVenue.getName() != null) {
+                existingVenue.setName(updatedVenue.getName());
+            }
+
+            if (updatedVenue.getPhoneNo() != null) {
+                existingVenue.setPhoneNo(updatedVenue.getPhoneNo());
+            }
+
+            if (updatedVenue.getStreet() != null) {
+                existingVenue.setStreet(updatedVenue.getStreet());
+            }
+
+            if (updatedVenue.getStreetNo() != 0) {
+                existingVenue.setStreetNo(updatedVenue.getStreetNo());
+            }
+
+            if (updatedVenue.getCity() != null) {
+                existingVenue.setCity(updatedVenue.getCity());
+            }
+
+            if (photoImageId != 0) {
+                final Photo photo = photoRepository.findById(photoImageId)
+                        .orElseThrow(() -> new IllegalArgumentException("Photo not found with id: " + photoImageId));
+                existingVenue.setPhotoImageId(photo);
+            }
 
             return venueRepository.save(existingVenue);
         }).orElseThrow(() -> new IllegalArgumentException("Venue not found with id: " + id));
