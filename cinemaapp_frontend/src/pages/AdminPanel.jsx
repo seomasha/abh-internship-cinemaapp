@@ -88,7 +88,7 @@ const AdminPanel = () => {
 
   // Venues
 
-  const [venues, setVenues] = useState([]);
+  const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
   const [selectedVenue, setSelectedVenue] = useState(0);
 
   const [venueName, setVenueName] = useState("");
@@ -107,6 +107,8 @@ const AdminPanel = () => {
   const [venueCityError, setVenueCityError] = useState("");
 
   const [venueLoading, setVenueLoading] = useState(false);
+  const [venuePage, setVenuePage] = useState(0);
+  const venuePageSize = 6;
 
   useEffect(() => {
     const getDraftMovies = async () => {
@@ -152,12 +154,21 @@ const AdminPanel = () => {
 
   useEffect(() => {
     const getAllVenues = async () => {
-      const response = await venueService.getAll(0, 6);
-      setVenues({ venues: response.venues, totalSize: response.totalSize });
+      const response = await venueService.getAll(venuePage, venuePageSize);
+      setVenues((prev) => {
+        if (venuePage === 0) {
+          return { venues: response.venues, totalSize: response.totalSize };
+        } else {
+          return {
+            venues: [...prev.venues, ...response.venues],
+            totalSize: response.totalSize,
+          };
+        }
+      });
     };
 
     getAllVenues();
-  }, []);
+  }, [venuePage, venuePageSize]);
 
   useEffect(() => {
     const getSelectedMovie = async () => {
@@ -815,6 +826,8 @@ const AdminPanel = () => {
   const publishMovies = async () => {
     await movieService.updateMovies(checkedMovies, "published");
   };
+
+  const hasMorePages = venues.totalSize > (venuePage + 1) * venuePageSize;
 
   return (
     <div>
@@ -1560,9 +1573,14 @@ const AdminPanel = () => {
                     />
                   ))}
                 </div>
-                <p className="text-center primary-red my-4 fw-bold text-decoration-underline fs-6">
-                  Load more
-                </p>
+                {hasMorePages && (
+                  <p
+                    className="text-center primary-red my-4 fw-bold text-decoration-underline fs-6"
+                    onClick={() => setVenuePage((prev) => prev + 1)}
+                  >
+                    Load more
+                  </p>
+                )}
               </>
             )}
             {currentFlow === "addVenue" && (
