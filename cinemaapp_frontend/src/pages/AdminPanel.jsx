@@ -836,10 +836,12 @@ const AdminPanel = () => {
 
   const archiveMovies = async () => {
     await movieService.updateMovies(checkedMovies, "archived");
+    window.location.reload();
   };
 
   const publishMovies = async () => {
     await movieService.updateMovies(checkedMovies, "published");
+    window.location.reload();
   };
 
   const hasMorePages = venues.totalSize > (venuePage + 1) * venuePageSize;
