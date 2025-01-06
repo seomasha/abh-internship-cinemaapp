@@ -44,4 +44,10 @@ export const venueService = {
     );
     return response;
   },
+    deleteByID: async (id) => {
+      const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+        method: "DELETE",
+      });
+      return response;
+    },
 };

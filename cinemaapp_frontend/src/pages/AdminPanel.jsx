@@ -28,6 +28,7 @@ import { projectionService } from "../services/projectionService.js";
 import { genreService } from "../services/genreService.js";
 import { TimePicker } from "rsuite";
 import { FiPhone } from "react-icons/fi";
+import { Modal } from "react-bootstrap";
 
 const AdminPanel = () => {
   const [selectedOption, setSelectedOption] = useState("movie");
@@ -109,6 +110,8 @@ const AdminPanel = () => {
   const [venueLoading, setVenueLoading] = useState(false);
   const [venuePage, setVenuePage] = useState(0);
   const venuePageSize = 6;
+
+  const [deleteVenueModal, setDeleteVenueModal] = useState(false);
 
   useEffect(() => {
     const getDraftMovies = async () => {
@@ -828,6 +831,12 @@ const AdminPanel = () => {
   };
 
   const hasMorePages = venues.totalSize > (venuePage + 1) * venuePageSize;
+
+  const handleDeleteVenue = async () => {
+    const response = await venueService.deleteByID(selectedVenue.id);
+
+    if (response) window.location.reload();
+  };
 
   return (
     <div>
@@ -1828,7 +1837,7 @@ const AdminPanel = () => {
 
                   <p
                     className="primary-red fs-6 text-decoration-underline pointer"
-                    onClick={() => setCurrentFlow("editVenue")}
+                    onClick={() => setDeleteVenueModal(true)}
                   >
                     Delete Venue
                   </p>
@@ -1926,6 +1935,31 @@ const AdminPanel = () => {
           </div>
         )}
       </div>
+
+      <Modal show={deleteVenueModal} onHide={() => setDeleteVenueModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete venue</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the venue{" "}
+          <span className="fw-bold primary-red">{selectedVenue.name}</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-danger"
+            onClick={() => setDeleteVenueModal(false)}
+          >
+            Close
+          </Button>
+          <Button
+            variant="danger"
+            className="btn button-primary"
+            onClick={handleDeleteVenue}
+          >
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
