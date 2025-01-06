@@ -25,7 +25,7 @@ public class PhotoController {
     ) throws IOException {
         if(!photos.isEmpty()) {
             if ("venue".equalsIgnoreCase(entityType)) {
-                Long photoId = photoService.savePhotoAndReturnId(photos.get(0), entityId, entityType, role);
+                final Long photoId = photoService.savePhotoAndReturnId(photos.get(0), entityId, entityType, role);
                 return ResponseEntity.status(HttpStatus.CREATED).body(photoId);
             }
 
