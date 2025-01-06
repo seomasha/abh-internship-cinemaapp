@@ -31,30 +31,45 @@ public class PhotoServiceImpl implements PhotoService {
                           final String entityType,
                           final String role) throws IOException {
         for (MultipartFile file : photos) {
-            final String fileName = file.getOriginalFilename();
-
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(BUCKET_NAME)
-                            .object(fileName)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
-
-
-            final Photo photo = new Photo();
-            photo.setUrl(minioURL + "/" +
-                    BUCKET_NAME +
-                    "/objects/download?preview=true&prefix=" +
-                    fileName + "&version_id=null");
-            photo.setType(file.getContentType());
-            photo.setEntityId(entityId);
-            photo.setEntityType(entityType);
-            photo.setRole(role);
-
-            photoRepository.save(photo);
+            saveSinglePhoto(file, entityId, entityType, role);
         }
+    }
+
+    @SneakyThrows
+    public Long savePhotoAndReturnId(final MultipartFile photo,
+                                     final Long entityId,
+                                     final String entityType,
+                                     final String role) throws IOException {
+        return saveSinglePhoto(photo, entityId, entityType, role).getId();
+    }
+
+    @SneakyThrows
+    private Photo saveSinglePhoto(final MultipartFile file,
+                                  final Long entityId,
+                                  final String entityType,
+                                  final String role) throws IOException {
+        final String fileName = file.getOriginalFilename();
+
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(BUCKET_NAME)
+                        .object(fileName)
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .contentType(file.getContentType())
+                        .build()
+        );
+
+        final Photo photo = new Photo();
+        photo.setUrl(minioURL + "/" +
+                BUCKET_NAME +
+                "/objects/download?preview=true&prefix=" +
+                fileName + "&version_id=null");
+        photo.setType(file.getContentType());
+        photo.setEntityId(entityId);
+        photo.setEntityType(entityType);
+        photo.setRole(role);
+
+        return photoRepository.save(photo);
     }
 
     @Override

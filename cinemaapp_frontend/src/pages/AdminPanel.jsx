@@ -11,7 +11,7 @@ import { CiLocationOn, CiClock2, CiCalendar } from "react-icons/ci";
 import { Md18UpRating } from "react-icons/md";
 import { GoHash, GoPerson } from "react-icons/go";
 import { IoIosLink } from "react-icons/io";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import Input from "../components/Input";
 import TextArea from "../components/TextArea.jsx";
 import Dropdown from "../components/Dropdown.jsx";
@@ -92,7 +92,8 @@ const AdminPanel = () => {
   const [selectedVenue, setSelectedVenue] = useState(0);
 
   const [venueName, setVenueName] = useState("");
-  const [venueImage, setVenueImage] = useState("");
+  const [venueImage, setVenueImage] = useState(null);
+  const [venueImageFile, setVenueImageFile] = useState(null);
   const [venuePhone, setVenuePhone] = useState("");
   const [venueStreet, setVenueStreet] = useState("");
   const [venueStreetNumber, setVenueStreetNumber] = useState("");
@@ -104,6 +105,8 @@ const AdminPanel = () => {
   const [venueStreetError, setVenueStreetError] = useState("");
   const [venueStreetNumberError, setVenueStreetNumberError] = useState("");
   const [venueCityError, setVenueCityError] = useState("");
+
+  const [venueLoading, setVenueLoading] = useState(false);
 
   useEffect(() => {
     const getDraftMovies = async () => {
@@ -251,6 +254,7 @@ const AdminPanel = () => {
   const handleVenueImage = (event) => {
     const file = event.target.files[0];
     if (file) {
+      setVenueImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setVenueImage(reader.result);
@@ -720,6 +724,36 @@ const AdminPanel = () => {
     setCurrentFlow("default");
     setMovieCreationStep(1);
     resetFields();
+    window.location.reload();
+  };
+
+  const handleAddVenue = async () => {
+    if (!validateVenueCreation()) return;
+
+    setVenueLoading(true);
+
+    const venue = await venueService.create({
+      name: venueName,
+      phoneNo: venuePhone,
+      street: venueStreet,
+      streetNo: venueStreetNumber,
+      city: venueCity,
+    });
+
+    const formData = new FormData();
+    formData.append("files", venueImageFile);
+    formData.append("entityId", venue.id);
+    formData.append("entityType", "venue");
+    formData.append("role", "poster");
+
+    const photoImageId = await photoService.create(
+      formData,
+      "multipart/form-data"
+    );
+
+    if (photoImageId && venue.id)
+      await venueService.updateVenueImage(venue.id, photoImageId);
+
     window.location.reload();
   };
 
@@ -1504,7 +1538,10 @@ const AdminPanel = () => {
                   <Button
                     className="btn button-primary"
                     variant="danger"
-                    onClick={() => setCurrentFlow("addVenue")}
+                    onClick={() => {
+                      setVenueLoading(false);
+                      setCurrentFlow("addVenue");
+                    }}
                   >
                     Add Venue
                   </Button>
@@ -1530,130 +1567,144 @@ const AdminPanel = () => {
             )}
             {currentFlow === "addVenue" && (
               <>
-                <div className="d-flex border-bottom pb-4">
-                  <h5>New Venue</h5>
-                </div>
-                <div className="text-center mt-4 pb-4 border-bottom">
-                  <div
-                    style={{ position: "relative", display: "inline-block" }}
-                  >
-                    <label htmlFor="image-upload" style={{ cursor: "pointer" }}>
-                      <img
-                        src={venueImage || placeholderImage}
-                        alt="Uploaded Preview"
-                        style={{
-                          width: "300px",
-                          height: "300px",
-                          objectFit: "cover",
-                          marginBottom: "10px",
-                          cursor: "pointer",
-                          borderRadius: "24px",
-                        }}
-                        className="border"
-                      />
+                {venueLoading ? (
+                  <div className="d-flex justify-content-center align-items-middle">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <>
+                    <div className="d-flex border-bottom pb-4">
+                      <h5>New Venue</h5>
+                    </div>
+                    <div className="text-center mt-4 pb-4 border-bottom">
                       <div
                         style={{
-                          position: "absolute",
-                          bottom: 10,
-                          left: 0,
-                          width: "100%",
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                          color: "white",
-                          textAlign: "center",
-                          padding: "5px",
-                          fontSize: "14px",
-                          borderBottomLeftRadius: "24px",
-                          borderBottomRightRadius: "24px",
+                          position: "relative",
+                          display: "inline-block",
                         }}
                       >
-                        Upload Photo
+                        <label
+                          htmlFor="image-upload"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <img
+                            src={venueImage || placeholderImage}
+                            alt="Uploaded Preview"
+                            style={{
+                              width: "300px",
+                              height: "300px",
+                              objectFit: "cover",
+                              marginBottom: "10px",
+                              cursor: "pointer",
+                              borderRadius: "24px",
+                            }}
+                            className="border"
+                          />
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: 10,
+                              left: 0,
+                              width: "100%",
+                              backgroundColor: "rgba(0, 0, 0, 0.5)",
+                              color: "white",
+                              textAlign: "center",
+                              padding: "5px",
+                              fontSize: "14px",
+                              borderBottomLeftRadius: "24px",
+                              borderBottomRightRadius: "24px",
+                            }}
+                          >
+                            Upload Photo
+                          </div>
+                        </label>
+                        <input
+                          id="image-upload"
+                          type="file"
+                          accept="image/*"
+                          style={{ display: "none" }}
+                          onChange={handleVenueImage}
+                        />
                       </div>
-                    </label>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleVenueImage}
-                    />
-                  </div>
-                  {!!venueImageError && (
-                    <p className="text-center text-danger">
-                      You should upload an image.
-                    </p>
-                  )}
-                </div>
+                      {!!venueImageError && (
+                        <p className="text-center text-danger">
+                          You should upload an image.
+                        </p>
+                      )}
+                    </div>
 
-                <div className="mt-4">
-                  <div className="d-flex gap-4">
-                    <Input
-                      label="Venue Name"
-                      value={venueName}
-                      placeholder="Venue"
-                      leadingIcon={<FaRegBuilding size={18} />}
-                      dark={true}
-                      invalid={!!venueNameError}
-                      invalidMessage={venueNameError}
-                      onChange={(e) => setVenueName(e.target.value)}
-                    />
-                    <Input
-                      label="Phone"
-                      value={venuePhone}
-                      placeholder="Phone"
-                      leadingIcon={<FiPhone size={18} />}
-                      dark={true}
-                      invalid={!!venuePhoneError}
-                      invalidMessage={venuePhoneError}
-                      onChange={(e) => setVenuePhone(e.target.value)}
-                    />
-                  </div>
-                  <div className="d-flex gap-4">
-                    <Input
-                      label="Street"
-                      value={venueStreet}
-                      placeholder="Street"
-                      leadingIcon={<CiLocationOn size={18} />}
-                      dark={true}
-                      invalid={!!venueStreetError}
-                      invalidMessage={venueStreetError}
-                      onChange={(e) => setVenueStreet(e.target.value)}
-                    />
-                    <Input
-                      label="Street Number"
-                      value={venueStreetNumber}
-                      placeholder="Street Number"
-                      leadingIcon={<GoHash size={18} />}
-                      dark={true}
-                      invalid={!!venueStreetNumberError}
-                      invalidMessage={venueStreetNumberError}
-                      onChange={(e) => setVenueStreetNumber(e.target.value)}
-                    />
-                  </div>
-                  <Input
-                    label="City"
-                    value={venueCity}
-                    placeholder="City"
-                    leadingIcon={<CiLocationOn size={18} />}
-                    dark={true}
-                    invalid={!!venueCityError}
-                    invalidMessage={venueCityError}
-                    onChange={(e) => setVenueCity(e.target.value)}
-                  />
-                  <div className="d-flex justify-content-end gap-3">
-                    <button
-                      className="btn button-secondary"
-                      onClick={() => setCurrentFlow("default_venue")}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="btn button-primary"
-                      onClick={() => validateVenueCreation()}
-                    >
-                      Add Venue
-                    </button>
-                  </div>
-                </div>
+                    <div className="mt-4">
+                      <div className="d-flex gap-4">
+                        <Input
+                          label="Venue Name"
+                          value={venueName}
+                          placeholder="Venue"
+                          leadingIcon={<FaRegBuilding size={18} />}
+                          dark={true}
+                          invalid={!!venueNameError}
+                          invalidMessage={venueNameError}
+                          onChange={(e) => setVenueName(e.target.value)}
+                        />
+                        <Input
+                          label="Phone"
+                          value={venuePhone}
+                          placeholder="Phone"
+                          leadingIcon={<FiPhone size={18} />}
+                          dark={true}
+                          invalid={!!venuePhoneError}
+                          invalidMessage={venuePhoneError}
+                          onChange={(e) => setVenuePhone(e.target.value)}
+                        />
+                      </div>
+                      <div className="d-flex gap-4">
+                        <Input
+                          label="Street"
+                          value={venueStreet}
+                          placeholder="Street"
+                          leadingIcon={<CiLocationOn size={18} />}
+                          dark={true}
+                          invalid={!!venueStreetError}
+                          invalidMessage={venueStreetError}
+                          onChange={(e) => setVenueStreet(e.target.value)}
+                        />
+                        <Input
+                          label="Street Number"
+                          value={venueStreetNumber}
+                          placeholder="Street Number"
+                          leadingIcon={<GoHash size={18} />}
+                          dark={true}
+                          invalid={!!venueStreetNumberError}
+                          invalidMessage={venueStreetNumberError}
+                          onChange={(e) => setVenueStreetNumber(e.target.value)}
+                        />
+                      </div>
+                      <Input
+                        label="City"
+                        value={venueCity}
+                        placeholder="City"
+                        leadingIcon={<CiLocationOn size={18} />}
+                        dark={true}
+                        invalid={!!venueCityError}
+                        invalidMessage={venueCityError}
+                        onChange={(e) => setVenueCity(e.target.value)}
+                      />
+                      <div className="d-flex justify-content-end gap-3">
+                        <button
+                          className="btn button-secondary"
+                          onClick={() => setCurrentFlow("default_venue")}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className="btn button-primary"
+                          onClick={() => handleAddVenue()}
+                        >
+                          Add Venue
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             )}
             {currentFlow === "seeVenue" && (

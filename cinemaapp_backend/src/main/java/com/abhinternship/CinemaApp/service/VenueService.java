@@ -18,4 +18,5 @@ public interface VenueService {
     List<Venue> findVenuesByCity(String city);
     Venue findVenueByName(String name);
     List<String> findVenueByMovieName(String name);
+    Venue updateVenueImage(Long id, Long photoId);
 }

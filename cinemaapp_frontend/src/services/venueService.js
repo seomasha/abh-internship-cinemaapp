@@ -34,4 +34,14 @@ export const venueService = {
     );
     return response;
   },
+  updateVenueImage: async (id, image) => {
+    const response = await request(
+      `${VENUE_ENDPOINT}/${id}?photoImageId=${image}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    return response;
+  },
 };

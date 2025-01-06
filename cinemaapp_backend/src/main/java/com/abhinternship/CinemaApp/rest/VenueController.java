@@ -73,4 +73,10 @@ public class VenueController {
         venueService.deleteVenue(id);
         return ResponseEntity.ok("Venue with ID " + id + " was successfully deleted.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Venue> updateVenue(@PathVariable Long id, @RequestParam Long photoImageId) {
+        final Venue venue = venueService.updateVenueImage(id, photoImageId);
+        return ResponseEntity.ok(venue);
+    }
 }

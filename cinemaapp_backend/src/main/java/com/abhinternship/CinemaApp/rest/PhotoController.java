@@ -17,13 +17,18 @@ public class PhotoController {
     private final PhotoService photoService;
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<String> uploadPhoto(
+    public ResponseEntity<?> uploadPhoto(
             @RequestPart("files") List<MultipartFile> photos,
             @RequestParam("entityId") Long entityId,
             @RequestParam("entityType") String entityType,
             @RequestParam("role") String role
     ) throws IOException {
         if(!photos.isEmpty()) {
+            if ("venue".equalsIgnoreCase(entityType)) {
+                Long photoId = photoService.savePhotoAndReturnId(photos.get(0), entityId, entityType, role);
+                return ResponseEntity.status(HttpStatus.CREATED).body(photoId);
+            }
+
             photoService.savePhoto(photos, entityId, entityType, role);
             return ResponseEntity.status(HttpStatus.CREATED).body("Photo successfully uploaded.");
         }
