@@ -34,4 +34,18 @@ export const venueService = {
     );
     return response;
   },
+  updateVenue: async (id, data) => {
+    const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: data,
+    });
+    return response;
+  },
+  deleteByID: async (id) => {
+    const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+      method: "DELETE",
+    });
+    return response;
+  },
 };

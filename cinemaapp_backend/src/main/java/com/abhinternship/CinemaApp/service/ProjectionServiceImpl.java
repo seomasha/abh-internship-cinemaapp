@@ -63,8 +63,6 @@ public class ProjectionServiceImpl implements ProjectionService {
         }
     }
 
-
-
     @Override
     public void deleteProjection(final Long id) {
         projectionRepository.deleteById(id);
