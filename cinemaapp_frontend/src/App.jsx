@@ -19,8 +19,9 @@ import UpcomingMovies from "./pages/UpcomingMovies";
 import MovieDetails from "./pages/MovieDetails";
 import AdminPanel from "./pages/AdminPanel";
 import SeatAndTickets from "./pages/SeatAndTickets";
+import UserProfile from "./pages/UserProfile";
 
-import { NavBarProvider, useNavBar } from "./context/NavBarContext";
+import { NavBarProvider } from "./context/NavBarContext";
 import Checkout from "./pages/Checkout";
 
 import { loadStripe } from "@stripe/stripe-js";
@@ -50,6 +51,7 @@ function App() {
                 element={<ProtectedRoute successComponent={<AdminPanel />} />}
               />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/profile" element={<UserProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Elements>

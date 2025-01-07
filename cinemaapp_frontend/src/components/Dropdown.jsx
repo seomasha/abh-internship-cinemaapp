@@ -11,6 +11,7 @@ const Dropdown = ({
   fullWidth = false,
   invalid,
   invalidMessage,
+  large = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -46,7 +47,7 @@ const Dropdown = ({
       <div
         className={`dropdown-container ${
           invalid ? "border border-2 border-danger" : ""
-        }`}
+        } ${large && "py-3"}`}
         ref={dropdownRef}
         onClick={toggleDropdown}
       >
