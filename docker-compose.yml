@@ -1,0 +1,68 @@
+'version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: cinema_db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sonyxperiaM5
+      POSTGRES_DB: cinema_app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/:/docker-entrypoint-initdb.d/
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U postgres"] 
+      interval: 10s 
+      timeout: 5s
+      retries: 5
+
+
+  backend:
+    build:
+      context: ./cinemaapp_backend
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cinema_app
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sonyxperiaM5
+      SERVER_SERVLET_CONTEXT_PATH: /api/v1
+      FRONTEND_URL: http://localhost:8086
+      JWT_SECRET: secret
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: maseticsead@gmail.com
+      SPRING_MAIL_PASSWORD: tbpuymmkbchgwjqb
+      STRIPE_API_KEY: sk_test_51QScTjRpC9Rpg0FJXxnwd92NjdZGpxFfknWYNJQza4Ctj5rFljR8nA8VZFlHjUHfg9qURsXOg9Wy1Gw13fJtRaO300PwRBcZx6
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./cinemaapp_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8086:80"
+    environment:
+      VITE_BACKEND_URL: http://localhost:8083
+      VITE_API_PATH: /api/v1
+      VITE_OMDB_URL: http://www.omdbapi.com/
+      VITE_OMDB_API_KEY: 4e55ca79
+      VITE_STRIPE_PK: pk_test_51QScTjRpC9Rpg0FJ1LeZPuss8eqyzlxufSeAnfovPjHKkskVKGTZ1YE23AT25QOBu3cIjsV3eXvmkl8JuNdIjEjv00O2R04yBd
+      VITE_EXCHANGE_RATE_URL: https://v6.exchangerate-api.com/v6/
+      VITE_EXCHANGE_RATE_API_KEY: 186e81f982949940540633d6
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+
+
+
