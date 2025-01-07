@@ -1,37 +1,28 @@
 # Build stage
 FROM eclipse-temurin:17-jdk-jammy AS builder
-
-# Postavi radni direktorij
+# Set the working directory
 WORKDIR /app
-
-# Kopiraj Maven Wrapper direktorij, fajlove i postavi dozvole za izvršavanje
+# Copy Maven Wrapper directory and files
 COPY .mvn/ .mvn/
 COPY mvnw ./
 COPY pom.xml ./
-RUN chmod +x mvnw
-
-# Testiraj da li su fajlovi pravilno kopirani
+# Ensure the Maven wrapper has correct permissions and line endings
+RUN apt-get update && apt-get install -y dos2unix && \
+  dos2unix mvnw && chmod +x mvnw
+# Verify that the Maven wrapper files were copied correctly
 RUN ls -l .mvn/wrapper/
-
-# Preuzmi Maven dependencije (offline mod za ubrzanje)
+# Download Maven dependencies in offline mode for faster builds
 RUN ./mvnw dependency:go-offline -B
-
-# Kopiraj source kod aplikacije i buildaj aplikaciju
+# Copy the source code and build the application
 COPY src ./src
 RUN ./mvnw clean package -DskipTests
-
-
 # Runtime stage
 FROM eclipse-temurin:17-jre-jammy
-
-# Postavi radni direktorij za runtime
+# Set the working directory for runtime
 WORKDIR /app
-
-# Kopiraj buildani JAR fajl iz builder faze
+# Copy the built JAR file from the builder stage
 COPY --from=builder /app/target/*.jar app.jar
-
-# Izloži port 8080
+# Expose port 8080 for the application
 EXPOSE 8080
-
-# Pokreni aplikaciju
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
