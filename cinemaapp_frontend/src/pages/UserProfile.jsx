@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 
 import { Button } from "react-bootstrap";
+import TabButton from "../components/TabButton";
 import Input from "../components/Input";
 
 import { FaRegUser } from "react-icons/fa";
@@ -12,10 +13,11 @@ import { FiPhone } from "react-icons/fi";
 import { CiMail, CiLocationOn, CiSearch } from "react-icons/ci";
 import { BiWorld } from "react-icons/bi";
 import Dropdown from "../components/Dropdown";
-import Reservation from "../components/PendingReservation";
+import Reservation from "../components/Reservation";
 
 const UserProfile = () => {
   const [currentFlow, setCurrentFlow] = useState("personalInfo");
+  const [activeTab, setActiveTab] = useState("upcoming");
 
   const placeholderImage = "https://via.placeholder.com/300";
 
@@ -274,6 +276,39 @@ const UserProfile = () => {
                 <h4>Pending Reservations</h4>
               </div>
               <Reservation image={placeholderImage} />
+            </>
+          )}
+          {currentFlow === "projections" && (
+            <>
+              <div className="d-flex justify-content-between mx-5 pt-5 pb-3">
+                <h4>Projections</h4>
+              </div>
+              <div className="mt-3 border-bottom gap-5 d-flex mx-5">
+                <TabButton
+                  label={`Upcoming (1)`}
+                  isActive={activeTab === "upcoming"}
+                  onClick={() => {
+                    setActiveTab("upcoming");
+                  }}
+                />
+                <TabButton
+                  label={`Past (1)`}
+                  isActive={activeTab === "past"}
+                  onClick={() => {
+                    setActiveTab("past");
+                  }}
+                />
+              </div>
+              {activeTab === "upcoming" && (
+                <>
+                  <Reservation image={placeholderImage} upcoming />
+                </>
+              )}
+              {activeTab === "past" && (
+                <>
+                  <Reservation image={placeholderImage} past />
+                </>
+              )}
             </>
           )}
         </div>

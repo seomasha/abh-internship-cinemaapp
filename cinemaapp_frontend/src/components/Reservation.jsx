@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { CiCircleInfo } from "react-icons/ci";
 import { OverlayTrigger, Popover, Modal, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../styles/Reservation.css";
+import { FaBell } from "react-icons/fa";
 
-const Reservation = ({ image }) => {
+const Reservation = ({ image, upcoming = false, past = false }) => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [showModal, setShowModal] = useState(false);
 
@@ -14,7 +16,9 @@ const Reservation = ({ image }) => {
         className="rounded"
         style={{ backgroundColor: "#1D2939", color: "white" }}
       >
-        Reservation expires one hour before projection
+        {past
+          ? "Projection passed and more details are no longer available"
+          : "Reservation expires one hour before projection"}
       </Popover.Body>
     </Popover>
   );
@@ -28,24 +32,41 @@ const Reservation = ({ image }) => {
         <div className="d-flex justify-content-between mb-4">
           <h6>Avatar: The way of water</h6>
           <div className="d-flex align-items-center gap-2">
-            <OverlayTrigger
-              placement="top"
-              overlay={popover}
-              delay={{ show: 100, hide: 200 }}
-            >
-              <span>
-                <CiCircleInfo size={24} style={{ cursor: "pointer" }} />
-              </span>
-            </OverlayTrigger>
-            <h6 className="border rounded p-2">
-              {Math.floor(timeLeft / 60)
-                .toString()
-                .padStart(2, "0")}
-              :{(timeLeft % 60).toString().padStart(2, "0")}
-            </h6>
+            {!upcoming && (
+              <>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={popover}
+                  delay={{ show: 100, hide: 200 }}
+                >
+                  <span>
+                    <CiCircleInfo size={24} style={{ cursor: "pointer" }} />
+                  </span>
+                </OverlayTrigger>
+                {past ? (
+                  <p className="primary-red fw-bold">Projection passed</p>
+                ) : (
+                  <h6 className="border rounded p-2">
+                    {Math.floor(timeLeft / 60)
+                      .toString()
+                      .padStart(2, "0")}
+                    :{(timeLeft % 60).toString().padStart(2, "0")}
+                  </h6>
+                )}
+              </>
+            )}
+            {upcoming && (
+              <Button
+                className="bell"
+                variant="danger"
+                onClick={() => setShowModal(true)}
+              >
+                <FaBell size={16} className="primary-red" />
+              </Button>
+            )}
           </div>
         </div>
-        <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between gap-5">
           <div className="d-flex gap-3">
             <img src={image} height={150} width={150} className="rounded" />
             <div>
@@ -60,7 +81,10 @@ const Reservation = ({ image }) => {
               </p>
             </div>
           </div>
-          <div className="d-flex gap-5">
+          <div
+            className="d-flex gap-5"
+            style={{ marginRight: !upcoming && !past ? "0px" : "200px" }}
+          >
             <div>
               <h6>Seat(s) details</h6>
               <p className="mt-3">
@@ -73,29 +97,43 @@ const Reservation = ({ image }) => {
                 Total Price: <span className="fw-bold">24 KM</span>
               </p>
             </div>
-            <div>
-              <div className="d-flex flex-column gap-4">
-                <button className="btn button-primary py-2">Buy Ticket</button>
-                <button
-                  className="btn button-secondary py-2"
-                  onClick={handleShow}
-                >
-                  Cancel Reservation
-                </button>
+            {!upcoming && !past && (
+              <div>
+                <div className="d-flex flex-column gap-4">
+                  <button className="btn button-primary py-2">
+                    Buy Ticket
+                  </button>
+                  <button
+                    className="btn button-secondary py-2"
+                    onClick={handleShow}
+                  >
+                    Cancel Reservation
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header>
-          <Modal.Title className="fw-bold">Cancel Reservation</Modal.Title>
+          <Modal.Title className="fw-bold">
+            {upcoming ? "Reminder On" : "Cancel Reservation"}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body>Do you want to cancel your reservation?</Modal.Body>
+        <Modal.Body>
+          {upcoming
+            ? "We will remind you about movie projection one day before the show."
+            : "Do you want to cancel your reservation?"}
+        </Modal.Body>
         <Modal.Footer>
-          <button className="btn button-secondary py-2">Back</button>
-          <button className="btn button-primary py-2">Yes, Cancel it</button>
+          <button className="btn button-secondary py-2">
+            {upcoming ? "Cancel" : "Back"}
+          </button>
+          <button className="btn button-primary py-2">
+            {upcoming ? "Remind Me" : "Yes, Cancel it"}
+          </button>
         </Modal.Footer>
       </Modal>
     </div>
