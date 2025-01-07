@@ -77,7 +77,7 @@ const UserProfile = () => {
           {currentFlow === "personalInfo" && (
             <>
               <div className="d-flex justify-content-between p-5">
-                <h4>Personal information</h4>
+                <h4>Personal Information</h4>
                 <Button
                   className="btn button-primary"
                   variant="danger"
@@ -227,6 +227,43 @@ const UserProfile = () => {
                   </button>
                   <button className="btn button-primary">Save Changes</button>
                 </div>
+              </div>
+            </>
+          )}
+          {currentFlow === "password" && (
+            <>
+              <div className="d-flex justify-content-between p-5">
+                <h4>Change Password</h4>
+              </div>
+              <div className="w-50 px-5">
+                <Input
+                  label="Current Password"
+                  placeholder="Current Password"
+                  leadingIcon={<IoLockClosedOutline size={18} />}
+                  dark={true}
+                />
+                <Input
+                  label="New Password"
+                  placeholder="New Password"
+                  leadingIcon={<IoLockClosedOutline size={18} />}
+                  dark={true}
+                />
+                <Input
+                  label="Repeat New Password"
+                  placeholder="Repeat New Password"
+                  leadingIcon={<IoLockClosedOutline size={18} />}
+                  dark={true}
+                />
+              </div>
+              <div className="border-bottom"></div>
+              <div className="d-flex justify-content-end gap-3 p-4">
+                <button
+                  className="btn button-secondary"
+                  onClick={() => setCurrentFlow("personalInfo")}
+                >
+                  Cancel
+                </button>
+                <button className="btn button-primary">Save Password</button>
               </div>
             </>
           )}
