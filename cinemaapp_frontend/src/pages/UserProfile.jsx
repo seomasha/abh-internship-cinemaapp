@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
 
 import { Button } from "react-bootstrap";
@@ -12,6 +12,7 @@ import { FiPhone } from "react-icons/fi";
 import { CiMail, CiLocationOn, CiSearch } from "react-icons/ci";
 import { BiWorld } from "react-icons/bi";
 import Dropdown from "../components/Dropdown";
+import Reservation from "../components/PendingReservation";
 
 const UserProfile = () => {
   const [currentFlow, setCurrentFlow] = useState("personalInfo");
@@ -121,7 +122,7 @@ const UserProfile = () => {
               <div className="d-flex justify-content-between p-5">
                 <h4>Personal information</h4>
               </div>
-              <div className="d-flex justify-content-center border-2 border-bottom pb-2 px-4">
+              <div className="d-flex justify-content-center border-2 border-bottom pb-2 mx-4">
                 <div
                   style={{
                     position: "relative",
@@ -196,7 +197,7 @@ const UserProfile = () => {
                   dark={true}
                 />
               </div>
-              <div className="d-flex px-3 pb-4 gap-4 border-2 border-bottom">
+              <div className="d-flex mx-3 pb-4 gap-4 border-2 border-bottom">
                 <Dropdown
                   icon={CiLocationOn}
                   title="City"
@@ -255,8 +256,8 @@ const UserProfile = () => {
                   dark={true}
                 />
               </div>
-              <div className="border-bottom"></div>
-              <div className="d-flex justify-content-end gap-3 p-4">
+              <div className="border-bottom mx-5"></div>
+              <div className="d-flex justify-content-end gap-3 p-5">
                 <button
                   className="btn button-secondary"
                   onClick={() => setCurrentFlow("personalInfo")}
@@ -265,6 +266,14 @@ const UserProfile = () => {
                 </button>
                 <button className="btn button-primary">Save Password</button>
               </div>
+            </>
+          )}
+          {currentFlow === "pendingReservations" && (
+            <>
+              <div className="d-flex justify-content-between mx-5 pt-5 pb-3 border-bottom">
+                <h4>Pending Reservations</h4>
+              </div>
+              <Reservation image={placeholderImage} />
             </>
           )}
         </div>
