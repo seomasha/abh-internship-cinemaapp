@@ -1,4 +1,4 @@
-version: "3.9"
+'version: "3.9"
 
 services:
   postgres:
@@ -33,7 +33,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: sonyxperiaM5
       SERVER_SERVLET_CONTEXT_PATH: /api/v1
-      FRONTEND_URL: http://localhost:83
+      FRONTEND_URL: http://localhost:8086
       JWT_SECRET: secret
       SPRING_MAIL_HOST: smtp.gmail.com
       SPRING_MAIL_PORT: 587
@@ -49,7 +49,7 @@ services:
       context: ./cinemaapp_frontend
       dockerfile: Dockerfile
     ports:
-      - "83:80"
+      - "8086:80"
     environment:
       VITE_BACKEND_URL: http://localhost:8083
       VITE_API_PATH: /api/v1
