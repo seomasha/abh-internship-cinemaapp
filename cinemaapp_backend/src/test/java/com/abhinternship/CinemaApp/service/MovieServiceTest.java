@@ -70,7 +70,7 @@ public class MovieServiceTest {
     public void testFindCurrentlyShowingMovies_NoFilter() {
         final Page<Movie> moviePage = new PageImpl<>(List.of(testMovie));
 
-        when(movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfter(any(LocalDate.class), any(LocalDate.class), eq(pageable)))
+        when(movieRepository.findByProjectionStartDateBeforeAndProjectionEndDateAfterAndStatus(any(LocalDate.class), any(LocalDate.class), eq(pageable), "published"))
                 .thenReturn(moviePage);
         when(projectionRepository.findByMovieIdOrderByProjectionTime(any(Movie.class)))
                 .thenReturn(Set.of(testProjection));
@@ -103,7 +103,7 @@ public class MovieServiceTest {
     public void testFindUpcomingMovies_NoFilter() {
         final Page<Movie> moviePage = new PageImpl<>(List.of(testMovie));
 
-        when(movieRepository.findByProjectionStartDateGreaterThanEqual(any(LocalDate.class), eq(pageable)))
+        when(movieRepository.findByProjectionStartDateGreaterThanEqualAndStatus(any(LocalDate.class), eq(pageable), "published"))
                 .thenReturn(moviePage);
         when(projectionRepository.findByMovieIdOrderByProjectionTime(any(Movie.class)))
                 .thenReturn(Set.of(testProjection));

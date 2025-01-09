@@ -46,4 +46,6 @@ public class Movie {
 
     @OneToMany(mappedBy = "entityId", cascade = CascadeType.ALL)
     private List<Photo> photos;
+
+    private String status;
 }

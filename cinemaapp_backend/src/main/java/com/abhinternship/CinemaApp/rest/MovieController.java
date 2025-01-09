@@ -56,12 +56,37 @@ public class MovieController {
         return ResponseEntity.ok(upcomingMovies);
     }
 
+    @GetMapping("/draft")
+    public ResponseEntity<List<Movie>> getDraftMovies() {
+        final List<Movie> movies = movieService.findMoviesByStatus("draft%");
+        return ResponseEntity.ok(movies);
+    }
+
+    @GetMapping("/archived")
+    public ResponseEntity<List<Movie>> getArchivedMovies() {
+        final List<Movie> movies = movieService.findMoviesByStatus("archived");
+        return ResponseEntity.ok(movies);
+    }
+
     @PostMapping
-    public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) {
+    public ResponseEntity<Long> createMovie(final @RequestBody Movie movie) throws ResourceNotFoundException {
         movieService.saveMovie(movie);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body(movie.getId());
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateMovieStatus(@PathVariable Long id, @RequestParam String status) throws ResourceNotFoundException {
+        movieService.updateMovieStatus(id, status);
+        return ResponseEntity.ok("Movie status updated successfully.");
+    }
+
+    @PatchMapping("/status")
+    public ResponseEntity<String> updateMoviesStatus(@RequestBody List<Long> ids, @RequestParam String status) throws ResourceNotFoundException {
+        movieService.updateMoviesStatus(ids, status);
+        return ResponseEntity.ok("Movies status updated successfully.");
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMovie(final @PathVariable Long id) {
