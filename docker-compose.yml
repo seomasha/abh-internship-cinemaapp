@@ -1,4 +1,4 @@
-'version: "3.9"
+version: "3.9"
 
 services:
   postgres:
@@ -13,12 +13,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/:/docker-entrypoint-initdb.d/
-    healthcheck: 
-      test: ["CMD-SHELL", "pg_isready -U postgres"] 
-      interval: 10s 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
       timeout: 5s
       retries: 5
-
 
   backend:
     build:
