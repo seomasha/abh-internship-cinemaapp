@@ -120,7 +120,8 @@
 
 .step-one,
 .step-two,
-.step-three {
+.step-three,
+.ended {
   display: inline-block;
   color: #b54708;
   background-color: #fef0c7;
@@ -138,4 +139,15 @@
 .step-three {
   color: #027a48;
   background-color: #d1fadf;
+}
+
+.ended {
+  color: #b42318;
+  background-color: #fee4e2;
+}
+
+.background-clear {
+  background-color: transparent !important;
+  border: none;
+  box-shadow: none;
 }

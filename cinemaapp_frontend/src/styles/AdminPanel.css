@@ -107,3 +107,22 @@
 .disabled {
   color: #667085;
 }
+
+.rs-picker {
+  width: 100%;
+}
+
+.rs-picker-input-group {
+  padding: 6px 0px;
+}
+
+.rs-calendar-time-dropdown-cell.rs-calendar-time-dropdown-cell-active {
+  color: #b22222;
+  background-color: #ff9898;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}

@@ -15,6 +15,8 @@ import java.util.List;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
-    Page<Movie> findByProjectionStartDateBeforeAndProjectionEndDateAfter(LocalDate endDate, LocalDate startDate, Pageable pageable);
-    Page<Movie> findByProjectionStartDateGreaterThanEqual(LocalDate endDate, Pageable pageable);
+    Page<Movie> findByProjectionStartDateBeforeAndProjectionEndDateAfterAndStatus(LocalDate endDate, LocalDate startDate, Pageable pageable, String status);
+    Page<Movie> findByProjectionStartDateGreaterThanEqualAndStatus(LocalDate endDate, Pageable pageable, String status);
+    @Query("SELECT m FROM Movie m WHERE m.status LIKE :status")
+    List<Movie> findAllByStatus(@Param("status") String status);
 }

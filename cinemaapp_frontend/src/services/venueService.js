@@ -22,4 +22,30 @@ export const venueService = {
     );
     return response;
   },
+  getVenuesByMovieName: async (movieName) => {
+    const response = await request(
+      `${VENUE_ENDPOINT}/venues-by-movie-name?movieName=${movieName}`
+    );
+    return response;
+  },
+  getVenuesByCity: async (cityName) => {
+    const response = await request(
+      `${VENUE_ENDPOINT}/venues-by-city?cityName=${cityName}`
+    );
+    return response;
+  },
+  updateVenue: async (id, data) => {
+    const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: data,
+    });
+    return response;
+  },
+  deleteByID: async (id) => {
+    const response = await request(`${VENUE_ENDPOINT}/${id}`, {
+      method: "DELETE",
+    });
+    return response;
+  },
 };

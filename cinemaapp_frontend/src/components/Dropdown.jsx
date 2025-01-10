@@ -42,7 +42,7 @@ const Dropdown = ({
 
   return (
     <div className={fullWidth ? "w-100" : ""}>
-      <p className={`fs-6 ${invalid ? "text-danger" : ""}`}>{label}</p>
+      <p className={`fs-6 ${invalid ? "text-danger" : "fw-bold"}`}>{label}</p>
       <div
         className={`dropdown-container ${
           invalid ? "border border-2 border-danger" : ""
