@@ -1,10 +1,12 @@
 package com.abhinternship.CinemaApp.rest;
 
+import com.abhinternship.CinemaApp.dto.ProjectionDTO;
 import com.abhinternship.CinemaApp.model.Movie;
 import com.abhinternship.CinemaApp.model.Projection;
 import com.abhinternship.CinemaApp.service.ProjectionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,12 @@ public class ProjectionController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/movie/{id}")
+    public ResponseEntity<List<Projection>> getProjectionsByMovieID(@PathVariable Long id) {
+        final List<Projection> projections = projectionService.findProjectionByMovieId(id);
+        return ResponseEntity.ok(projections);
+    }
+
     @GetMapping("/times")
     public ResponseEntity<List<LocalTime>> getAllDistinctProjectionTimes() {
         final List<LocalTime> projectionTimes = projectionService.findAllDistinctProjectionTimes();
@@ -55,5 +63,17 @@ public class ProjectionController {
         final List<LocalTime> projectionTimes = projectionService.findProjectionTimesByMovieAndVenue(
                 movieName, city, venueName);
         return ResponseEntity.ok(projectionTimes);
+    }
+
+    @PostMapping
+    public ResponseEntity<String> createProjection(@RequestBody List<ProjectionDTO> projections) {
+        projectionService.saveProjection(projections);
+        return ResponseEntity.status(HttpStatus.CREATED).body("The projections have been successfully created");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProjection(@PathVariable Long id) {
+        projectionService.deleteProjection(id);
+        return ResponseEntity.ok("Projection with ID " + id + " successfully deleted.");
     }
 }

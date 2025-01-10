@@ -19,4 +19,26 @@ export const movieService = {
     const response = await request(endpoint, { params });
     return response;
   },
+  getDraftMovies: async () => {
+    const response = await request(`${MOVIE_ENDPOINT}/draft`);
+    return response;
+  },
+  getArchivedMovies: async () => {
+    const response = await request(`${MOVIE_ENDPOINT}/archived`);
+    return response;
+  },
+  updateMovie: async (id, status) => {
+    const response = await request(
+      `${MOVIE_ENDPOINT}/${id}/status?status=${status}`,
+      { method: "PATCH" }
+    );
+    return response;
+  },
+  updateMovies: async (ids, status) => {
+    const response = await request(
+      `${MOVIE_ENDPOINT}/status?status=${status}`,
+      { method: "PATCH", data: ids }
+    );
+    return response;
+  },
 };
