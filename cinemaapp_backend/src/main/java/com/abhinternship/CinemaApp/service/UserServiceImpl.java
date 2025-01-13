@@ -1,6 +1,7 @@
 package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.model.User;
+import com.abhinternship.CinemaApp.repository.PhotoRepository;
 import com.abhinternship.CinemaApp.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -16,6 +18,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PhotoRepository photoRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -73,5 +76,42 @@ public class UserServiceImpl implements UserService {
 
         user.setStatus("deactivated");
         userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(final long id, final Map<String, Object> updates) {
+        final User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        if (updates.containsKey("firstName")) {
+            existingUser.setFirstName((String) updates.get("firstName"));
+        }
+        if (updates.containsKey("lastName")) {
+            existingUser.setLastName((String) updates.get("lastName"));
+        }
+        if (updates.containsKey("email")) {
+            final String email = (String) updates.get("email");
+            if (!email.equals(existingUser.getEmail()) && userRepository.existsByEmail(email)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use.");
+            }
+            existingUser.setEmail(email);
+        }
+        if (updates.containsKey("phoneNo")) {
+            existingUser.setPhoneNo((String) updates.get("phoneNo"));
+        }
+        if (updates.containsKey("city")) {
+            existingUser.setCity((String) updates.get("city"));
+        }
+        if (updates.containsKey("country")) {
+            existingUser.setCountry((String) updates.get("country"));
+        }
+        if (updates.containsKey("profilePhotoId")) {
+            final Long profilePhotoId = Long.valueOf((Integer) updates.get("profilePhotoId"));
+            existingUser.setProfilePhotoId(photoRepository.findById(profilePhotoId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Photo not found with ID: " + profilePhotoId)));
+        }
+
+        return userRepository.save(existingUser);
     }
 }

@@ -136,4 +136,12 @@ public class UserController {
 
         return ResponseEntity.ok("Account with email: " + email + " is deactivated.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(
+            @PathVariable long id,
+            @RequestBody @Valid Map<String, Object> updates) {
+        final User updatedUser = userService.updateUser(id, updates);
+        return ResponseEntity.ok(updatedUser);
+    }
 }

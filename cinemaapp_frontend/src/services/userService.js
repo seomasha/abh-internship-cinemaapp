@@ -66,4 +66,10 @@ export const userService = {
       data: data,
     });
   },
+  editProfile: async (id, data) => {
+    const response = await request(`${USER_ENDPOINT}/${id}`, {
+      method: "PUT",
+      data: data,
+    });
+  },
 };

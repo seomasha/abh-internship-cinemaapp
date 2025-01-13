@@ -16,6 +16,7 @@ import Dropdown from "../components/Dropdown";
 import Reservation from "../components/Reservation";
 import { getUserInfoFromToken } from "../utils/JwtDecode";
 import { userService } from "../services/userService";
+import { photoService } from "../services/photoService";
 import ToastService from "../services/toastService";
 import { Modal } from "react-bootstrap";
 import { useNavBar } from "../context/NavBarContext";
@@ -34,6 +35,15 @@ const UserProfile = () => {
   const [confirmNewPasswordError, setConfirmNewPasswordError] = useState("");
   const [showModal, setShowModal] = useState(false);
 
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+
   const placeholderImage = "https://via.placeholder.com/300";
 
   const token = localStorage.getItem("token");
@@ -44,9 +54,16 @@ const UserProfile = () => {
   useEffect(() => {
     const getUser = async () => {
       setLoading(true);
-      const response = await userService.findUserByEmail(userEmail);
+      const response = await userService.get(localStorage.getItem("userId"));
       setUser(response);
       setLoading(false);
+
+      setFirstName(response.firstName);
+      setLastName(response.lastName);
+      setPhoneNo(response.phoneNo);
+      setEmail(response.email);
+      setCity(response.city);
+      setCountry(response.country);
     };
 
     getUser();
@@ -148,6 +165,56 @@ const UserProfile = () => {
     handleLogout();
   };
 
+  const handleCityChange = (selectedCities) => {
+    setCity(selectedCities);
+  };
+
+  const handleCountryChange = (selectedCountry) => {
+    setCountry(selectedCountry);
+  };
+
+  const handleProfileImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditProfile = async () => {
+    setLoading(true);
+
+    let photoImageId;
+
+    if (profileImage) {
+      const formData = new FormData();
+      formData.append("files", profileImage);
+      formData.append("entityId", localStorage.getItem("userId"));
+      formData.append("entityType", "user");
+      formData.append("role", "profile_photo");
+
+      photoImageId = await photoService.create(formData, "multipart/form-data");
+    }
+
+    const data = {
+      firstName,
+      lastName,
+      phoneNo,
+      email,
+      city: Array.isArray(city) ? city[0] : city,
+      country: Array.isArray(country) ? country[0] : country,
+      profilePhotoId: photoImageId,
+    };
+
+    await userService.editProfile(localStorage.getItem("userId"), data);
+
+    window.location.reload();
+  };
+
   return (
     <div>
       <NavBar />
@@ -232,8 +299,8 @@ const UserProfile = () => {
                   />
                   <div>
                     <h3>
-                      {user?.firstName && user?.lastName
-                        ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`
+                      {user?.firstName || user?.lastName
+                        ? `${user?.firstName || ""} ${user?.lastName || ""}`
                         : "Add Name"}
                     </h3>
 
@@ -272,7 +339,11 @@ const UserProfile = () => {
                 >
                   <label htmlFor="image-upload" style={{ cursor: "pointer" }}>
                     <img
-                      src={placeholderImage}
+                      src={
+                        previewImage ||
+                        user?.profilePhotoId.url ||
+                        placeholderImage
+                      }
                       alt="Uploaded Preview"
                       style={{
                         width: "300px",
@@ -307,6 +378,7 @@ const UserProfile = () => {
                     type="file"
                     accept="image/*"
                     style={{ display: "none" }}
+                    onChange={handleProfileImageChange}
                   />
                 </div>
               </div>
@@ -316,12 +388,16 @@ const UserProfile = () => {
                   placeholder="First Name"
                   leadingIcon={<CiSearch size={18} />}
                   dark={true}
+                  value={firstName || ""}
+                  onChange={(e) => setFirstName(e.target.value)}
                 />
                 <Input
                   label="Last Name"
                   placeholder="Last Name"
                   leadingIcon={<CiSearch size={18} />}
                   dark={true}
+                  value={lastName || ""}
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </div>
               <div className="d-flex p-3 gap-4">
@@ -330,28 +406,40 @@ const UserProfile = () => {
                   placeholder="Phone"
                   leadingIcon={<FiPhone size={18} />}
                   dark={true}
+                  value={phoneNo || ""}
+                  onChange={(e) => setPhoneNo(e.target.value)}
                 />
                 <Input
                   label="Email"
                   placeholder="Email"
                   leadingIcon={<CiMail size={18} />}
                   dark={true}
+                  value={email || ""}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="d-flex mx-3 pb-4 gap-4 border-2 border-bottom">
                 <Dropdown
                   icon={CiLocationOn}
-                  title="City"
-                  options={[""]}
+                  title={city.length > 0 ? city : user?.city}
+                  options={[
+                    "Sarajevo",
+                    "Mostar",
+                    "Zenica",
+                    "Tuzla",
+                    "Banja Luka",
+                  ]}
                   label="City"
+                  onChange={handleCityChange}
                   fullWidth
                   large
                 />
                 <Dropdown
                   icon={BiWorld}
-                  title="Country"
-                  options={[""]}
+                  title={country.length > 0 ? country : user?.country}
+                  options={["Bosna i Hercegovina"]}
                   label="Country"
+                  onChange={handleCountryChange}
                   fullWidth
                   large
                 />
@@ -370,7 +458,12 @@ const UserProfile = () => {
                   >
                     Cancel
                   </button>
-                  <button className="btn button-primary">Save Changes</button>
+                  <button
+                    className="btn button-primary"
+                    onClick={handleEditProfile}
+                  >
+                    Save Changes
+                  </button>
                 </div>
               </div>
             </>
