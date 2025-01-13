@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
 
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import TabButton from "../components/TabButton";
 import Input from "../components/Input";
 
@@ -14,12 +14,118 @@ import { CiMail, CiLocationOn, CiSearch } from "react-icons/ci";
 import { BiWorld } from "react-icons/bi";
 import Dropdown from "../components/Dropdown";
 import Reservation from "../components/Reservation";
+import { getUserInfoFromToken } from "../utils/JwtDecode";
+import { userService } from "../services/userService";
+import ToastService from "../services/toastService";
 
 const UserProfile = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentFlow, setCurrentFlow] = useState("personalInfo");
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+  const [passwordError, setPasswordError] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [confirmNewPasswordError, setConfirmNewPasswordError] = useState("");
 
   const placeholderImage = "https://via.placeholder.com/300";
+
+  const token = localStorage.getItem("token");
+  const userEmail = getUserInfoFromToken(token).sub;
+
+  useEffect(() => {
+    const getUser = async () => {
+      const response = await userService.findUserByEmail(userEmail);
+      setUser(response);
+    };
+
+    getUser();
+  }, []);
+
+  const setError = (condition, setter, message) => {
+    if (condition) {
+      setter(message);
+      return true;
+    } else {
+      setter("");
+      return false;
+    }
+  };
+
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return regex.test(password);
+  };
+
+  const validatePasswordChange = () => {
+    const passwordError = setError(
+      !validatePassword(password),
+      setPasswordError,
+      "Password must be at least 8 characters long, contain at least one letter, and one number."
+    );
+
+    const newPasswordError = setError(
+      !validatePassword(newPassword),
+      setNewPasswordError,
+      "Password must be at least 8 characters long, contain at least one letter, and one number."
+    );
+
+    const confirmPasswordRegexError = !validatePassword(confirmNewPassword);
+    const confirmPasswordMismatchError = confirmNewPassword !== newPassword;
+
+    const confirmNewPasswordError = setError(
+      confirmPasswordRegexError || confirmPasswordMismatchError,
+      setConfirmNewPasswordError,
+      confirmPasswordRegexError
+        ? "Password must be at least 8 characters long, contain at least one letter, and one number."
+        : "The passwords don't match."
+    );
+
+    return (
+      !passwordError &&
+      !newPasswordError &&
+      !confirmPasswordRegexError &&
+      !confirmPasswordMismatchError
+    );
+  };
+
+  const handlePasswordChange = async () => {
+    setLoading(true);
+    if (!validatePasswordChange()) {
+      setLoading(false);
+      return;
+    }
+
+    const verifyPassword = await userService.verifyPassword({
+      email: userEmail,
+      password,
+    });
+
+    if (!verifyPassword) {
+      setPasswordError("The password is incorrect.");
+      setLoading(false);
+      return;
+    }
+
+    const resetPassword = await userService.resetPassword({
+      email: userEmail,
+      password: newPassword,
+    });
+
+    if (resetPassword) {
+      ToastService.success("Password is changed succesfully");
+
+      setPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setCurrentFlow("personalInfo");
+
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -77,7 +183,12 @@ const UserProfile = () => {
         </div>
 
         <div className="col-10">
-          {currentFlow === "personalInfo" && (
+          {loading && (
+            <>
+              <Spinner />
+            </>
+          )}
+          {currentFlow === "personalInfo" && !loading && (
             <>
               <div className="d-flex justify-content-between p-5">
                 <h4>Personal Information</h4>
@@ -119,7 +230,7 @@ const UserProfile = () => {
               </div>
             </>
           )}
-          {currentFlow === "editProfile" && (
+          {currentFlow === "editProfile" && !loading && (
             <>
               <div className="d-flex justify-content-between p-5">
                 <h4>Personal information</h4>
@@ -233,7 +344,7 @@ const UserProfile = () => {
               </div>
             </>
           )}
-          {currentFlow === "password" && (
+          {currentFlow === "password" && !loading && (
             <>
               <div className="d-flex justify-content-between p-5">
                 <h4>Change Password</h4>
@@ -244,18 +355,33 @@ const UserProfile = () => {
                   placeholder="Current Password"
                   leadingIcon={<IoLockClosedOutline size={18} />}
                   dark={true}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  invalid={!!passwordError}
+                  invalidMessage={passwordError}
+                  type="password"
                 />
                 <Input
                   label="New Password"
                   placeholder="New Password"
                   leadingIcon={<IoLockClosedOutline size={18} />}
                   dark={true}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  invalid={!!newPasswordError}
+                  invalidMessage={newPasswordError}
+                  type="password"
                 />
                 <Input
                   label="Repeat New Password"
                   placeholder="Repeat New Password"
                   leadingIcon={<IoLockClosedOutline size={18} />}
                   dark={true}
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  invalid={!!confirmNewPasswordError}
+                  invalidMessage={confirmNewPasswordError}
+                  type="password"
                 />
               </div>
               <div className="border-bottom mx-5"></div>
@@ -266,11 +392,16 @@ const UserProfile = () => {
                 >
                   Cancel
                 </button>
-                <button className="btn button-primary">Save Password</button>
+                <button
+                  className="btn button-primary"
+                  onClick={handlePasswordChange}
+                >
+                  Save Password
+                </button>
               </div>
             </>
           )}
-          {currentFlow === "pendingReservations" && (
+          {currentFlow === "pendingReservations" && !loading && (
             <>
               <div className="d-flex justify-content-between mx-5 pt-5 pb-3 border-bottom">
                 <h4>Pending Reservations</h4>
@@ -278,7 +409,7 @@ const UserProfile = () => {
               <Reservation image={placeholderImage} />
             </>
           )}
-          {currentFlow === "projections" && (
+          {currentFlow === "projections" && !loading && (
             <>
               <div className="d-flex justify-content-between mx-5 pt-5 pb-3">
                 <h4>Projections</h4>

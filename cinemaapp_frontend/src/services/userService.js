@@ -53,4 +53,11 @@ export const userService = {
     });
     return response;
   },
+  verifyPassword: async (data) => {
+    const response = await request(`${USER_ENDPOINT}/verify-password`, {
+      method: "POST",
+      data: data,
+    });
+    return response;
+  },
 };

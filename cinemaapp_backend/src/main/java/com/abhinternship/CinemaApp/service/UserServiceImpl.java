@@ -57,4 +57,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
+
+    @Override
+    public boolean verifyPassword(final String email, final String enteredPassword) {
+        final User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        return passwordEncoder.matches(enteredPassword, user.getPassword());
+    }
 }

@@ -119,4 +119,13 @@ public class UserController {
 
         return ResponseEntity.ok(otpService.verifyOtp(email, enteredOtp));
     }
+
+    @PostMapping("/verify-password")
+    public ResponseEntity<Boolean> verifyPassword(@RequestBody Map<String, String> requestBody) {
+        final String email = requestBody.get("email");
+        final String enteredPassword = requestBody.get("password");
+
+        boolean isMatch = userService.verifyPassword(email, enteredPassword);
+        return ResponseEntity.ok(isMatch);
+    }
 }
