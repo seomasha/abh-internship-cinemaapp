@@ -107,7 +107,9 @@ const NavBar = ({ state }) => {
               {emailPrefix} <span className="caret"></span>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item>Profile</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/profile")}>
+                Profile
+              </Dropdown.Item>
               {role === "admin" && (
                 <Dropdown.Item onClick={navigateToAdminPanel}>
                   Admin
