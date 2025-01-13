@@ -65,4 +65,13 @@ public class UserServiceImpl implements UserService {
 
         return passwordEncoder.matches(enteredPassword, user.getPassword());
     }
+
+    @Override
+    public void deactivateAccount(final String email) {
+        final User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        user.setStatus("deactivated");
+        userRepository.save(user);
+    }
 }

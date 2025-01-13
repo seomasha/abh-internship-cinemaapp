@@ -128,4 +128,12 @@ public class UserController {
         boolean isMatch = userService.verifyPassword(email, enteredPassword);
         return ResponseEntity.ok(isMatch);
     }
+
+    @PostMapping("/deactivate-account")
+    public ResponseEntity<String> deactivateAccount(@RequestBody Map<String, String> body) {
+        final String email = body.get("email");
+        userService.deactivateAccount(email);
+
+        return ResponseEntity.ok("Account with email: " + email + " is deactivated.");
+    }
 }

@@ -60,4 +60,10 @@ export const userService = {
     });
     return response;
   },
+  deactivateAccount: async (data) => {
+    const response = await request(`${USER_ENDPOINT}/deactivate-account`, {
+      method: "POST",
+      data: data,
+    });
+  },
 };

@@ -17,6 +17,8 @@ import Reservation from "../components/Reservation";
 import { getUserInfoFromToken } from "../utils/JwtDecode";
 import { userService } from "../services/userService";
 import ToastService from "../services/toastService";
+import { Modal } from "react-bootstrap";
+import { useNavBar } from "../context/NavBarContext";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -30,16 +32,21 @@ const UserProfile = () => {
   const [passwordError, setPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
   const [confirmNewPasswordError, setConfirmNewPasswordError] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const placeholderImage = "https://via.placeholder.com/300";
 
   const token = localStorage.getItem("token");
   const userEmail = getUserInfoFromToken(token).sub;
 
+  const { handleLogout } = useNavBar();
+
   useEffect(() => {
     const getUser = async () => {
+      setLoading(true);
       const response = await userService.findUserByEmail(userEmail);
       setUser(response);
+      setLoading(false);
     };
 
     getUser();
@@ -127,6 +134,20 @@ const UserProfile = () => {
     }
   };
 
+  const handleClose = () => setShowModal(false);
+
+  const handleDeactivateAccount = async () => {
+    setLoading(true);
+
+    await userService.deactivateAccount({
+      email: userEmail,
+    });
+
+    setShowModal(false);
+    setLoading(false);
+    handleLogout();
+  };
+
   return (
     <div>
       <NavBar />
@@ -203,27 +224,34 @@ const UserProfile = () => {
               <div className="px-5">
                 <div className="d-flex p-4 gap-3 rounded-4 bg-white">
                   <img
-                    src={placeholderImage}
+                    src={user?.profilePhotoId.url || placeholderImage}
                     alt="placeholder"
                     className="rounded-2"
+                    width={300}
+                    height={300}
                   />
                   <div>
-                    <h3>John Doe</h3>
+                    <h3>
+                      {user?.firstName && user?.lastName
+                        ? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`
+                        : "Add Name"}
+                    </h3>
+
                     <h6 className="d-flex align-items-center gap-2 fw-light mt-4">
                       <FiPhone size={18} className="primary-red" />
-                      +387 62 111 111
+                      {user?.phoneNo ? user?.phoneNo : "Add phone number"}
                     </h6>
                     <h6 className="d-flex align-items-center gap-2 fw-light mt-4">
                       <CiMail size={18} className="primary-red" />
-                      mail@mail.com
+                      {user?.email ? user?.email : "mail@mail.com"}
                     </h6>
                     <h6 className="d-flex align-items-center gap-2 fw-light mt-4">
                       <CiLocationOn size={18} className="primary-red" />
-                      Sarajevo
+                      {user?.city ? user?.city : "Add your city"}
                     </h6>
                     <h6 className="d-flex align-items-center gap-2 fw-light mt-4">
                       <BiWorld size={18} className="primary-red" />
-                      Bosnia and Herzegovina
+                      {user?.country ? user?.country : "Add your country"}
                     </h6>
                   </div>
                 </div>
@@ -329,7 +357,10 @@ const UserProfile = () => {
                 />
               </div>
               <div className="d-flex justify-content-between mt-4 px-4">
-                <p className="primary-red text-decoration-underline fw-bold pointer">
+                <p
+                  className="primary-red text-decoration-underline fw-bold pointer"
+                  onClick={() => setShowModal(true)}
+                >
                   Deactivate my account
                 </p>
                 <div className="d-flex justify-content-end gap-3">
@@ -444,6 +475,26 @@ const UserProfile = () => {
           )}
         </div>
       </div>
+
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header>
+          <Modal.Title className="fw-bold">Deactivate account?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to deactivate your account?
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn button-secondary py-2" onClick={handleClose}>
+            Cancel
+          </button>
+          <button
+            className="btn button-primary py-2"
+            onClick={handleDeactivateAccount}
+          >
+            Yes
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
