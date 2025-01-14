@@ -550,7 +550,10 @@ const UserProfile = () => {
               <div className="d-flex justify-content-between mx-5 pt-5 pb-3 border-bottom">
                 <h4>Pending Reservations</h4>
               </div>
-              <Reservation image={placeholderImage} />
+              <p className="px-5 py-3 text-danger fw-bold">
+                No pending reservations
+              </p>
+              {/*<Reservation image={placeholderImage} /> Will be implemented when ticket reservation system is implemented */}
             </>
           )}
           {currentFlow === "projections" && !loading && (
