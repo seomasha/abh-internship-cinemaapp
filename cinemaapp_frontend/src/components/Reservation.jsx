@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/Reservation.css";
 import { FaBell } from "react-icons/fa";
 
-const Reservation = ({ image, upcoming = false, past = false }) => {
+const Reservation = ({ projection, upcoming = false, past = false }) => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [showModal, setShowModal] = useState(false);
 
@@ -23,6 +23,15 @@ const Reservation = ({ image, upcoming = false, past = false }) => {
     </Popover>
   );
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    }).format(date);
+  };
+
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
 
@@ -30,7 +39,7 @@ const Reservation = ({ image, upcoming = false, past = false }) => {
     <div className="d-flex">
       <div className="border w-100 m-5 p-4 rounded-4">
         <div className="d-flex justify-content-between mb-4">
-          <h6>Avatar: The way of water</h6>
+          <h6>{projection.projectionId.movieId.name}</h6>
           <div className="d-flex align-items-center gap-2">
             {!upcoming && (
               <>
@@ -68,16 +77,34 @@ const Reservation = ({ image, upcoming = false, past = false }) => {
         </div>
         <div className="d-flex justify-content-between gap-5">
           <div className="d-flex gap-3">
-            <img src={image} height={150} width={150} className="rounded" />
+            <img
+              src={
+                projection.projectionId.movieId.photos.find(
+                  (photo) => photo.entityType === "movie"
+                )?.url
+              }
+              height={150}
+              width={150}
+              className="rounded"
+            />
             <div>
               <h6>Booking Details</h6>
-              <p className="mt-3">Monday, Dec 22 at 18:00</p>
               <p className="mt-3">
-                Cineplex: Cinebh, Zmaja od Bosne 4, Sarajevo 71000
+                {formatDate(projection.date)} at{" "}
+                {projection.projectionId.projectionTime.slice(0, 5)}
+              </p>
+              <p className="mt-3">
+                {projection.projectionId.venueId.name},{" "}
+                {projection.projectionId.venueId.street},{" "}
+                {projection.projectionId.venueId.city}{" "}
+                {projection.projectionId.venueId.streetNo}
               </p>
               <p className="mt-3 d-flex gap-2">
-                PG-13 <span className="primary-red">|</span> English{" "}
-                <span className="primary-red">|</span> 117 min{" "}
+                {projection.projectionId.movieId.pgRating}{" "}
+                <span className="primary-red">|</span>{" "}
+                {projection.projectionId.movieId.language}{" "}
+                <span className="primary-red">|</span>{" "}
+                {projection.projectionId.movieId.movieDuration} min{" "}
               </p>
             </div>
           </div>
@@ -88,13 +115,17 @@ const Reservation = ({ image, upcoming = false, past = false }) => {
             <div>
               <h6>Seat(s) details</h6>
               <p className="mt-3">
-                Seat(s): <span className="fw-bold">A1, A2</span>
+                Seat(s): <span className="fw-bold">{projection.seatNo}</span>
               </p>
               <p className="mt-3">
-                Hall: <span className="fw-bold">Hall 1</span>
+                Hall:{" "}
+                <span className="fw-bold">
+                  Hall {projection.projectionId.hallId.number}
+                </span>
               </p>
               <p className="mt-3">
-                Total Price: <span className="fw-bold">24 KM</span>
+                Total Price:{" "}
+                <span className="fw-bold">{projection.price} KM</span>
               </p>
             </div>
             {!upcoming && !past && (
@@ -128,7 +159,7 @@ const Reservation = ({ image, upcoming = false, past = false }) => {
             : "Do you want to cancel your reservation?"}
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn button-secondary py-2">
+          <button className="btn button-secondary py-2" onClick={handleClose}>
             {upcoming ? "Cancel" : "Back"}
           </button>
           <button className="btn button-primary py-2">

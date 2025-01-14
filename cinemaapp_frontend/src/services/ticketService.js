@@ -33,4 +33,12 @@ export const ticketService = {
     });
     return response;
   },
+  getUserUpcomingProjections: async (id) => {
+    const response = await request(`${TICKET_ENDPOINT}/user/${id}/upcoming`);
+    return response;
+  },
+  getUserExpiredProjections: async (id) => {
+    const response = await request(`${TICKET_ENDPOINT}/user/${id}/expired`);
+    return response;
+  },
 };

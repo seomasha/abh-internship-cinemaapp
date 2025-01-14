@@ -17,6 +17,7 @@ import Reservation from "../components/Reservation";
 import { getUserInfoFromToken } from "../utils/JwtDecode";
 import { userService } from "../services/userService";
 import { photoService } from "../services/photoService";
+import { ticketService } from "../services/ticketService";
 import ToastService from "../services/toastService";
 import { Modal } from "react-bootstrap";
 import { useNavBar } from "../context/NavBarContext";
@@ -44,6 +45,9 @@ const UserProfile = () => {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
 
+  const [upcomingProjections, setUpcomingProjections] = useState([]);
+  const [expiredProjections, setExpiredProjections] = useState([]);
+
   const placeholderImage = "https://via.placeholder.com/300";
 
   const token = localStorage.getItem("token");
@@ -66,6 +70,22 @@ const UserProfile = () => {
       setCountry(response.country);
     };
 
+    const getUpcomingProjections = async () => {
+      const response = await ticketService.getUserUpcomingProjections(
+        localStorage.getItem("userId")
+      );
+      setUpcomingProjections(response);
+    };
+
+    const getExpiredProjections = async () => {
+      const response = await ticketService.getUserExpiredProjections(
+        localStorage.getItem("userId")
+      );
+      setExpiredProjections(response);
+    };
+
+    getUpcomingProjections();
+    getExpiredProjections();
     getUser();
   }, []);
 
@@ -540,14 +560,14 @@ const UserProfile = () => {
               </div>
               <div className="mt-3 border-bottom gap-5 d-flex mx-5">
                 <TabButton
-                  label={`Upcoming (1)`}
+                  label={`Upcoming (${upcomingProjections.length})`}
                   isActive={activeTab === "upcoming"}
                   onClick={() => {
                     setActiveTab("upcoming");
                   }}
                 />
                 <TabButton
-                  label={`Past (1)`}
+                  label={`Past (${expiredProjections.length})`}
                   isActive={activeTab === "past"}
                   onClick={() => {
                     setActiveTab("past");
@@ -556,12 +576,36 @@ const UserProfile = () => {
               </div>
               {activeTab === "upcoming" && (
                 <>
-                  <Reservation image={placeholderImage} upcoming />
+                  {upcomingProjections.length === 0 ? (
+                    <p className="px-5 py-3 text-danger fw-bold">
+                      No upcoming projections available.
+                    </p>
+                  ) : (
+                    upcomingProjections.map((projection) => (
+                      <Reservation
+                        key={projection.id}
+                        projection={projection}
+                        upcoming
+                      />
+                    ))
+                  )}
                 </>
               )}
               {activeTab === "past" && (
                 <>
-                  <Reservation image={placeholderImage} past />
+                  {expiredProjections.length === 0 ? (
+                    <p className="px-5 py-3 text-danger fw-bold">
+                      No expired projections available.
+                    </p>
+                  ) : (
+                    expiredProjections.map((projection) => (
+                      <Reservation
+                        key={projection.id}
+                        projection={projection}
+                        past
+                      />
+                    ))
+                  )}
                 </>
               )}
             </>

@@ -90,6 +90,16 @@ public class TicketServiceImpl implements TicketService {
         return totalPrice;
     }
 
+    @Override
+    public List<Ticket> getUpcomingMovies(final Long userId) {
+        return ticketRepository.findUpcomingMoviesByUserId(userId);
+    }
+
+    @Override
+    public List<Ticket> getExpiredMovies(final Long userId) {
+        return ticketRepository.findExpiredMoviesByUserId(userId);
+    }
+
     @Scheduled(fixedRate = 60000)
     @Transactional
     @Override
