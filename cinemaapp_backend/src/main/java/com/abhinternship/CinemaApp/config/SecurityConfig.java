@@ -29,6 +29,13 @@ public class SecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    @Value("${prod.url}")
+    private String productionUrl;
+
+
+    @Value("${prod.numeric.url}")
+    private String productionNumericUrl;
+
     @Value("${spring.profiles.active}")
     private String profile;
 
@@ -96,7 +103,7 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(frontendUrl, "http://localhost:8086"));
+        config.setAllowedOrigins(List.of(frontendUrl, productionUrl, productionNumericUrl));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
