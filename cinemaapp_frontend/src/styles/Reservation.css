@@ -1,0 +1,14 @@
+.bell {
+  border-color: #b22222;
+  background-color: transparent;
+  padding: 6px 10px;
+}
+
+.bell:hover {
+  color: white;
+  background-color: #b22222;
+}
+
+.bell:hover svg {
+  color: white;
+}

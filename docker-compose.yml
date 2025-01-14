@@ -30,13 +30,17 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: sonyxperiaM5
       SERVER_SERVLET_CONTEXT_PATH: /api/v1
-      FRONTEND_URL: http://localhost:8086
+      FRONTEND_URL: http://63.176.2.136:8086
       JWT_SECRET: secret
       SPRING_MAIL_HOST: smtp.gmail.com
       SPRING_MAIL_PORT: 587
       SPRING_MAIL_USERNAME: maseticsead@gmail.com
       SPRING_MAIL_PASSWORD: tbpuymmkbchgwjqb
       STRIPE_API_KEY: sk_test_51QScTjRpC9Rpg0FJXxnwd92NjdZGpxFfknWYNJQza4Ctj5rFljR8nA8VZFlHjUHfg9qURsXOg9Wy1Gw13fJtRaO300PwRBcZx6
+      MINIO_ENDPOINT: http://127.0.0.1:9002
+      MINIO_ACCESSKEY: minioadmin
+      MINIO_SECRETKEY: minioadmin
+      MINIO_URL: http://127.0.0.1:9001/api/v1/buckets/
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,7 +51,7 @@ services:
     ports:
       - "8086:80"
     environment:
-      VITE_BACKEND_URL: http://localhost:8083
+      VITE_BACKEND_URL: http://63.176.2.136:8083
       VITE_API_PATH: /api/v1
       VITE_OMDB_URL: http://www.omdbapi.com/
       VITE_OMDB_API_KEY: 4e55ca79
