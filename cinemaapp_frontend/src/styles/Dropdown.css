@@ -1,7 +1,6 @@
 .dropdown-container {
   display: flex;
   align-items: center;
-  padding: 10px;
   border: 1px solid #e4e7ec;
   border-radius: 8px;
   cursor: pointer;
@@ -9,11 +8,7 @@
   transition: background-color 0.2s ease;
   margin-top: 16px;
   width: 100%;
-}
-
-.dropdown-container {
   border: 1px solid #ccc;
-  padding: 10px;
 }
 
 .error-message {
