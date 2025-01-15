@@ -90,13 +90,8 @@ const UserProfile = () => {
   }, []);
 
   const setError = (condition, setter, message) => {
-    if (condition) {
-      setter(message);
-      return true;
-    } else {
-      setter("");
-      return false;
-    }
+    setter(condition ? message : "");
+    return condition;
   };
 
   const validatePassword = (password) => {
