@@ -65,6 +65,7 @@ export const userService = {
       method: "POST",
       data: data,
     });
+    return response;
   },
   editProfile: async (id, data) => {
     const response = await request(`${USER_ENDPOINT}/${id}`, {
