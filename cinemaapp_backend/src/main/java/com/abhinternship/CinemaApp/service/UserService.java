@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
+import com.abhinternship.CinemaApp.dto.UserDTO;
 import com.abhinternship.CinemaApp.model.User;
 import org.springframework.stereotype.Service;
 
@@ -16,5 +17,5 @@ public interface UserService {
     void resetPassword(String email, String password);
     boolean verifyPassword(String email, String enteredPassword);
     void deactivateAccount(String email);
-    User updateUser(long id, Map<String, Object> updates);
+    User updateUser(long id, UserDTO userDTO);
 }

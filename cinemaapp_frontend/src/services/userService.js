@@ -71,5 +71,6 @@ export const userService = {
       method: "PUT",
       data: data,
     });
+    return response;
   },
 };

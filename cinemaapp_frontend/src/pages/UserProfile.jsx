@@ -195,30 +195,30 @@ const UserProfile = () => {
 
   const handleProfileImageChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    setProfileImage(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleEditProfile = async () => {
     setLoading(true);
 
-    let photoImageId;
-
-    if (profileImage) {
-      const formData = new FormData();
-      formData.append("files", profileImage);
-      formData.append("entityId", localStorage.getItem("userId"));
-      formData.append("entityType", "user");
-      formData.append("role", "profile_photo");
-
-      photoImageId = await photoService.create(formData, "multipart/form-data");
-    }
+    const photoImageId = profileImage
+      ? await (async () => {
+          const formData = new FormData();
+          formData.append("files", profileImage);
+          formData.append("entityId", localStorage.getItem("userId"));
+          formData.append("entityType", "user");
+          formData.append("role", "profile_photo");
+          return photoService.create(formData, "multipart/form-data");
+        })()
+      : null;
 
     const data = {
       firstName,
@@ -227,7 +227,7 @@ const UserProfile = () => {
       email,
       city: Array.isArray(city) ? city[0] : city,
       country: Array.isArray(country) ? country[0] : country,
-      profilePhotoId: photoImageId,
+      ...(photoImageId && { profilePhotoId: photoImageId }),
     };
 
     await userService.editProfile(localStorage.getItem("userId"), data);

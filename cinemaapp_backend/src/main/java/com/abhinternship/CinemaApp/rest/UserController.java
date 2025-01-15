@@ -2,6 +2,7 @@ package com.abhinternship.CinemaApp.rest;
 
 import com.abhinternship.CinemaApp.dto.EmailDTO;
 import com.abhinternship.CinemaApp.dto.OtpDTO;
+import com.abhinternship.CinemaApp.dto.UserDTO;
 import com.abhinternship.CinemaApp.model.User;
 import com.abhinternship.CinemaApp.service.EmailService;
 import com.abhinternship.CinemaApp.service.OtpService;
@@ -125,8 +126,7 @@ public class UserController {
         final String email = requestBody.get("email");
         final String enteredPassword = requestBody.get("password");
 
-        boolean isMatch = userService.verifyPassword(email, enteredPassword);
-        return ResponseEntity.ok(isMatch);
+        return ResponseEntity.ok(userService.verifyPassword(email, enteredPassword));
     }
 
     @PostMapping("/deactivate-account")
@@ -140,8 +140,8 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
             @PathVariable long id,
-            @RequestBody @Valid Map<String, Object> updates) {
-        final User updatedUser = userService.updateUser(id, updates);
+            @RequestBody @Valid UserDTO userDTO) {
+        final User updatedUser = userService.updateUser(id, userDTO);
         return ResponseEntity.ok(updatedUser);
     }
 }

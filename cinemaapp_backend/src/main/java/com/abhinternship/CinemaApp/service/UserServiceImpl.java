@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.service;
 
+import com.abhinternship.CinemaApp.dto.UserDTO;
 import com.abhinternship.CinemaApp.model.User;
 import com.abhinternship.CinemaApp.repository.PhotoRepository;
 import com.abhinternship.CinemaApp.repository.UserRepository;
@@ -79,39 +80,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(final long id, final Map<String, Object> updates) {
+    public User updateUser(final long id, final UserDTO userDTO) {
         final User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        if (updates.containsKey("firstName")) {
-            existingUser.setFirstName((String) updates.get("firstName"));
-        }
-        if (updates.containsKey("lastName")) {
-            existingUser.setLastName((String) updates.get("lastName"));
-        }
-        if (updates.containsKey("email")) {
-            final String email = (String) updates.get("email");
-            if (!email.equals(existingUser.getEmail()) && userRepository.existsByEmail(email)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use.");
-            }
-            existingUser.setEmail(email);
-        }
-        if (updates.containsKey("phoneNo")) {
-            existingUser.setPhoneNo((String) updates.get("phoneNo"));
-        }
-        if (updates.containsKey("city")) {
-            existingUser.setCity((String) updates.get("city"));
-        }
-        if (updates.containsKey("country")) {
-            existingUser.setCountry((String) updates.get("country"));
-        }
-        if (updates.containsKey("profilePhotoId")) {
-            final Long profilePhotoId = Long.valueOf((Integer) updates.get("profilePhotoId"));
-            existingUser.setProfilePhotoId(photoRepository.findById(profilePhotoId)
+        // Map fields from the DTO to the entity
+        existingUser.setFirstName(userDTO.getFirstName());
+        existingUser.setLastName(userDTO.getLastName());
+        existingUser.setEmail(userDTO.getEmail());
+        existingUser.setPhoneNo(userDTO.getPhoneNo());
+        existingUser.setCity(userDTO.getCity());
+        existingUser.setCountry(userDTO.getCountry());
+
+        if (userDTO.getProfilePhotoId() != null) {
+            existingUser.setProfilePhotoId(photoRepository.findById(userDTO.getProfilePhotoId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Photo not found with ID: " + profilePhotoId)));
+                            "Photo not found with ID: " + userDTO.getProfilePhotoId())));
         }
 
         return userRepository.save(existingUser);
     }
+
 }
