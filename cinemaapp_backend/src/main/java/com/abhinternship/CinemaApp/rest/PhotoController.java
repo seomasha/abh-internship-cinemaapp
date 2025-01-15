@@ -24,7 +24,7 @@ public class PhotoController {
             @RequestParam("role") String role
     ) throws IOException {
         if(!photos.isEmpty()) {
-            if ("venue".equalsIgnoreCase(entityType)) {
+            if ("venue".equalsIgnoreCase(entityType) || "user".equalsIgnoreCase(entityType)) {
                 final Long photoId = photoService.savePhotoAndReturnId(photos.get(0), entityId, entityType, role);
                 return ResponseEntity.status(HttpStatus.CREATED).body(photoId);
             }

@@ -41,4 +41,14 @@ public class TicketController {
     public int getSeatPrice(@RequestBody List<String> seatNos) {
         return ticketService.calculateTotalPrice(seatNos);
     }
+
+    @GetMapping("/user/{id}/upcoming")
+    public List<Ticket> getUpcomingMovies(@PathVariable Long id) {
+        return ticketService.getUpcomingMovies(id);
+    }
+
+    @GetMapping("/user/{id}/expired")
+    public List<Ticket> getExpiredMovies(@PathVariable Long id) {
+        return ticketService.getExpiredMovies(id);
+    }
 }

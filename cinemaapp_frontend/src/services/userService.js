@@ -53,4 +53,25 @@ export const userService = {
     });
     return response;
   },
+  verifyPassword: async (data) => {
+    const response = await request(`${USER_ENDPOINT}/verify-password`, {
+      method: "POST",
+      data: data,
+    });
+    return response;
+  },
+  deactivateAccount: async (data) => {
+    const response = await request(`${USER_ENDPOINT}/deactivate-account`, {
+      method: "POST",
+      data: data,
+    });
+    return response;
+  },
+  editProfile: async (id, data) => {
+    const response = await request(`${USER_ENDPOINT}/${id}`, {
+      method: "PUT",
+      data: data,
+    });
+    return response;
+  },
 };

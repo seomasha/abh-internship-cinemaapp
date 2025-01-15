@@ -11,4 +11,6 @@ public interface TicketService {
     List<Ticket> buyTickets(Long projectionId, Long userId);
     int calculateTotalPrice(List<String> seatNos);
     void deleteExpiredReservedTickets();
+    List<Ticket> getUpcomingMovies(Long userId);
+    List<Ticket> getExpiredMovies(Long userId);
 }
