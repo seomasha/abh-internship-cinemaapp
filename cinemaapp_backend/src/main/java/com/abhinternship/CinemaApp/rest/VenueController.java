@@ -4,13 +4,16 @@ import com.abhinternship.CinemaApp.dto.VenueDTO;
 import com.abhinternship.CinemaApp.dto.VenueUpdateDTO;
 import com.abhinternship.CinemaApp.model.Venue;
 import com.abhinternship.CinemaApp.service.VenueService;
+import com.abhinternship.CinemaApp.utils.FilterVenue;
 import com.abhinternship.CinemaApp.utils.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -20,8 +23,24 @@ public class VenueController {
     private final VenueService venueService;
 
     @GetMapping
-    public ResponseEntity<VenueDTO> getAllVenues(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "4") int size) {
-        final VenueDTO venues = venueService.findAllVenues(page, size);
+    public ResponseEntity<VenueDTO> getAllVenues(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String cities) {
+
+        final Map<String, String> filterParams = new HashMap<>();
+        if (name != null) {
+            filterParams.put("name", name);
+        }
+        if (cities != null) {
+            filterParams.put("cities", cities);
+        }
+
+        final FilterVenue filterVenue = new FilterVenue(filterParams);
+
+        final VenueDTO venues = venueService.findAllVenues(filterVenue, page, size);
+
         return ResponseEntity.ok(venues);
     }
 

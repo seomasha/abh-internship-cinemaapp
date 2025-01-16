@@ -4,11 +4,14 @@ import com.abhinternship.CinemaApp.dto.VenueDTO;
 import com.abhinternship.CinemaApp.dto.VenueUpdateDTO;
 import com.abhinternship.CinemaApp.model.Photo;
 import com.abhinternship.CinemaApp.model.Venue;
+import com.abhinternship.CinemaApp.repository.FilterVenueRepositoryImpl;
 import com.abhinternship.CinemaApp.repository.PhotoRepository;
 import com.abhinternship.CinemaApp.repository.VenueRepository;
+import com.abhinternship.CinemaApp.utils.FilterVenue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,19 +22,19 @@ import java.util.Optional;
 public class VenueServiceImpl implements VenueService {
     private final VenueRepository venueRepository;
     private final PhotoRepository photoRepository;
+    private final FilterVenueRepositoryImpl filterVenueRepository;
 
     @Override
-    public VenueDTO findAllVenues(final int page, final int size) {
-        if (size == 0) {
-            final List<Venue> allVenues = venueRepository.findAll();
-            return new VenueDTO(allVenues, allVenues.size());
-        } else {
-            final Page<Venue> venues = venueRepository.findAll(PageRequest.of(page, size));
-            final long totalSize = venues.getTotalElements();
+    public VenueDTO findAllVenues(final FilterVenue filterVenue, final int page, final int size) {
+        final Pageable pageable = size == 0 ? Pageable.unpaged() : PageRequest.of(page, size);
 
-            return new VenueDTO(venues.getContent(), totalSize);
-        }
+        final Page<Venue> venuePage = filterVenue.isEmpty()
+                ? venueRepository.findAll(pageable)
+                : filterVenueRepository.findVenuesByFilter(filterVenue, pageable);
+
+        return new VenueDTO(venuePage.getContent(), venuePage.getTotalElements());
     }
+
 
     @Override
     public Optional<Venue> findVenueById(final Long id) {

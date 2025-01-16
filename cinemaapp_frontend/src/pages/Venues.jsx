@@ -11,32 +11,55 @@ import { venueService } from "../services/venueService";
 const Venues = () => {
   const [venues, setVenues] = useState({ venues: [], totalSize: 0 });
   const [cities, setCities] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
   const [page, setPage] = useState(0);
   const pageSize = 4;
 
   useEffect(() => {
     const getVenues = async () => {
-      const response = await venueService.getAll(0, pageSize);
+      const response = await venueService.getVenues({
+        page: 0,
+        size: pageSize,
+        ...(searchQuery && { name: searchQuery }),
+        ...(selectedCities.length > 0 && { cities: selectedCities.join(",") }),
+      });
       setVenues({ venues: response.venues, totalSize: response.totalSize });
     };
 
+    getVenues();
+  }, [page, searchQuery, selectedCities]);
+
+  useEffect(() => {
     const getCities = async () => {
       const response = await venueService.getAllCities();
       setCities(response);
     };
 
     getCities();
-    getVenues();
   }, []);
 
   const loadMoreVenues = async () => {
     const nextPage = page + 1;
-    const response = await venueService.getAll(nextPage, pageSize);
+    const response = await venueService.getVenues({
+      page: nextPage,
+      size: pageSize,
+      ...(searchQuery && { name: searchQuery }),
+      ...(selectedCities.length > 0 && { cities: selectedCities.join(",") }),
+    });
     setVenues((prevState) => ({
       ...prevState,
       venues: [...prevState.venues, ...response.venues],
     }));
     setPage(nextPage);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const handleCityChange = (selectedCities) => {
+    setSelectedCities(selectedCities);
   };
 
   return (
@@ -45,9 +68,14 @@ const Venues = () => {
       <h2 className="px-5 pt-5">Venues ({venues.totalSize})</h2>
 
       <div className="d-flex px-5 gap-3">
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
         <div className="mt-3" style={{ width: "15%" }}>
-          <Dropdown icon={CiLocationOn} title="City" options={cities} />
+          <Dropdown
+            icon={CiLocationOn}
+            title="City"
+            options={cities}
+            onChange={handleCityChange}
+          />
         </div>
       </div>
 
