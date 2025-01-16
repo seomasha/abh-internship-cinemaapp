@@ -3,7 +3,7 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
 import Dropdown from "../components/Dropdown";
-import Venue from "../components/Venue";
+import VenueCard from "../components/VenueCard";
 
 import { CiLocationOn } from "react-icons/ci";
 
@@ -22,12 +22,12 @@ const Venues = () => {
 
       <div className="p-5">
         <div className="d-flex gap-3 mx-1">
-          <Venue
+          <VenueCard
             id={1}
             image="https://via.placeholder.com/300"
             title="Cineplexx"
           />
-          <Venue
+          <VenueCard
             id={2}
             image="https://via.placeholder.com/300"
             title="Cineplexx"

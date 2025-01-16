@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const Venue = ({ id, image, title }) => {
+const VenueCard = ({ id, image, title }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -24,4 +24,4 @@ const Venue = ({ id, image, title }) => {
   );
 };
 
-export default Venue;
+export default VenueCard;
