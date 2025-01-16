@@ -26,18 +26,9 @@ public class VenueController {
     public ResponseEntity<VenueDTO> getAllVenues(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String cities) {
+            @RequestParam(required = false) Map<String, String> filters) {
 
-        final Map<String, String> filterParams = new HashMap<>();
-        if (name != null) {
-            filterParams.put("name", name);
-        }
-        if (cities != null) {
-            filterParams.put("cities", cities);
-        }
-
-        final FilterVenue filterVenue = new FilterVenue(filterParams);
+        final FilterVenue filterVenue = (filters == null || filters.isEmpty()) ? FilterVenue.empty() : new FilterVenue(filters);
 
         final VenueDTO venues = venueService.findAllVenues(filterVenue, page, size);
 
