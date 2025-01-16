@@ -33,7 +33,7 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 script {
-                    sh 'docker-compose down || true'
+                    sh 'docker-compose down --remove-orphans || true'
                     sh 'docker-compose up --build -d'
                 }
             }
