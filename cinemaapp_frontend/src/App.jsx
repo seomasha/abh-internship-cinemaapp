@@ -27,6 +27,7 @@ import Checkout from "./pages/Checkout";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Venues from "./pages/Venues";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -52,6 +53,7 @@ function App() {
               />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/profile" element={<UserProfile />} />
+              <Route path="/venues" element={<Venues />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Elements>
