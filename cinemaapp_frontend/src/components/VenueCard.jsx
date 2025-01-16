@@ -10,15 +10,28 @@ const VenueCard = ({ id, image, title }) => {
 
   return (
     <div
-      className="col-6 border rounded-3 shadow-sm pointer"
+      className="col-6 border rounded-4 shadow-sm pointer w-100"
       onClick={handleClick}
     >
-      <img
-        src={image}
-        style={{ width: "100%", borderRadius: "24px" }}
-        height={400}
+      <div
+        style={{
+          width: "100%",
+          height: "400px",
+          overflow: "hidden",
+        }}
         className="p-3"
-      />
+      >
+        <img
+          src={image}
+          alt={title}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            borderRadius: "8px"
+          }}
+        />
+      </div>
       <h5 className="pb-2 px-3">{title}</h5>
     </div>
   );

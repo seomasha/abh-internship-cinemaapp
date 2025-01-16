@@ -39,16 +39,6 @@ const Venues = () => {
     setPage(nextPage);
   };
 
-  const chunkVenues = (venuesArray, chunkSize) => {
-    const chunks = [];
-    for (let i = 0; i < venuesArray.length; i += chunkSize) {
-      chunks.push(venuesArray.slice(i, i + chunkSize));
-    }
-    return chunks;
-  };
-
-  const venueChunks = chunkVenues(venues.venues, 2);
-
   return (
     <div>
       <NavBar />
@@ -62,20 +52,25 @@ const Venues = () => {
       </div>
 
       <div className="p-5">
-        {venueChunks.map((chunk, index) => (
-          <div key={index} className="d-flex gap-3 mx-1 mb-4">
-            {chunk.map((venue) => (
-              <VenueCard
-                key={venue.id}
-                id={venue.id}
-                image={
-                  venue.photoImageId?.url || "https://via.placeholder.com/300"
-                }
-                title={venue.name}
-              />
-            ))}
-          </div>
-        ))}
+        <div
+          className="grid-container"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "1rem",
+          }}
+        >
+          {venues.venues.map((venue) => (
+            <VenueCard
+              key={venue.id}
+              id={venue.id}
+              image={
+                venue.photoImageId?.url || "https://via.placeholder.com/300"
+              }
+              title={venue.name}
+            />
+          ))}
+        </div>
       </div>
 
       {venues.totalSize > venues.venues.length && (
