@@ -23,21 +23,23 @@ public class FilterVenueRepositoryImpl implements FilterVenueRepository {
     }
 
     @Override
-    public Page<Venue> findVenuesByFilter(final FilterVenue filter, final Pageable pageable) {
-        final String baseQuery = "SELECT v FROM Venue v";
+    public Page<Venue> findVenuesByFilter(FilterVenue filter, Pageable pageable) {
+        String query = "SELECT v FROM Venue v";
 
         final Map<String, Object> parameters = new HashMap<>();
-        final String filterQuery = filter.toQueryString(parameters);
+        String filterQuery = filter.toQueryString(parameters);
 
-        final String finalQuery = filterQuery.isEmpty() ? baseQuery : baseQuery + " WHERE " + filterQuery;
+        if (!filterQuery.isEmpty()) {
+            query += " WHERE " + filterQuery;
+        }
 
-        final Query query = entityManager.createQuery(finalQuery, Venue.class);
-        parameters.forEach(query::setParameter);
+        final Query queryObj = entityManager.createQuery(query, Venue.class);
+        parameters.forEach(queryObj::setParameter);
 
-        query.setFirstResult((int) pageable.getOffset());
-        query.setMaxResults(pageable.getPageSize());
+        queryObj.setFirstResult((int) pageable.getOffset());
+        queryObj.setMaxResults(pageable.getPageSize());
 
-        final List<Venue> venues = query.getResultList();
+        final List<Venue> venues = queryObj.getResultList();
 
         final Query countQuery = entityManager.createQuery(
                 "SELECT COUNT(v) FROM Venue v" + (filterQuery.isEmpty() ? "" : " WHERE " + filterQuery)

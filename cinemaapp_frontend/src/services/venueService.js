@@ -9,8 +9,7 @@ export const venueService = {
   getVenues: async ({ page = 0, size = 4, ...filters } = {}) => {
     const params = { page, size, ...filters };
 
-    const response = await request(`${VENUE_ENDPOINT}`, { params });
-    return response;
+    return await request(`${VENUE_ENDPOINT}`, { params });
   },
   getAllCities: async () => {
     const response = await request(`${VENUE_ENDPOINT}/cities`);
