@@ -22,6 +22,7 @@ pipeline {
                     cd cinemaapp_frontend
                     echo "VITE_BACKEND_URL=http://63.176.2.136:8083" > .env
                     echo "VITE_API_PATH=/api/v1" >> .env
+                    echo "VITE_OMDB_URL=http://www.omdbapi.com/" >> .env
                     echo "VITE_OMDB_API_KEY=${TEAM1_OMDB_API_KEY}" >> .env
                     echo "VITE_STRIPE_PK=${TEAM1_STRIPE_PK}" >> .env
                     echo "VITE_EXCHANGE_RATE_URL=https://v6.exchangerate-api.com/v6/" >> .env
