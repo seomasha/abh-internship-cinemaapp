@@ -103,7 +103,7 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(frontendUrl, productionUrl, productionNumericUrl));
+        config.setAllowedOrigins(List.of(frontendUrl, productionUrl, productionNumericUrl, "http://team1.frontend.praksa.abhapp.com"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
