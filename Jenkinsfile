@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main',
+                git branch: 'dev',
                     credentialsId: 'gh-token3',
                     url: 'https://github.com/seomasha/abh-internship-cinemaapp.git'
             }
