@@ -27,7 +27,7 @@ public class FilterVenueRepositoryImpl implements FilterVenueRepository {
         String query = "SELECT v FROM Venue v";
 
         final Map<String, Object> parameters = new HashMap<>();
-        String filterQuery = filter.toQueryString(parameters);
+        final String filterQuery = filter.toQueryString(parameters);
 
         if (!filterQuery.isEmpty()) {
             query += " WHERE " + filterQuery;
