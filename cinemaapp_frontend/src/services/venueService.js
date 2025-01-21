@@ -6,6 +6,11 @@ const venueApiService = apiService(VENUE_ENDPOINT);
 
 export const venueService = {
   ...venueApiService,
+  getVenues: async ({ page = 0, size = 4, ...filters } = {}) => {
+    const params = { page, size, ...filters };
+
+    return await request(`${VENUE_ENDPOINT}`, { params });
+  },
   getAllCities: async () => {
     const response = await request(`${VENUE_ENDPOINT}/cities`);
     return response;

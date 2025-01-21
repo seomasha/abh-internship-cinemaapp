@@ -2,6 +2,7 @@ package com.abhinternship.CinemaApp.service;
 
 import com.abhinternship.CinemaApp.dto.ProjectionDTO;
 import com.abhinternship.CinemaApp.model.Projection;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -17,4 +18,5 @@ public interface ProjectionService {
             String movieName, String city, String venueName);
     Optional<Projection> findProjectionByMovieIdAndVenueId(Long movieId, Long venueId);
     List<Projection> findProjectionByMovieId(Long movieId);
+    Page<Projection> findProjectionsByVenueId(Long venueId, Long page, Long size);
 }

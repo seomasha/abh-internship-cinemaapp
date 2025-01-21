@@ -12,6 +12,7 @@ import com.abhinternship.CinemaApp.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -90,4 +91,11 @@ public class ProjectionServiceImpl implements ProjectionService {
     public List<Projection> findProjectionByMovieId(final Long movieId) {
         return projectionRepository.findByMovieId_Id(movieId);
     }
+
+    @Override
+    public Page<Projection> findProjectionsByVenueId(final Long venueId, final Long page, final Long size) {
+        final Pageable pageable = PageRequest.of(page.intValue(), size.intValue());
+        return projectionRepository.findByVenueId_Id(venueId, pageable);
+    }
+
 }

@@ -32,6 +32,12 @@ export const projectionService = {
     const response = await request(`${PROJECTION_ENDPOINT}/movie/${movieId}`);
     return response;
   },
+  getProjectionsByVenueId: async (venueId, page = 0, size = 4) => {
+    const response = await request(
+      `${PROJECTION_ENDPOINT}/venue/${venueId}?page=${page}&size=${size}`
+    );
+    return response;
+  },
   deleteProjection: async (projectionId) => {
     const response = await request(`${PROJECTION_ENDPOINT}/${projectionId}`, {
       method: "DELETE",
