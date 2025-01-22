@@ -6,6 +6,7 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import "../styles/Navbar.css";
 import AuthForm from "./AuthForm";
 import { useNavBar } from "../context/NavBarContext";
+import { FaRegBell } from "react-icons/fa";
 
 const NavBar = ({ state }) => {
   const [email, setEmail] = useState("");
@@ -98,26 +99,38 @@ const NavBar = ({ state }) => {
 
       <Navbar.Collapse className="justify-content-end">
         {isLoggedIn ? (
-          <Dropdown>
-            <Dropdown.Toggle
-              variant="outline-light"
-              id="dropdown-basic"
-              className="px-4 py-2"
-            >
-              {emailPrefix} <span className="caret"></span>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => navigate("/profile")}>
-                Profile
-              </Dropdown.Item>
-              {role === "admin" && (
-                <Dropdown.Item onClick={navigateToAdminPanel}>
-                  Admin
+          <div className="d-flex gap-3">
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-light"
+                className="bell-container rounded-3 position-relative"
+                id="notification-dropdown"
+              >
+                <FaRegBell size={18} />
+                <div className="notification-badge"></div>
+              </Dropdown.Toggle>
+            </Dropdown>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-light"
+                id="dropdown-basic"
+                className="px-4 py-2"
+              >
+                {emailPrefix} <span className="caret"></span>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => navigate("/profile")}>
+                  Profile
                 </Dropdown.Item>
-              )}
-              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+                {role === "admin" && (
+                  <Dropdown.Item onClick={navigateToAdminPanel}>
+                    Admin
+                  </Dropdown.Item>
+                )}
+                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         ) : (
           <Button
             variant="outline-light"

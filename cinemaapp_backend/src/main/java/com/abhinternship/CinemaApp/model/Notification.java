@@ -1,5 +1,6 @@
 package com.abhinternship.CinemaApp.model;
 
+import com.abhinternship.CinemaApp.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,4 +22,13 @@ public class Notification {
     private Movie movieId;
 
     private LocalDateTime createdAt;
+
+    private String message;
+
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+
+    private boolean isRead = false;
+
+    private LocalDateTime expiresAt;
 }

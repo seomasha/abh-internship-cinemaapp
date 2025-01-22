@@ -65,3 +65,25 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+#notification-dropdown::after {
+  display: none;
+}
+
+#notification-dropdown {
+  border-color: #344054;
+}
+
+.bell-container {
+  padding: 8px 12px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: red;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
@@ -30,9 +30,23 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Venues from "./pages/Venues";
 import Venue from "./pages/Venue";
 
+import socket from "./utils/socket";
+import ToastService from "./services/toastService";
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
 function App() {
+  useEffect(() => {
+    socket.on("/topic/notifications", (data) => {
+      console.log("Received notification: ", data);
+
+      return () => {
+        socket.disconnect();
+        socket.off("/topic/notifications");
+      };
+    });
+  }, []);
+
   return (
     <div className="main-font primary-background">
       <Router>

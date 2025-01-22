@@ -1778,7 +1778,6 @@ const AdminPanel = () => {
                 )}
               </>
             )}
-            {console.log(selectedVenue)}
             {currentFlow === "seeVenue" && (
               <>
                 <div className="d-flex justify-content-between border-bottom pb-4">
