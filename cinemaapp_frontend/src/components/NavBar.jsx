@@ -7,6 +7,8 @@ import "../styles/Navbar.css";
 import AuthForm from "./AuthForm";
 import { useNavBar } from "../context/NavBarContext";
 import { FaRegBell } from "react-icons/fa";
+import { notificationService } from "../services/notificationService";
+import Notification from "./Notification";
 
 const NavBar = ({ state }) => {
   const [email, setEmail] = useState("");
@@ -16,6 +18,7 @@ const NavBar = ({ state }) => {
   const [confirmChangedPassword, setConfirmChangedPassword] = useState("");
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
+  const [notifications, setNotifications] = useState([]);
 
   const {
     showSignIn,
@@ -33,6 +36,17 @@ const NavBar = ({ state }) => {
     { id: 2, path: "/upcoming", label: "Upcoming movies" },
     { id: 3, path: "/venues", label: "Venues" },
   ];
+
+  useEffect(() => {
+    const getNotifications = async () => {
+      const response = await notificationService.getNotificationsByUserId(
+        localStorage.getItem("userId")
+      );
+      setNotifications(response);
+    };
+
+    getNotifications();
+  }, []);
 
   useEffect(() => {
     if (showSignIn) {
@@ -107,8 +121,43 @@ const NavBar = ({ state }) => {
                 id="notification-dropdown"
               >
                 <FaRegBell size={18} />
-                <div className="notification-badge"></div>
+                {notifications.some((notif) => !notif.read) && (
+                  <div className="notification-badge"></div>
+                )}
               </Dropdown.Toggle>
+              <Dropdown.Menu className="notification-dropdown dropdown-menu-end">
+                {notifications.length > 0 ? (
+                  notifications.map((notif, index) => (
+                    <Dropdown.Item
+                      key={notif.id}
+                      className="notification-item"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Notification id={notif.id} notif={notif} />
+                    </Dropdown.Item>
+                  ))
+                ) : (
+                  <Dropdown.Item>No new notifications</Dropdown.Item>
+                )}
+                <div className="d-flex justify-content-evenly align-items-center">
+                  <p
+                    style={{ fontSize: "12px" }}
+                    className={`text-center primary-red text-decoration-underline fw-bold pt-4 pointer mt-1 ${
+                      notifications.length === 0 ? "disabled" : ""
+                    }`}
+                    onClick={() => {
+                      if (notifications.length > 0) {
+                        notificationService.clearAllNotifications(
+                          localStorage.getItem("userId")
+                        );
+                        window.location.reload();
+                      }
+                    }}
+                  >
+                    Clear all notifications
+                  </p>
+                </div>
+              </Dropdown.Menu>
             </Dropdown>
             <Dropdown>
               <Dropdown.Toggle

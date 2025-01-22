@@ -53,4 +53,15 @@ public class EmailService {
         message.setText("Your payment is successful.");
         mailSender.send(message);
     }
+
+    @Async
+    public void sendEmail(final String to, final String subject, final String text) {
+        final SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(to);
+        message.setFrom(sender);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
+    }
 }

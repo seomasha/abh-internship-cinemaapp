@@ -22,4 +22,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findUpcomingMoviesByUserId(@Param("userId") Long userId);
     @Query("SELECT t FROM Ticket t WHERE t.userId.id = :userId AND t.date < CURRENT_DATE")
     List<Ticket> findExpiredMoviesByUserId(@Param("userId") Long userId);
+    List<Ticket> findByProjectionId_Id(Long projectionId);
 }

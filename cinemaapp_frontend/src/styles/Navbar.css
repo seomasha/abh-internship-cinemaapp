@@ -74,6 +74,11 @@
   border-color: #344054;
 }
 
+.notification-item:active {
+  background-color: #b22222 !important;
+  color: white;
+}
+
 .bell-container {
   padding: 8px 12px;
 }
@@ -86,4 +91,9 @@
   height: 10px;
   border-radius: 50%;
   background-color: red;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }
