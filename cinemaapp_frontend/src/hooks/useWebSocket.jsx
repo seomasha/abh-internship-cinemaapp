@@ -7,12 +7,10 @@ const useWebSocket = () => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const sockJS = new SockJS("http://localhost:8080/ws");
+    const sockJS = new SockJS(`${import.meta.env.VITE_BACKEND_URL}/ws`);
     const stompClient = Stomp.over(sockJS);
 
     stompClient.connect({}, () => {
-      console.log("Connected to WebSocket");
-
       stompClient.subscribe("/topic/notifications", (message) => {
         const notification = JSON.parse(message.body);
         setNotifications((prevNotifications) => [
