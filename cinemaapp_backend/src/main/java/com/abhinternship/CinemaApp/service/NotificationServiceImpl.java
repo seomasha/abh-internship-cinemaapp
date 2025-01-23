@@ -3,6 +3,7 @@ package com.abhinternship.CinemaApp.service;
 import com.abhinternship.CinemaApp.model.Notification;
 import com.abhinternship.CinemaApp.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
