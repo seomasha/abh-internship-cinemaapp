@@ -16,7 +16,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<Notification> findAllByUserId(final Long userId) {
-        return notificationRepository.findAllByUserId_Id(userId);
+        return notificationRepository.findByUserId_IdOrderByIsReadAsc(userId);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void clearNotifications(final Long id) {
-        List<Notification> notifications = notificationRepository.findAllByUserId_Id(id);
+        List<Notification> notifications = notificationRepository.findByUserId_IdOrderByIsReadAsc(id);
         notificationRepository.deleteAll(notifications);
     }
 }

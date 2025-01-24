@@ -7,35 +7,25 @@ const useWebSocket = () => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const sockJS = new SockJS(`${import.meta.env.VITE_BACKEND_URL}/ws`);
+    const sockJS = new SockJS(
+      `${import.meta.env.VITE_BACKEND_URL}${import.meta.env.VITE_API_PATH}/ws`
+    );
     const stompClient = Stomp.over(sockJS);
 
-    stompClient.connect({}, () => {
+    stompClient.connect({}, (frame) => {
       stompClient.subscribe("/topic/notifications", (message) => {
-        const notification = JSON.parse(message.body);
+        const newNotification = JSON.parse(message.body);
         setNotifications((prevNotifications) => [
           ...prevNotifications,
-          notification,
+          newNotification,
         ]);
       });
     });
 
     setClient(stompClient);
-
-    return () => {
-      if (client) {
-        client.disconnect();
-      }
-    };
   }, []);
 
-  const sendNotification = (notification) => {
-    if (client) {
-      client.send("/app/send-notification", {}, JSON.stringify(notification));
-    }
-  };
-
-  return { notifications, sendNotification };
+  return { notifications };
 };
 
 export default useWebSocket;

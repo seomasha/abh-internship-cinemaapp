@@ -17,10 +17,6 @@ public class Notification {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User userId;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", referencedColumnName = "id")
-    private Movie movieId;
-
     private LocalDateTime createdAt;
 
     private String message;

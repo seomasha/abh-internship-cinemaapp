@@ -77,9 +77,10 @@ public class TicketServiceImpl implements TicketService {
 
         final Notification notification = new Notification();
         notification.setUserId(user);
-        notification.setMovieId(projection.getMovieId());
         notification.setCreatedAt(LocalDateTime.now());
-        notification.setMessage("Your payment was successful.");
+        notification.setMessage("Your payment for the movie " +
+                projection.getMovieId().getName() +
+                " was successful.");
         notification.setType(NotificationType.PAYMENT_CONFIRMATION);
 
         webSocketService.sendNotification(user.getEmail(), notification);
@@ -132,38 +133,28 @@ public class TicketServiceImpl implements TicketService {
         for (Projection projection : upcomingProjections) {
             final List<Ticket> tickets = ticketRepository.findByProjectionId_Id(projection.getId());
 
-            Set<User> notifiedUsers = new HashSet<>();
-
             for (Ticket ticket : tickets) {
                 if (!ticket.getDate().isEqual(today)) {
                     continue;
                 }
 
                 final User user = ticket.getUserId();
+                final Movie movie = projection.getMovieId();
 
-                if (!notifiedUsers.contains(user)) {
-                    final Movie movie = projection.getMovieId();
+                final Notification notification = new Notification();
+                notification.setUserId(user);
+                notification.setCreatedAt(LocalDateTime.now());
+                notification.setMessage("Reminder: Your movie '" + movie.getName() + "' starts in 1 minute!");
+                notification.setType(NotificationType.EVENT_REMINDER);
 
-                    final Notification notification = new Notification();
-                    notification.setUserId(user);
-                    notification.setMovieId(movie);
-                    notification.setCreatedAt(LocalDateTime.now());
-                    notification.setMessage("Reminder: Your movie '" + movie.getName() + "' starts in 1 minute!");
-                    notification.setType(NotificationType.EVENT_REMINDER);
-                    notification.setRead(false);
+                webSocketService.sendNotification(user.getEmail(), notification);
 
-                    webSocketService.sendNotification(user.getEmail(), notification);
-
-                    final String emailSubject = "Movie Reminder: " + movie.getName();
-                    final String emailBody = "Hi " + user.getFirstName() + ",\n\n" +
-                            "This is a reminder that your movie '" + movie.getName() + "' is starting in 1 minute at " +
-                            projection.getVenueId().getName() + ".\n\nEnjoy the show!";
-                    emailService.sendEmail(user.getEmail(), emailSubject, emailBody);
-
-                    notifiedUsers.add(user);
-                }
+                final String emailSubject = "Movie Reminder: " + movie.getName();
+                final String emailBody = "Hi " + user.getFirstName() + ",\n\n" +
+                        "This is a reminder that your movie '" + movie.getName() + "' is starting in 1 minute at " +
+                        projection.getVenueId().getName() + ".\n\nEnjoy the show!";
+                emailService.sendEmail(user.getEmail(), emailSubject, emailBody);
             }
         }
     }
-
 }

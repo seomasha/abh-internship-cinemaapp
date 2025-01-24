@@ -9,6 +9,7 @@ import { useNavBar } from "../context/NavBarContext";
 import { FaRegBell } from "react-icons/fa";
 import { notificationService } from "../services/notificationService";
 import Notification from "./Notification";
+import useWebSocket from "../hooks/useWebSocket";
 
 const NavBar = ({ state }) => {
   const [email, setEmail] = useState("");
@@ -19,6 +20,7 @@ const NavBar = ({ state }) => {
   const [currentFlow, setCurrentFlow] = useState("signIn");
   const [passwordResetStep, setPasswordResetStep] = useState(1);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const {
     showSignIn,
@@ -30,6 +32,8 @@ const NavBar = ({ state }) => {
   } = useNavBar();
 
   const navigate = useNavigate();
+
+  const { notifications: liveNotifications } = useWebSocket();
 
   const navTabs = [
     { id: 1, path: "/currently-showing", label: "Currently showing" },
@@ -49,6 +53,24 @@ const NavBar = ({ state }) => {
   }, []);
 
   useEffect(() => {
+    if (liveNotifications && liveNotifications.length > 0) {
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        ...liveNotifications,
+      ]);
+    }
+  }, [liveNotifications]);
+
+  useEffect(() => {
+    const calculateUnreadCount = () => {
+      const unread = notifications.filter((notif) => !notif.read).length;
+      setUnreadCount(unread);
+    };
+
+    calculateUnreadCount();
+  }, [notifications]);
+
+  useEffect(() => {
     if (showSignIn) {
       document.body.style.overflow = "hidden";
     } else {
@@ -61,6 +83,16 @@ const NavBar = ({ state }) => {
 
   const navigateToAdminPanel = () => {
     navigate("/admin");
+  };
+
+  const markAsRead = (notifId) => {
+    const updatedNotifications = notifications.map((notif) =>
+      notif.id === notifId ? { ...notif, read: true } : notif
+    );
+    setNotifications(updatedNotifications);
+
+    const unread = updatedNotifications.filter((notif) => !notif.read).length;
+    setUnreadCount(unread);
   };
 
   return (
@@ -121,9 +153,7 @@ const NavBar = ({ state }) => {
                 id="notification-dropdown"
               >
                 <FaRegBell size={18} />
-                {notifications.some((notif) => !notif.read) && (
-                  <div className="notification-badge"></div>
-                )}
+                {unreadCount > 0 && <div className="notification-badge"></div>}
               </Dropdown.Toggle>
               <Dropdown.Menu className="notification-dropdown dropdown-menu-end">
                 {notifications.length > 0 ? (
@@ -133,7 +163,11 @@ const NavBar = ({ state }) => {
                       className="notification-item"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Notification id={notif.id} notif={notif} />
+                      <Notification
+                        id={notif.id}
+                        notif={notif}
+                        markAsRead={markAsRead}
+                      />
                     </Dropdown.Item>
                   ))
                 ) : (
@@ -150,7 +184,8 @@ const NavBar = ({ state }) => {
                         notificationService.clearAllNotifications(
                           localStorage.getItem("userId")
                         );
-                        window.location.reload();
+                        setNotifications([]);
+                        setUnreadCount(0);
                       }
                     }}
                   >
