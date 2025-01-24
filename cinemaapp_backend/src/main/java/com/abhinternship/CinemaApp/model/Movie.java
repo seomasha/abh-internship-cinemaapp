@@ -36,7 +36,7 @@ public class Movie {
 
     private LocalDate projectionEndDate;
 
-    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
             name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -44,7 +44,7 @@ public class Movie {
     )
     private Set<Genre> genres;
 
-    @OneToMany(mappedBy = "entityId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "entityId", cascade = CascadeType.ALL)
     private List<Photo> photos;
 
     private String status;
