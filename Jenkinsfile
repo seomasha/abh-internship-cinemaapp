@@ -20,7 +20,7 @@ pipeline {
                 script {
                     sh '''
                     cd cinemaapp_frontend
-                    echo "VITE_BACKEND_URL=https://63.176.2.136:8083" > .env
+                    echo "VITE_BACKEND_URL=https://team1.backend.praksa.abhapp.com" > .env
                     echo "VITE_API_PATH=/api/v1" >> .env
                     echo "VITE_OMDB_API_KEY=${TEAM1_OMDB_API_KEY}" >> .env
                     echo "VITE_STRIPE_PK=${TEAM1_STRIPE_PK}" >> .env
