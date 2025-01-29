@@ -41,7 +41,7 @@ services:
       MINIO_ACCESSKEY: minioadmin
       MINIO_SECRETKEY: minioadmin
       MINIO_URL: http://127.0.0.1:9001/api/v1/buckets/
-      PROD_URL: http://team1.frontend.praksa.abhapp.com
+      PROD_URL: https://team1.frontend.praksa.abhapp.com
       PROD_NUMERIC_URL: http://63.176.2.136:8086 
     depends_on:
       postgres:
