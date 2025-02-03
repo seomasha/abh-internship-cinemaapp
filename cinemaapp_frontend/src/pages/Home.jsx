@@ -76,6 +76,7 @@ const Home = () => {
 
     fetchCurrentlyShowingMovies();
     fetchUpcomingMovies();
+    setLoading(false);
   }, [currentlyShowingPage, upcomingPage, heroMoviesSet, selectedVenueId]);
 
   useEffect(() => {
@@ -107,15 +108,6 @@ const Home = () => {
     fetchAndProcessCurrentlyShowing();
     fetchAndProcessUpcomingMovies();
   }, [selectedVenueId, currentlyShowingPage, upcomingPage]);
-
-  useEffect(() => {
-    if (
-      currentlyShowingMovies.movies.length > 0 &&
-      upcomingMovies.movies.length > 0
-    ) {
-      setLoading(false);
-    }
-  }, [currentlyShowingMovies, upcomingMovies]);
 
   const handleCurrentlyShowingPageChange = (newPage) => {
     setCurrentlyShowingPage(newPage);
