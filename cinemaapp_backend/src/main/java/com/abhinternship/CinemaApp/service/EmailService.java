@@ -30,14 +30,9 @@ public class EmailService {
     @Async
     public String sendOTPEmail(final String to, final String subject) {
         final String generatedOtp = generateOtp();
+        final String text = "Your OTP password is: " + generatedOtp;
 
-        final SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setFrom(sender);
-        message.setSubject(subject);
-        message.setText("Your OTP password is: " + generatedOtp);
-        mailSender.send(message);
-
+        sendEmail(to, subject, text);
         otpService.saveOtp(to, generatedOtp);
 
         return generatedOtp;
@@ -45,12 +40,18 @@ public class EmailService {
 
     @Async
     public void sendPaymentMail(final String to, final String subject) {
+        final String text = "Your payment is successful.";
+        sendEmail(to, subject, text);
+    }
+
+    @Async
+    public void sendEmail(final String to, final String subject, final String text) {
         final SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(to);
         message.setFrom(sender);
         message.setSubject(subject);
-        message.setText("Your payment is successful.");
+        message.setText(text);
         mailSender.send(message);
     }
 }
